@@ -1,0 +1,6 @@
+{
+  "name": "Metemphysics Synthesis AI",
+  "description": "An interactive mathematical, thermodynamics, and consciousness workspace mapping T x S = C relationships under the Unified Synthesis AI Singularity.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
