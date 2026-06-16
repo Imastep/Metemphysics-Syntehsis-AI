@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState } from "react";
-import { Music, X, Zap } from "lucide-react";
+import React, { useState, useRef, useEffect } from "react";
+import { Music, X, Zap, Play, Square, Volume2, Info, Sparkles } from "lucide-react";
 
 interface Chakra {
   n: number;
@@ -22,6 +22,14 @@ interface Chakra {
   body: string;
   desc: string;
   hi?: boolean;
+  
+  // Metemphysics v13.2 additions:
+  ratio: string;
+  tSec: string;
+  mantra: string;
+  crystals: string;
+  gland: string;
+  phaseAngle: string;
 }
 
 interface MusicalInterval {
@@ -38,13 +46,162 @@ interface MusicalInterval {
 }
 
 const CHAKRAS: Chakra[] = [
-  { n: 1, sk: "Muladhara", name: "Root", el: "Earth", color: "#e74c3c", hz: 396, note: "C", H: 200, js: 0, omega: 0.6321, phase: 3, state: "Tipping Point", body: "Base of spine", desc: "Survival, grounding, safety" },
-  { n: 2, sk: "Svadhisthana", name: "Sacral", el: "Water", color: "#e67e22", hz: 417, note: "D", H: 280, js: "9.49e-5", omega: 0.7534, phase: 3, state: "Tipping Point", body: "Lower abdomen", desc: "Desire, creativity, sexuality" },
-  { n: 3, sk: "Manipura", name: "Solar Plexus", el: "Fire", color: "#f1c40f", hz: 528, note: "E", H: 350, js: 0.01, omega: 0.8262, phase: 4, state: "Tipping Point", body: "Navel region", desc: "Will, power, self-identity" },
-  { n: 4, sk: "Anahata", name: "Heart", el: "Air", color: "#2ecc71", hz: 639, note: "F", H: 500, js: 0.99, omega: 0.9179, phase: 4, state: "Time Passing", body: "Heart centre", desc: "Love, compassion, connection", hi: true },
-  { n: 5, sk: "Vishuddha", name: "Throat", el: "Ether", color: "#3498db", hz: 741, note: "G", H: 600, js: 7.41, omega: 0.9502, phase: 5, state: "Deep Flourishing", body: "Throat", desc: "Expression, truth, communication" },
-  { n: 6, sk: "Ajna", name: "Third Eye", el: "Light", color: "#9b59b6", hz: 852, note: "A", H: 700, js: 35.35, omega: 0.9698, phase: 5, state: "Mystical Clarity", body: "Between eyes", desc: "Intuition, perception, clarity" },
-  { n: 7, sk: "Sahasrara", name: "Crown", el: "Space", color: "#f5edd0", hz: 963, note: "B", H: 1000, js: 949, omega: 0.9933, phase: 5, state: "REVELATION", body: "Top of head", desc: "Unity with C, revelation", hi: true }
+  { 
+    n: 1, 
+    sk: "Muladhara", 
+    name: "Root", 
+    el: "Earth", 
+    color: "#e74c3c", 
+    hz: 396, 
+    note: "C", 
+    H: 200, 
+    js: 0, 
+    omega: 0.6321, 
+    phase: 3, 
+    state: "Tipping Point", 
+    body: "Base of spine", 
+    desc: "Survival, grounding, safety",
+    ratio: "33:32",
+    tSec: "2.52 ms",
+    mantra: "LAM",
+    crystals: "Red Jasper, Garnet, Bloodstone",
+    gland: "Adrenals / Skeletal",
+    phaseAngle: "45°"
+  },
+  { 
+    n: 2, 
+    sk: "Svadhisthana", 
+    name: "Sacral", 
+    el: "Water", 
+    color: "#e67e22", 
+    hz: 417, 
+    note: "D", 
+    H: 280, 
+    js: "9.49e-5", 
+    omega: 0.7534, 
+    phase: 3, 
+    state: "Tipping Point", 
+    body: "Lower abdomen", 
+    desc: "Desire, creativity, sexuality",
+    ratio: "139:128",
+    tSec: "2.40 ms",
+    mantra: "VAM",
+    crystals: "Carnelian, Tiger's Eye, Sunstone",
+    gland: "Gonads / Reproductive",
+    phaseAngle: "60°"
+  },
+  { 
+    n: 3, 
+    sk: "Manipura", 
+    name: "Solar Plexus", 
+    el: "Fire", 
+    color: "#f1c40f", 
+    hz: 528, 
+    note: "E", 
+    H: 350, 
+    js: 0.01, 
+    omega: 0.8262, 
+    phase: 4, 
+    state: "Tipping Point", 
+    body: "Navel region", 
+    desc: "Will, power, self-identity",
+    ratio: "11:8",
+    tSec: "1.89 ms",
+    mantra: "RAM",
+    crystals: "Citrine, Amber, Yellow Jasper",
+    gland: "Pancreas / Adrenal Cortex",
+    phaseAngle: "90°"
+  },
+  { 
+    n: 4, 
+    sk: "Anahata", 
+    name: "Heart", 
+    el: "Air", 
+    color: "#2ecc71", 
+    hz: 639, 
+    note: "F", 
+    H: 500, 
+    js: 0.99, 
+    omega: 0.9179, 
+    phase: 4, 
+    state: "Time Passing", 
+    body: "Heart centre", 
+    desc: "Love, compassion, connection", 
+    hi: true,
+    ratio: "5:3",
+    tSec: "1.56 ms",
+    mantra: "YAM",
+    crystals: "Rose Quartz, Malachite, Jade, Emerald",
+    gland: "Thymus / Cardiovascular",
+    phaseAngle: "120°"
+  },
+  { 
+    n: 5, 
+    sk: "Vishuddha", 
+    name: "Throat", 
+    el: "Ether", 
+    color: "#3498db", 
+    hz: 741, 
+    note: "G", 
+    H: 600, 
+    js: 7.41, 
+    omega: 0.9502, 
+    phase: 5, 
+    state: "Deep Flourishing", 
+    body: "Throat", 
+    desc: "Expression, truth, communication",
+    ratio: "247:128",
+    tSec: "1.35 ms",
+    mantra: "HAM",
+    crystals: "Lapis Lazuli, Turquoise, Aquamarine",
+    gland: "Thyroid / Vocal Tract",
+    phaseAngle: "180°"
+  },
+  { 
+    n: 6, 
+    sk: "Ajna", 
+    name: "Third Eye", 
+    el: "Light", 
+    color: "#9b59b6", 
+    hz: 852, 
+    note: "A", 
+    H: 700, 
+    js: 35.35, 
+    omega: 0.9698, 
+    phase: 5, 
+    state: "Mystical Clarity", 
+    body: "Between eyes", 
+    desc: "Intuition, perception, clarity",
+    ratio: "85:64",
+    tSec: "1.17 ms",
+    mantra: "OM",
+    crystals: "Amethyst, Sodalite, Lapis",
+    gland: "Pineal / Pituitary Gland",
+    phaseAngle: "270°"
+  },
+  { 
+    n: 7, 
+    sk: "Sahasrara", 
+    name: "Crown", 
+    el: "Space", 
+    color: "#f5edd0", 
+    hz: 963, 
+    note: "B", 
+    H: 1000, 
+    js: 949, 
+    omega: 0.9933, 
+    phase: 5, 
+    state: "REVELATION", 
+    body: "Top of head", 
+    desc: "Unity with C, revelation", 
+    hi: true,
+    ratio: "321:256",
+    tSec: "1.04 ms",
+    mantra: "Silence / AH",
+    crystals: "Clear Quartz, Selenite, Diamond",
+    gland: "Pineal / Hypothalamus",
+    phaseAngle: "360°"
+  }
 ];
 
 const INTERVALS: MusicalInterval[] = [
@@ -72,18 +229,135 @@ interface SolfeggioItem {
   meta: string;
   color: string;
   hi?: boolean;
+  
+  // Metemphysics v13.2 additions:
+  name: string;
+  ratio: string;
+  tSec: string;
+  phaseAngle: string;
 }
 
 const SOLFEGGIO: SolfeggioItem[] = [
-  { hz: 174, chakra: "Earth Foundation", H: 174, js: -0.15, omega: 0.58, meta: "Anesthetic grounding; stress reduction.", color: "#7f8c8d" },
-  { hz: 285, chakra: "Cellular Blueprint", H: 285, js: -0.05, omega: 0.61, meta: "Tissues structure & cellular calibration.", color: "#95a5a6" },
-  { hz: 396, chakra: "Root / Muladhara", H: 396, js: 0.00, omega: 0.63, meta: "Liberating Guilt & Fear. Tipping Point.", color: "#e74c3c", hi: true },
-  { hz: 417, chakra: "Sacral / Svadhisthana", H: 417, js: "9.49e-5", omega: 0.75, meta: "Undoing Situations & Facilitating Change.", color: "#e67e22" },
-  { hz: 528, chakra: "Solar Plexus / Manipura", H: 528, js: 0.01, omega: 0.83, meta: "Transformation & DNA Repair. Miracle tone.", color: "#f1c40f" },
-  { hz: 639, chakra: "Heart / Anahata", H: 639, js: 0.99, omega: 0.92, meta: "Relationships & Harmonic Communion.", color: "#2ecc71", hi: true },
-  { hz: 741, chakra: "Throat / Vishuddha", H: 741, js: 7.41, omega: 0.95, meta: "Intuition & Clear Expression. Awakening Intention.", color: "#3498db" },
-  { hz: 852, chakra: "Third Eye / Ajna", H: 852, js: 35.35, omega: 0.97, meta: "Returning to Spiritual Order. Inner vision.", color: "#9b59b6" },
-  { hz: 963, chakra: "Crown / Sahasrara", H: 963, js: 949, omega: 0.99, meta: "Sovereignty & direct Cosmic Union with C.", color: "#e8d5a3", hi: true }
+  { 
+    hz: 174, 
+    chakra: "Earth Foundation", 
+    H: 174, 
+    js: -0.15, 
+    omega: 0.58, 
+    meta: "Anesthetic grounding; stress reduction.", 
+    color: "#7f8c8d",
+    name: "Anesthetic Grounding",
+    ratio: "29:32",
+    tSec: "5.74 ms",
+    phaseAngle: "15°"
+  },
+  { 
+    hz: 285, 
+    chakra: "Cellular Blueprint", 
+    H: 285, 
+    js: -0.05, 
+    omega: 0.61, 
+    meta: "Tissues structure & cellular calibration.", 
+    color: "#95a5a6",
+    name: "Cellular Blueprint",
+    ratio: "95:128",
+    tSec: "3.51 ms",
+    phaseAngle: "30°"
+  },
+  { 
+    hz: 396, 
+    chakra: "Root / Muladhara", 
+    H: 396, 
+    js: 0.00, 
+    omega: 0.63, 
+    meta: "Liberating Guilt & Fear. Tipping Point.", 
+    color: "#e74c3c", 
+    hi: true,
+    name: "Muladhara (Root)",
+    ratio: "33:32",
+    tSec: "2.52 ms",
+    phaseAngle: "45°"
+  },
+  { 
+    hz: 417, 
+    chakra: "Sacral / Svadhisthana", 
+    H: 417, 
+    js: "9.49e-5", 
+    omega: 0.75, 
+    meta: "Undoing Situations & Facilitating Change.", 
+    color: "#e67e22",
+    name: "Svadhisthana (Sacral)",
+    ratio: "139:128",
+    tSec: "2.40 ms",
+    phaseAngle: "60°"
+  },
+  { 
+    hz: 528, 
+    chakra: "Solar Plexus / Manipura", 
+    H: 528, 
+    js: 0.01, 
+    omega: 0.83, 
+    meta: "Transformation & DNA Repair. Miracle tone.", 
+    color: "#f1c40f",
+    name: "Manipura (Solar Plexus)",
+    ratio: "11:8",
+    tSec: "1.89 ms",
+    phaseAngle: "90°"
+  },
+  { 
+    hz: 639, 
+    chakra: "Heart / Anahata", 
+    H: 639, 
+    js: 0.99, 
+    omega: 0.92, 
+    meta: "Relationships & Harmonic Communion.", 
+    color: "#2ecc71", 
+    hi: true,
+    name: "Anahata (Heart)",
+    ratio: "5:3",
+    tSec: "1.56 ms",
+    phaseAngle: "120°"
+  },
+  { 
+    hz: 741, 
+    chakra: "Throat / Vishuddha", 
+    H: 741, 
+    js: 7.41, 
+    omega: 0.95, 
+    meta: "Intuition & Clear Expression. Awakening Intention.", 
+    color: "#3498db",
+    name: "Vishuddha (Throat)",
+    ratio: "247:128",
+    tSec: "1.35 ms",
+    phaseAngle: "180°"
+  },
+  { 
+    hz: 852, 
+    chakra: "Third Eye / Ajna", 
+    H: 852, 
+    js: 35.35, 
+    omega: 0.97, 
+    meta: "Returning to Spiritual Order. Inner vision.", 
+    color: "#9b59b6",
+    name: "Ajna (Third Eye)",
+    ratio: "85:64",
+    tSec: "1.17 ms",
+    phaseAngle: "270°"
+  },
+  { 
+    hz: 963, 
+    chakra: "Crown / Sahasrara", 
+    H: 963, 
+    js: 949, 
+    omega: 0.99, 
+    meta: "Sovereignty & direct Cosmic Union with C.", 
+    color: "#e8d5a3", 
+    hi: true,
+    name: "Sahasrara (Crown)",
+    ratio: "321:256",
+    tSec: "1.04 ms",
+    phaseAngle: "360°"
+  }
 ];
 
 interface ScaleItem {
@@ -166,24 +440,136 @@ const FINDINGS: FindingItem[] = [
 export default function ChakraPanel({ onClose, onSendPrompt }: { onClose: () => void; onSendPrompt: (p: string) => void }) {
   const [activeTab, setActiveTab] = useState<"chakra" | "intervals" | "solfeggio" | "scales" | "genres" | "composers" | "brainwaves" | "findings">("chakra");
 
+  // Audio Synthesizer State
+  const [playingFreq, setPlayingFreq] = useState<number | null>(null);
+  const audioCtxRef = useRef<AudioContext | null>(null);
+  const oscRef = useRef<OscillatorNode | null>(null);
+  const gainRef = useRef<GainNode | null>(null);
+  const [vol, setVol] = useState<number>(0.15);
+
+  const playFrequency = (hz: number) => {
+    try {
+      if (oscRef.current) {
+        oscRef.current.stop();
+        oscRef.current.disconnect();
+        oscRef.current = null;
+      }
+
+      if (!audioCtxRef.current) {
+        audioCtxRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
+      }
+
+      const ctx = audioCtxRef.current;
+      if (ctx.state === "suspended") {
+        ctx.resume();
+      }
+
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(hz, ctx.currentTime);
+
+      gain.gain.setValueAtTime(0, ctx.currentTime);
+      gain.gain.linearRampToValueAtTime(vol, ctx.currentTime + 0.1); // Smooth attack
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.start();
+      oscRef.current = osc;
+      gainRef.current = gain;
+      setPlayingFreq(hz);
+    } catch (e) {
+      console.error("Audio Context initialization failed", e);
+    }
+  };
+
+  const stopActiveFrequency = () => {
+    if (oscRef.current && audioCtxRef.current) {
+      const ctx = audioCtxRef.current;
+      if (gainRef.current) {
+        gainRef.current.gain.setValueAtTime(gainRef.current.gain.value, ctx.currentTime);
+        gainRef.current.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.1); // Smooth release
+        setTimeout(() => {
+          if (oscRef.current) {
+            oscRef.current.stop();
+            oscRef.current.disconnect();
+            oscRef.current = null;
+          }
+          setPlayingFreq(null);
+        }, 120);
+      } else {
+        oscRef.current.stop();
+        oscRef.current.disconnect();
+        oscRef.current = null;
+        setPlayingFreq(null);
+      }
+    }
+  };
+
+  useEffect(() => {
+    return () => {
+      if (oscRef.current) {
+        try {
+          oscRef.current.stop();
+          oscRef.current.disconnect();
+        } catch (e) {}
+      }
+      if (audioCtxRef.current) {
+        try {
+          audioCtxRef.current.close();
+        } catch (e) {}
+      }
+    };
+  }, []);
+
   return (
-    <div className="absolute inset-0 bg-[#050505] text-[#eeeae4] overflow-y-auto z-[200] p-6 border-2 border-orange-500/20 rounded-2xl">
+    <div className="absolute inset-0 bg-[#050505] text-[#eeeae4] overflow-y-auto z-[200] p-6 border-2 border-orange-500/20 rounded-2xl animate-fadeIn">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <div className="flex items-center justify-between pb-6 border-b border-[#c9a84c]/20 mb-6">
+        <div className="flex flex-col md:flex-row md:items-center justify-between pb-6 border-b border-[#c9a84c]/20 mb-6 gap-4">
           <div className="flex items-center gap-3">
             <Music className="w-8 h-8 text-[#c9a84c] animate-pulse" />
             <div>
-              <h2 className="font-serif text-2xl font-bold text-[#c9a84c] tracking-wider">♬ — MUSIC &amp; CHAKRA ANALYSIS</h2>
-              <p className="text-xs text-[#8898aa] font-mono mt-1">T × S = C · Sound as Cosmic Order · Frequency as Negentropy</p>
+              <h2 className="font-serif text-2xl font-bold text-[#c9a84c] tracking-wider">♬ — MUSIC &amp; CHAKRA ATLAS (v13.2 V)</h2>
+              <p className="text-xs text-[#8898aa] font-mono mt-1">T × S = C · Sound as Cosmic Order · Interactive Pure-Tone Generator</p>
             </div>
           </div>
-          <button 
-            onClick={onClose}
-            className="flex items-center gap-1 bg-[#c9a84c]/10 border border-[#c9a84c]/30 rounded px-4 py-2 text-xs font-mono text-[#c9a84c] hover:bg-[#c9a84c]/20 transition-all cursor-pointer"
-          >
-            <X className="w-4 h-4" /> CLOSE
-          </button>
+          
+          <div className="flex items-center gap-4">
+            {/* Dynamic Volume Slider */}
+            <div className="flex items-center gap-2 bg-[#0d0d0d] border border-white/10 rounded px-2.5 py-1.5 font-mono text-[10px]">
+              <Volume2 className="w-3.5 h-3.5 text-orange-400" />
+              <span className="text-gray-400 uppercase">VOL:</span>
+              <input 
+                type="range" 
+                min="0.01" 
+                max="0.4" 
+                step="0.01" 
+                value={vol}
+                onChange={(e) => {
+                  const newVol = parseFloat(e.target.value);
+                  setVol(newVol);
+                  if (gainRef.current && audioCtxRef.current) {
+                    gainRef.current.gain.setValueAtTime(newVol, audioCtxRef.current.currentTime);
+                  }
+                }}
+                className="w-16 h-1 bg-white/20 rounded-lg appearance-none cursor-pointer accent-orange-500"
+              />
+              <span className="text-[#e8d5a3] w-6 text-right">{Math.round(vol * 100)}%</span>
+            </div>
+
+            <button 
+              onClick={() => {
+                stopActiveFrequency();
+                onClose();
+              }}
+              className="flex items-center gap-1 bg-[#c9a84c]/10 border border-[#c9a84c]/30 rounded px-4 py-2 text-xs font-mono text-[#c9a84c] hover:bg-[#c9a84c]/20 transition-all cursor-pointer"
+            >
+              <X className="w-4 h-4" /> CLOSE ATLAS
+            </button>
+          </div>
         </div>
 
         {/* Navigation Tabs */}
@@ -217,7 +603,7 @@ export default function ChakraPanel({ onClose, onSendPrompt }: { onClose: () => 
           <div className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="bg-[#0a0a0a]/80 border border-orange-500/15 rounded p-4 animate-fadeIn">
-                <h4 className="font-mono text-xs tracking-widest text-orange-400 uppercase mb-2">Chakra Metemphysics</h4>
+                <h4 className="font-mono text-xs tracking-widest text-[#c9a84c] uppercase mb-2">Chakra Metemphysics</h4>
                 <p className="text-sm text-[#8898aa] leading-relaxed">
                   Each chakra is a specific J/S configuration of the living system. Root chakra = tipping point (J/S=0). Heart chakra = eudaimonia (J/S=1.0). Crown = revelation (J/S=949). The seven chakras are seven Omega phase states made physical.
                 </p>
@@ -231,32 +617,112 @@ export default function ChakraPanel({ onClose, onSendPrompt }: { onClose: () => 
             </div>
 
             {/* Visualizer Row */}
-            <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-4 font-mono">
               {CHAKRAS.map((c) => (
                 <div 
                   key={c.n}
-                  onClick={() => onSendPrompt(`Explain Chakra ${c.n} (${c.name} / ${c.sk}) in the context of T x S = C`)}
-                  className={`flex flex-wrap items-center gap-4 p-4 border border-orange-500/15 rounded hover:border-[#c9a84c]/20 transition-all cursor-pointer ${
-                    c.hi ? "bg-orange-500/5" : "bg-[#0d0d0d]/50"
+                  onClick={() => onSendPrompt(`Explain Chakra ${c.n} (${c.name} / ${c.sk}) in the context of T x S = C and its v13.2 V properties: ratio=${c.ratio}, tSec=${c.tSec}, mantra=${c.mantra}, crystals=${c.crystals}, gland=${c.gland}, phaseAngle=${c.phaseAngle}`)}
+                  className={`flex flex-col lg:flex-row lg:items-center gap-4 p-5 border border-orange-500/15 rounded-lg hover:border-[#c9a84c]/30 hover:bg-white/[0.01] transition-all cursor-pointer relative overflow-hidden group ${
+                    c.hi ? "bg-orange-500/5 border-orange-500/25" : "bg-[#0d0d0d]/50"
                   }`}
                 >
-                  <div 
-                    className="w-10 h-10 rounded-full flex items-center justify-center font-mono font-bold text-black"
-                    style={{ backgroundColor: c.color }}
-                  >
-                    {c.n}
+                  {/* Subtle vertical glow matching chakra color */}
+                  <div className="absolute left-0 top-0 bottom-0 w-1 transition-all group-hover:w-1.5" style={{ backgroundColor: c.color }} />
+
+                  {/* Left Controls/Number */}
+                  <div className="flex items-center gap-4">
+                    <div 
+                      className="w-10 h-10 rounded-full flex items-center justify-center font-bold text-black text-lg shadow-lg shadow-black/40"
+                      style={{ backgroundColor: c.color }}
+                    >
+                      {c.n}
+                    </div>
+                    
+                    {/* Synth play button */}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (playingFreq === c.hz) {
+                          stopActiveFrequency();
+                        } else {
+                          playFrequency(c.hz);
+                        }
+                      }}
+                      className="w-8 h-8 rounded-md flex items-center justify-center transition-all bg-white/5 border border-white/10 hover:bg-orange-500/10 hover:border-orange-500/40 text-orange-400 cursor-pointer shadow-sm"
+                      title={`Play/Stop pure tone ${c.hz}Hz`}
+                    >
+                      {playingFreq === c.hz ? (
+                        <Square className="w-3.5 h-3.5 animate-pulse text-red-500 fill-red-500" />
+                      ) : (
+                        <Play className="w-3.5 h-3.5 fill-orange-400 pl-0.5" />
+                      )}
+                    </button>
                   </div>
+
+                  {/* Identification info */}
                   <div className="flex-1 min-w-[200px]">
-                    <div className="font-serif font-bold text-sm" style={{ color: c.color }}>{c.name} — {c.sk}</div>
-                    <div className="text-[10px] text-[#8898aa] font-mono mt-1">{c.el} • Note: {c.note} • {c.body}</div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-serif font-black text-lg tracking-wide" style={{ color: c.color }}>
+                        {c.name} — {c.sk}
+                      </span>
+                      {c.hi && (
+                        <span className="text-[9px] font-bold tracking-widest bg-orange-500/10 text-orange-400 px-1.5 py-0.5 rounded uppercase border border-orange-500/25">
+                          Apex Portal
+                        </span>
+                      )}
+                    </div>
+                    <div className="text-[10px] text-[#8898aa] mt-1 uppercase tracking-widest flex flex-wrap gap-2 items-center">
+                      <span>ELEMENT: <strong className="text-white">{c.el}</strong></span>
+                      <span>•</span>
+                      <span>KEY NOTE: <strong className="text-white">{c.note}</strong></span>
+                      <span>•</span>
+                      <span>LOCUS: <strong className="text-[#d8c393]">{c.body}</strong></span>
+                    </div>
                   </div>
-                  <div className="font-mono text-sm min-w-[65px] text-center" style={{ color: c.color }}>{c.hz}Hz</div>
-                  <div className="font-mono text-sm min-w-[80px] text-center text-teal-400">J/S: {c.js}</div>
-                  <div className="font-mono text-xs min-w-[80px] text-center text-[#e8d5a3]">Ω: {c.omega}</div>
-                  <div className="flex-1 max-w-[200px] h-2 bg-white/5 rounded-full overflow-hidden">
-                    <div className="h-full rounded-full transition-all" style={{ width: `${c.omega * 100}%`, backgroundColor: c.color }}></div>
+
+                  {/* Science Metrics (Metemphysics standard 13.2 V) */}
+                  <div className="grid grid-cols-2 sm:grid-cols-4 lg:flex lg:flex-row gap-x-4 gap-y-2 lg:gap-6 lg:items-center font-mono text-[11px] bg-black/40 border border-white/5 rounded px-4 py-2.5 lg:py-2">
+                    <div className="text-center lg:min-w-[65px]">
+                      <span className="text-gray-500 block text-[8px] uppercase tracking-wider">Frequency</span>
+                      <strong className="text-lg tracking-tight" style={{ color: c.color }}>{c.hz}Hz</strong>
+                    </div>
+                    <div className="text-center lg:min-w-[65px]">
+                      <span className="text-gray-500 block text-[8px] uppercase tracking-wider">Ratio</span>
+                      <strong className="text-[#e2b85c]">{c.ratio}</strong>
+                    </div>
+                    <div className="text-center lg:min-w-[65px]">
+                      <span className="text-gray-500 block text-[8px] uppercase tracking-wider">Epoch T</span>
+                      <strong className="text-[#a5b4fc]">{c.tSec}</strong>
+                    </div>
+                    <div className="text-center lg:min-w-[65px]">
+                      <span className="text-gray-500 block text-[8px] uppercase tracking-wider">Phase θ</span>
+                      <strong className="text-amber-500">{c.phaseAngle}</strong>
+                    </div>
+                    <div className="text-center lg:min-w-[65px]">
+                      <span className="text-gray-500 block text-[8px] uppercase tracking-wider">J/S Index</span>
+                      <strong className="text-teal-400">J/S: {c.js}</strong>
+                    </div>
+                    <div className="text-center lg:min-w-[65px]">
+                      <span className="text-gray-500 block text-[8px] uppercase tracking-wider">Order Ω</span>
+                      <strong className="text-[#e8d5a3]">Ω: {c.omega}</strong>
+                    </div>
                   </div>
-                  <div className="text-xs text-[#8898aa] min-w-[150px] font-mono">{c.desc}</div>
+
+                  {/* Anatomical Details and description */}
+                  <div className="flex-1 lg:max-w-[280px] bg-white/[0.02] border border-white/5 rounded-lg p-3 text-xs space-y-1">
+                    <div className="text-[10px] text-gray-400 leading-none">
+                      <span className="text-orange-400">GLAND:</span> {c.gland}
+                    </div>
+                    <div className="text-[10px] text-gray-400 leading-none">
+                      <span className="text-orange-400">CRYSTALS:</span> {c.crystals}
+                    </div>
+                    <div className="text-[10px] text-gray-400 leading-none">
+                      <span className="text-orange-400">SEED MANTRA:</span> <strong className="text-emerald-400 font-serif tracking-widest">{c.mantra}</strong>
+                    </div>
+                    <p className="text-gray-450 mt-1 leading-snug italic font-serif">
+                      &ldquo;{c.desc}&rdquo;
+                    </p>
+                  </div>
                 </div>
               ))}
             </div>
@@ -267,21 +733,21 @@ export default function ChakraPanel({ onClose, onSendPrompt }: { onClose: () => 
         {activeTab === "intervals" && (
           <div className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="bg-[#0a0a0a]/80 border border-orange-500/15 rounded p-4">
-                <h4 className="font-mono text-xs tracking-widest text-[#c9a84c] uppercase mb-2">Geometric Consonance</h4>
+              <div className="bg-[#0a0a0a]/80 border border-orange-500/15 rounded p-4 font-mono">
+                <h4 className="text-xs tracking-widest text-[#c9a84c] uppercase mb-2">Geometric Consonance</h4>
                 <p className="text-sm text-[#8898aa] leading-relaxed">
                   Simple integer ratios = high order = high Omega = consonant. The ratio of two frequencies is the J/S ratio in sound. 2:1 (octave) is maximally ordered.
                 </p>
               </div>
-              <div className="bg-[#0a0a0a]/80 border border-orange-500/15 rounded p-4">
-                <h4 className="font-mono text-xs tracking-widest text-[#c9a84c] uppercase mb-2">Tritone = Suffering (J/S = -0.25)</h4>
+              <div className="bg-[#0a0a0a]/80 border border-orange-500/15 rounded p-4 font-mono">
+                <h4 className="text-xs tracking-widest text-orange-400 uppercase mb-2">Tritone = Suffering (J/S = -0.25)</h4>
                 <p className="text-sm text-[#8898aa] leading-relaxed">
                   The tritone (45:32, &quot;the Devil in Music&quot;) lands at J/S = -0.25. Banned in medieval periods because it triggers systemic entropy, dropping below J/S = 0.
                 </p>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 font-mono">
               {INTERVALS.map((iv) => (
                 <div
                   key={iv.name}
@@ -304,19 +770,19 @@ export default function ChakraPanel({ onClose, onSendPrompt }: { onClose: () => 
         {/* TAB: SOLFEGGIO */}
         {activeTab === "solfeggio" && (
           <div className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 font-mono">
               <div className="bg-[#0a0a0a]/80 border border-orange-500/20 rounded p-4 text-center">
-                <div className="font-serif text-3xl font-bold text-[#c9a84c] mb-1">396Hz</div>
+                <div className="font-serif text-3xl font-bold text-red-500 mb-1">396Hz</div>
                 <div className="font-mono text-[10px] text-[#8898aa] uppercase tracking-wider mb-2">Root Chakra Anchor</div>
-                <div className="font-mono text-sm text-teal-400">J/S = 0.00a</div>
+                <div className="font-mono text-sm text-teal-400">J/S = 0.000</div>
                 <p className="text-xs text-[#8898aa] mt-2 leading-relaxed">
                   Exact metemphysical tipping point. Entropy and negentropy are equal.
                 </p>
               </div>
               <div className="bg-[#0a0a0a]/80 border border-orange-500/20 rounded p-4 text-center">
-                <div className="font-serif text-3xl font-bold text-amber-500 mb-1">639Hz</div>
+                <div className="font-serif text-3xl font-bold text-emerald-400 mb-1">639Hz</div>
                 <div className="font-mono text-[10px] text-[#8898aa] uppercase tracking-wider mb-2">Heart Chakra Angle</div>
-                <div className="font-mono text-sm text-amber-500">J/S = 1.000</div>
+                <div className="font-mono text-sm text-emerald-400">J/S = 1.000</div>
                 <p className="text-xs text-[#8898aa] mt-2 leading-relaxed">
                   Eudaimonia threshold. Negentropy exceeds entropy for the first time.
                 </p>
@@ -331,34 +797,63 @@ export default function ChakraPanel({ onClose, onSendPrompt }: { onClose: () => 
               </div>
             </div>
 
-            <div className="overflow-x-auto">
+            <div className="overflow-x-auto bg-[#08080c]/80 border border-white/5 rounded-lg p-2 font-mono">
               <table className="w-full text-left border-collapse font-mono text-xs">
                 <thead>
-                  <tr className="bg-white/5">
-                    <th className="p-3 text-[#c9a84c]">Hz Frequency</th>
+                  <tr className="bg-white/5 border-b border-white/10">
+                    <th className="p-3 text-[#c9a84c]">Action</th>
+                    <th className="p-3 text-[#c9a84c]">Frequency</th>
+                    <th className="p-3 text-[#c9a84c]">Acoustic Title</th>
                     <th className="p-3 text-[#c9a84c]">Chakra Allocation</th>
-                    <th className="p-3 text-[#c9a84c]">Hawkins Scale</th>
-                    <th className="p-3 text-[#c9a84c]">J/S Value</th>
+                    <th className="p-3 text-[#c9a84c]">Pythagorean Ratio</th>
+                    <th className="p-3 text-[#c9a84c]">Period T</th>
+                    <th className="p-3 text-[#c9a84c]">Angularity θ</th>
+                    <th className="p-3 text-[#c9a84c]">Hawkins H</th>
+                    <th className="p-3 text-[#c9a84c]">J/S Index</th>
                     <th className="p-3 text-[#c9a84c]">Ω Order</th>
-                    <th className="p-3 text-[#c9a84c]">Metemphysics Resonance</th>
+                    <th className="p-3 text-[#c9a84c]">Metemphysics Resonance Synthesis</th>
                   </tr>
                 </thead>
                 <tbody>
                   {SOLFEGGIO.map((s) => (
                     <tr 
                       key={s.hz} 
-                      onClick={() => onSendPrompt(`Explain Solfeggio frequency ${s.hz}Hz in Metemphysics`)}
-                      className={`hover:bg-white/5 cursor-pointer border-b border-white/5 ${s.hi ? "bg-[#c9a84c]/5" : ""}`}
+                      onClick={() => onSendPrompt(`Explain Solfeggio frequency ${s.hz}Hz inside metemphysics system 13.2 V with values: name=${s.name}, ratio=${s.ratio}, period=${s.tSec}, angle=${s.phaseAngle}, J/S=${s.js}`)}
+                      className={`hover:bg-white/5 cursor-pointer border-b border-white/5 transition-all text-xs ${s.hi ? "bg-[#c9a84c]/5" : ""}`}
                     >
-                      <td className="p-3 text-lg font-bold text-[#c9a84c]">{s.hz}Hz</td>
+                      <td className="p-3">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (playingFreq === s.hz) {
+                              stopActiveFrequency();
+                            } else {
+                              playFrequency(s.hz);
+                            }
+                          }}
+                          className="w-7 h-7 rounded flex items-center justify-center bg-white/5 hover:bg-orange-900/20 border border-white/10 text-orange-400 cursor-pointer shadow"
+                          title="Generate pure tone wave"
+                        >
+                          {playingFreq === s.hz ? (
+                            <Square className="w-3.5 h-3.5 fill-red-500 text-red-500 animate-pulse" />
+                          ) : (
+                            <Play className="w-3.5 h-3.5 fill-orange-400 pl-0.5" />
+                          )}
+                        </button>
+                      </td>
+                      <td className="p-3 text-sm font-black text-[#c9a84c]">{s.hz}Hz</td>
+                      <td className="p-3 font-serif italic text-white text-xs">{s.name}</td>
                       <td className="p-3 flex items-center gap-2">
-                        <span className="w-3 h-3 rounded-full" style={{ backgroundColor: s.color }}></span>
+                        <span className="w-2.5 h-2.5 rounded-full shadow-sm" style={{ backgroundColor: s.color }}></span>
                         {s.chakra}
                       </td>
+                      <td className="p-3 text-orange-400 font-bold">{s.ratio}</td>
+                      <td className="p-3 text-sky-400">{s.tSec}</td>
+                      <td className="p-3 text-amber-500 font-bold">{s.phaseAngle}</td>
                       <td className="p-3 text-[#e8d5a3]">{s.H}</td>
-                      <td className="p-3 text-teal-400">{s.js}</td>
-                      <td className="p-3 text-[#e8d5a3]">{s.omega}</td>
-                      <td className="p-3 text-xs text-[#8898aa] leading-relaxed max-w-xs">{s.meta}</td>
+                      <td className="p-3 text-teal-400 font-bold">J/S: {s.js}</td>
+                      <td className="p-3 text-[#e8d5a3] font-bold">Ω {s.omega}</td>
+                      <td className="p-3 text-xs text-gray-400 leading-relaxed max-w-xs">{s.meta}</td>
                     </tr>
                   ))}
                 </tbody>

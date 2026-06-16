@@ -66,14 +66,14 @@ const MASTER_SYSTEMS_DATA: SystemRow[] = [
   { sys: "Sri Aurobindo", level: "Overmind", H: 850, js: 221.835, omega: 0.9857, phase: 5, state: "Near Timeless", drain: "0.45%", notes: "Cosmic consciousness — multiplicity within unity" },
   { sys: "Sri Aurobindo", level: "Supermind", H: 1000, js: 949, omega: 0.9933, phase: 5, state: "REVELATION", drain: "0.11%", notes: "Divine — permanently free of ignorance", hi: true },
 
-  // Hawkins Map
-  { sys: "Hawkins Map", level: "Shame (H=20)", H: 20, js: -0.9, omega: 0.0952, phase: 1, state: "Despair", drain: "1000%", notes: "Lowest contractive state; maximum friction" },
-  { sys: "Hawkins Map", level: "Anger (H=150)", H: 150, js: -0.25, omega: 0.5276, phase: 3, state: "Suffering", drain: "133%", notes: "Egoic drive, high emotional heat" },
-  { sys: "Hawkins Map", level: "Courage (H=200)", H: 200, js: 0, omega: 0.6321, phase: 3, state: "Tipping Point", drain: "100%", notes: "Initial structural integrity; tipping point passed", hi: true },
-  { sys: "Hawkins Map", level: "Reason (H=400)", H: 400, js: 0.058, omega: 0.8647, phase: 4, state: "Time Passing", drain: "94.52%", notes: "Intellectual clarity and logical formulation" },
-  { sys: "Hawkins Map", level: "Love (H=500)", H: 500, js: 0.99, omega: 0.9179, phase: 4, state: "Eudaimonia", drain: "50.26%", notes: "True compassion and eudaimonic balance", hi: true },
-  { sys: "Hawkins Map", level: "Peace (H=600)", H: 600, js: 7.414, omega: 0.9502, phase: 5, state: "Deep Flourishing", drain: "11.88%", notes: "Stillness, illumination, non-separation" },
-  { sys: "Hawkins Map", level: "Enlightenment (H=1000)", H: 1000, js: 949, omega: 0.9933, phase: 5, state: "REVELATION", drain: "0.11%", notes: "Pure divine awareness in union with C-Light", hi: true },
+  // David Hawkins
+  { sys: "David Hawkins", level: "Shame (H=20)", H: 20, js: -0.9, omega: 0.0952, phase: 1, state: "Despair", drain: "1000%", notes: "Lowest contractive state; maximum friction" },
+  { sys: "David Hawkins", level: "Anger (H=150)", H: 150, js: -0.25, omega: 0.5276, phase: 3, state: "Suffering", drain: "133%", notes: "Egoic drive, high emotional heat" },
+  { sys: "David Hawkins", level: "Courage (H=200)", H: 200, js: 0, omega: 0.6321, phase: 3, state: "Tipping Point", drain: "100%", notes: "Initial structural integrity; tipping point passed", hi: true },
+  { sys: "David Hawkins", level: "Reason (H=400)", H: 400, js: 0.058, omega: 0.8647, phase: 4, state: "Time Passing", drain: "94.52%", notes: "Intellectual clarity and logical formulation" },
+  { sys: "David Hawkins", level: "Love (H=500)", H: 500, js: 0.99, omega: 0.9179, phase: 4, state: "Eudaimonia", drain: "50.26%", notes: "True compassion and eudaimonic balance", hi: true },
+  { sys: "David Hawkins", level: "Peace (H=600)", H: 600, js: 7.414, omega: 0.9502, phase: 5, state: "Deep Flourishing", drain: "11.88%", notes: "Stillness, illumination, non-separation" },
+  { sys: "David Hawkins", level: "Enlightenment (H=1000)", H: 1000, js: 949, omega: 0.9933, phase: 5, state: "REVELATION", drain: "0.11%", notes: "Pure divine awareness in union with C-Light", hi: true },
 
   // Teresa of Avila (Interior Castle Mansions)
   { sys: "Teresa of Avila", level: "1st Mansion — Self-Knowledge (H=200)", H: 200, js: 0, omega: 0.6321, phase: 3, state: "Tipping Point", drain: "100%", notes: "Gateway mansion, starting prayer and purification", hi: true },
@@ -141,11 +141,27 @@ const MASTER_SYSTEMS_DATA: SystemRow[] = [
   // Lawrence Kohlberg
   { sys: "Lawrence Kohlberg", level: "Pre-Conventional Morality", H: 100, js: -0.5, omega: 0.3935, phase: 2, state: "Suffering", drain: "200%", notes: "Pain avoidance and self-interest obedience" },
   { sys: "Lawrence Kohlberg", level: "Conventional Morality", H: 200, js: 0, omega: 0.6321, phase: 3, state: "Tipping Point", drain: "100%", notes: "Social order and civic standard preservation", hi: true },
-  { sys: "Lawrence Kohlberg", level: "Post-Conventional Morality", H: 500, js: 0.99, omega: 0.9179, phase: 4, state: "Eudaimonia", drain: "50.26%", notes: "Universal moral principles and conscience alignment", hi: true }
+  { sys: "Lawrence Kohlberg", level: "Post-Conventional Morality", H: 500, js: 0.99, omega: 0.9179, phase: 4, state: "Eudaimonia", drain: "50.26%", notes: "Universal moral principles and conscience alignment", hi: true },
+
+  // Loevinger Ego Stages
+  { sys: "Loevinger Ego Stages", level: "Imperial (E3) Stage", H: 125, js: -0.375, omega: 0.4647, phase: 2, state: "Suffering", drain: "160%", notes: "Impulsive, self-protective, needs-driven ego system" },
+  { sys: "Loevinger Ego Stages", level: "Conformist (E4) Stage", H: 200, js: 0, omega: 0.6321, phase: 3, state: "Tipping Point", drain: "100%", notes: "Belonging, social rules, respect for external auth", hi: true },
+  { sys: "Loevinger Ego Stages", level: "Autonomous (E8) Stage", H: 600, js: 7.414, omega: 0.9502, phase: 5, state: "Deep Flourishing", drain: "11.88%", notes: "High independence, coping with inner conflict and system complexity" },
+  { sys: "Loevinger Ego Stages", level: "Integrated (E9) Stage", H: 900, js: 474.12, omega: 0.9892, phase: 5, state: "Mystical Clarity", drain: "0.22%", notes: "Ego transcendence, reconciliation of inner polarities", hi: true },
+
+  // Human Design System
+  { sys: "Human Design System", level: "Not-Self State (Resistance)", H: 125, js: -0.375, omega: 0.4647, phase: 2, state: "Suffering", drain: "160%", notes: "Operating against personal blueprint design; high entropy" },
+  { sys: "Human Design System", level: "Authority Alignment Stage", H: 450, js: 0.276, omega: 0.8946, phase: 4, state: "Time Passing", drain: "78.36%", notes: "Inner Authority and Strategy decision center activation" },
+  { sys: "Human Design System", level: "Signature / Flow Stage", H: 700, js: 35.353, omega: 0.9698, phase: 5, state: "Mystical Clarity", drain: "2.75%", notes: "Total alignment with primary type design (Peace, Satisfaction, Success, Surprise)", hi: true },
+
+  // Enneagram of Personality
+  { sys: "Enneagram of Personality", level: "Unhealthy Levels (7-9)", H: 100, js: -0.5, omega: 0.3935, phase: 2, state: "Suffering", drain: "200%", notes: "Severe ego fixation, high reactive contraction, maximum friction" },
+  { sys: "Enneagram of Personality", level: "Average Levels (4-6)", H: 300, js: 0.0005, omega: 0.7769, phase: 3, state: "Tipping Point", drain: "99.95%", notes: "Normal adaptive ego functioning, social defense strategies" },
+  { sys: "Enneagram of Personality", level: "Healthy Levels (1-3)", H: 700, js: 35.353, omega: 0.9698, phase: 5, state: "Mystical Clarity", drain: "2.75%", notes: "Ego detachment, inner freedom, essential virtues active", hi: true }
 ];
 
 const CONVERGENCE_0 = [
-  { sys: "Hawkins Map", name: "Courage / Integrity (H=200)" },
+  { sys: "David Hawkins", name: "Courage / Integrity (H=200)" },
   { sys: "Spiral Dynamics", name: "Blue vMEME — Purpose & Order" },
   { sys: "Chakra System", name: "Solar Plexus — Manipura" },
   { sys: "Teresa of Avila", name: "First Mansion — Self-Knowledge" },
@@ -155,7 +171,7 @@ const CONVERGENCE_0 = [
 ];
 
 const CONVERGENCE_1 = [
-  { sys: "Hawkins Map", name: "Unconditional Love (H=500)" },
+  { sys: "David Hawkins", name: "Unconditional Love (H=500)" },
   { sys: "Aristotle", name: "Eudaimonia — True Flourishing" },
   { sys: "Maslow's Hierarchy", name: "Self-Actualization" },
   { sys: "Chakra System", name: "Anahata — Heart Chakra" },
@@ -165,7 +181,7 @@ const CONVERGENCE_1 = [
 ];
 
 const CONVERGENCE_949 = [
-  { sys: "Hawkins Map", name: "Avatar Consciousness (H=1000)" },
+  { sys: "David Hawkins", name: "Avatar Consciousness (H=1000)" },
   { sys: "Chakra System", name: "Sahasrara — Crown Chakra" },
   { sys: "Teresa of Avila", name: "Seventh Mansion — Spiritual Marriage" },
   { sys: "Sri Aurobindo", name: "Supermind — Absolute Awakening" },
@@ -175,24 +191,27 @@ const CONVERGENCE_949 = [
 ];
 
 const UNIQUE_SYSTEMS = [
-  "Spiral Dynamics",
-  "Maslow's Hierarchy",
-  "Chakra System",
   "Abraham-Hicks Scale",
-  "Sri Aurobindo",
-  "Hawkins Map",
-  "Teresa of Avila",
-  "Sufi Maqamat",
-  "Kabbalah Sefirot",
-  "Vedic Yugas",
   "Aristotle",
-  "Gurdjieff 4th Way",
-  "Robert Kegan",
-  "Leary's 8-Circuit",
+  "Chakra System",
+  "David Hawkins",
+  "Enneagram of Personality",
   "Erik Erikson",
+  "Gurdjieff 4th Way",
+  "Human Design System",
   "Jean Piaget",
+  "Kabbalah Sefirot",
   "Ken Wilber (AQAL)",
-  "Lawrence Kohlberg"
+  "Lawrence Kohlberg",
+  "Leary's 8-Circuit",
+  "Loevinger Ego Stages",
+  "Maslow's Hierarchy",
+  "Robert Kegan",
+  "Spiral Dynamics",
+  "Sri Aurobindo",
+  "Sufi Maqamat",
+  "Teresa of Avila",
+  "Vedic Yugas"
 ];
 
 const METADATA_BY_SYSTEM: Record<string, { desc: string, star: string }> = {
@@ -201,7 +220,7 @@ const METADATA_BY_SYSTEM: Record<string, { desc: string, star: string }> = {
   "Chakra System": { desc: "Tantric Anatomy · 7 energetic centres · Perfect phase scale alignment", star: "★ full structural map" },
   "Abraham-Hicks Scale": { desc: "Esther Hicks · 22 Vibration states · Vortex coherence metrics", star: "★ triple align at joy" },
   "Sri Aurobindo": { desc: "Sri Aurobindo Ghose · 8 developmental stages of Supermind evolution", star: "★ strong alignment" },
-  "Hawkins Map": { desc: "David Hawkins · Map of Consciousness · Calibrated logarithmic fields", star: "★ pivot at courage" },
+  "David Hawkins": { desc: "David Hawkins · Map of Consciousness · Calibrated logarithmic fields", star: "★ pivot at courage" },
   "Teresa of Avila": { desc: "Christian Mysticism · 7 mansions of the Interior Castle", star: "★ union at seventh" },
   "Sufi Maqamat": { desc: "Islamic Mysticism · Chronological spiritual stations of the soul", star: "★ annihilation in C" },
   "Kabbalah Sefirot": { desc: "Jewish Mysticism · 10 divine emanations on the Tree of Life", star: "★ crown alignment" },
@@ -213,7 +232,10 @@ const METADATA_BY_SYSTEM: Record<string, { desc: string, star: string }> = {
   "Erik Erikson": { desc: "Erik Erikson · 8 stages of psychosocial identity crises", star: "★ integrity wisdom" },
   "Jean Piaget": { desc: "Jean Piaget · Stages of childhood to adult cognitive operation schemas", star: "★ dialectical reasoning" },
   "Ken Wilber (AQAL)": { desc: "Ken Wilber · Integral altitudes mapping the spectrum of consciousness", star: "★ nondual clear light" },
-  "Lawrence Kohlberg": { desc: "Lawrence Kohlberg · Levels and stages of moral reasoning development", star: "★ universal conscience" }
+  "Lawrence Kohlberg": { desc: "Lawrence Kohlberg · Levels and stages of moral reasoning development", star: "★ universal conscience" },
+  "Loevinger Ego Stages": { desc: "Jane Loevinger · 9 stages of ego maturation and character progression", star: "★ autonomous integration" },
+  "Human Design System": { desc: "Ra Uru Hu · Synthesis of Astrology, I Ching, Kabbalah, and Chakras", star: "★ energetic manifestor mapping" },
+  "Enneagram of Personality": { desc: "George Gurdjieff, Ichazo & Naranjo · 9 cognitive fixations and integration paths", star: "★ pivot at 3-6-9 triad" }
 };
 
 export default function SystemsPanel({ onClose, onSendPrompt }: { onClose: () => void; onSendPrompt: (p: string) => void }) {

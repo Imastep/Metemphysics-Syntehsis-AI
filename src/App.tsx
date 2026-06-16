@@ -145,6 +145,103 @@ function cleanMathText(text: string): string {
   return s;
 }
 
+const METEM_GLOSSARY: { wordReg: RegExp; key: string; hoverStyle?: string; tip: string }[] = [
+  {
+    wordReg: /(\bt\s*×\s*s\s*=\s*c\b|\bt\s*[*x]\s*s\s*=\s*c\b)/i,
+    key: "txsc",
+    tip: "Axiom Proof Formula: Experienced Time (T) × Structural Entropy (S) = Speed of Light Constant (C). Governs state conservation balances."
+  },
+  {
+    wordReg: /(\bentropy\b|\bentropies\b)/i,
+    key: "entropy",
+    tip: "Thermodynamic / informational metric of microstate chaos/randomness. In T×S=C, structural or chemical entropy is conserved against time."
+  },
+  {
+    wordReg: /(\bomega\b|\bomega-matrix\b|[\u03A9\u03C9])/i,
+    key: "omega",
+    tip: "Integrated frequency indicator (Ω) scaling from 0 to 999. High Omega indicates deep spiritual, cognitive & harmonic coherence."
+  },
+  {
+    wordReg: /(\bj\/s\b|\bjoules?\s+per\s+seconds?\b)/i,
+    key: "js",
+    tip: "Joule-seconds (J/S) representing thermodynamic energy-information transduction rate intensity supporting high-level attractors."
+  },
+  {
+    wordReg: /(\bknodes?\b)/i,
+    key: "knode",
+    tip: "Resonant nodes in the multidimensional energy network. Portals of field energy and informational transduction."
+  },
+  {
+    wordReg: /(\bsolfeggio\b)/i,
+    key: "solfeggio",
+    tip: "Acoustic scale (e.g. 396Hz, 528Hz, 963Hz) mimicking ancient sound frequencies believed to hold specific biological & systemic resonance."
+  },
+  {
+    wordReg: /(\bplanck\b)/i,
+    key: "planck",
+    tip: "Planck constant/limits. The minimal quantization spacing of physics, denoting the pixelated boundaries of physical reality."
+  },
+  {
+    wordReg: /(\bhawkins\b)/i,
+    key: "hawkins",
+    tip: "Scale of Consciousness (1 to 1000) charted by Dr. David R. Hawkins, corresponding direct attractor energy levels."
+  },
+];
+
+function renderKeywordsWithTooltips(text: string): React.ReactNode[] | string {
+  let tokens: { text: string; isKeyword: boolean; tip?: string }[] = [{ text, isKeyword: false }];
+  
+  for (const item of METEM_GLOSSARY) {
+    const nextTokens: typeof tokens = [];
+    for (const t of tokens) {
+      if (t.isKeyword) {
+        nextTokens.push(t);
+        continue;
+      }
+      
+      const parts = t.text.split(item.wordReg);
+      if (parts.length <= 1) {
+        nextTokens.push(t);
+        continue;
+      }
+      
+      for (let i = 0; i < parts.length; i++) {
+        const part = parts[i];
+        if (!part) continue;
+        
+        if (i % 2 === 1) {
+          nextTokens.push({ text: part, isKeyword: true, tip: item.tip });
+        } else {
+          nextTokens.push({ text: part, isKeyword: false });
+        }
+      }
+    }
+    tokens = nextTokens;
+  }
+  
+  if (tokens.length === 1 && !tokens[0].isKeyword) {
+    return tokens[0].text;
+  }
+  
+  return tokens.map((t, idx) => {
+    if (t.isKeyword) {
+      return (
+        <span 
+          key={idx} 
+          className="relative group/tooltip inline cursor-help border-b border-dotted border-orange-500/80 text-orange-400 font-medium"
+        >
+          {t.text}
+          <span className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-56 p-2 bg-[#0c0603] border border-orange-500/40 text-[10px] text-[#e5dbcb] rounded shadow-[0_0_15px_rgba(255,95,0,0.3)] font-mono opacity-0 group-hover/tooltip:opacity-100 transition-opacity duration-200 z-50 text-center leading-normal whitespace-normal break-words normal-case">
+            {t.tip}
+            <span className="absolute top-full left-1/2 -translate-x-1/2 border-x-4 border-x-transparent border-t-4 border-t-orange-500/40" />
+          </span>
+        </span>
+      );
+    }
+    return t.text;
+  });
+}
+
 function renderFormattedInlines(inlineText: string) {
   const parts: React.ReactNode[] = [];
   let currentText = cleanMathText(inlineText);
@@ -167,7 +264,7 @@ function renderFormattedInlines(inlineText: string) {
     ].filter(m => m.match && m.match.index !== undefined);
 
     if (matches.length === 0) {
-      parts.push(<span key={`text-end-${idxCounter}`}>{currentText}</span>);
+      parts.push(<span key={`text-end-${idxCounter}`}>{renderKeywordsWithTooltips(currentText)}</span>);
       break;
     }
 
@@ -178,7 +275,7 @@ function renderFormattedInlines(inlineText: string) {
 
     // Add string preceding match
     if (matchStart > 0) {
-      parts.push(<span key={`text-mid-${idxCounter}`}>{currentText.substring(0, matchStart)}</span>);
+      parts.push(<span key={`text-mid-${idxCounter}`}>{renderKeywordsWithTooltips(currentText.substring(0, matchStart))}</span>);
     }
 
     const matchedValue = earliest.match![1];
@@ -193,7 +290,7 @@ function renderFormattedInlines(inlineText: string) {
     } else if (earliest.type === "bold") {
       parts.push(
         <strong key={`bold-${idxCounter}`} className="font-serif font-bold text-white tracking-wide">
-          {matchedValue}
+          {renderKeywordsWithTooltips(matchedValue)}
         </strong>
       );
     } else if (earliest.type === "bracket") {
@@ -213,7 +310,7 @@ function renderFormattedInlines(inlineText: string) {
     currentText = currentText.substring(matchStart + fullLength);
   }
 
-  return parts.length > 0 ? parts : inlineText;
+  return parts.length > 0 ? parts : <span>{renderKeywordsWithTooltips(inlineText)}</span>;
 }
 
 function formatOracleMessage(text: string) {
@@ -413,7 +510,7 @@ export default function App() {
   // Real-time Sidebar and Formula states
   const [sidebarTab, setSidebarTab] = useState<"ontology" | "states" | "formulas" | "harmonics">("ontology");
   const [calcT, setCalcT] = useState<string>("1.0");
-  const [calcS, setCalcS] = useState<string>("299792458");
+  const [calcS, setCalcS] = useState<string>("1.0");
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -623,7 +720,13 @@ export default function App() {
     handleSendMessage(prompt);
   };
 
-  const filteredItems = METEM_DB[selectedDbCategory].filter((item) => {
+  const getOmegaValueNumber = (omegaStr?: string) => {
+    if (!omegaStr) return 0;
+    const match = omegaStr.match(/\d+/);
+    return match ? parseInt(match[0], 10) : 0;
+  };
+
+  const rawFilteredItems = METEM_DB[selectedDbCategory].filter((item) => {
     const query = dbSearch.toLowerCase();
     return (
       item.name.toLowerCase().includes(query) ||
@@ -631,6 +734,8 @@ export default function App() {
       (item.concepts && item.concepts.some((c) => c.toLowerCase().includes(query)))
     );
   });
+
+  const filteredItems = [...rawFilteredItems].sort((a, b) => getOmegaValueNumber(b.omegaVal) - getOmegaValueNumber(a.omegaVal));
 
   const getConstC = () => {
     switch (conservedLimit) {
@@ -732,9 +837,17 @@ export default function App() {
             {sidebarTab === "ontology" && (
               <div className="flex-1 flex flex-col h-full">
                 <div className="flex items-center justify-between pb-3 border-b border-orange-500/20 mb-3">
-                  <h3 className="font-serif font-bold text-white text-xs tracking-wider flex items-center gap-2">
-                    <BookOpen className="w-4 h-4 text-orange-500 drop-shadow-[0_0_4px_rgba(255,95,0,0.4)]" /> SYNTHESIS
-                  </h3>
+                  <div className="relative group/synthesis-title flex items-center gap-1.5">
+                    <h3 className="font-serif font-bold text-white text-xs tracking-wider flex items-center gap-2 cursor-help">
+                      <BookOpen className="w-4 h-4 text-orange-500 drop-shadow-[0_0_4px_rgba(255,95,0,0.4)]" /> SYNTHESIS
+                    </h3>
+                    {/* Tooltip for the overall Synthesis Table */}
+                    <span className="pointer-events-none absolute left-0 top-full mt-2 w-64 p-2.5 bg-[#090503]/95 border border-orange-500/40 text-[9.5px] text-[#dacbb6] font-mono rounded shadow-[0_0_15px_rgba(255,95,0,0.35)] opacity-0 group-hover/synthesis-title:opacity-100 transition-opacity duration-200 z-50 text-left leading-relaxed">
+                      <strong className="text-orange-400 block mb-1 font-serif uppercase tracking-wider">Unified Synthesis Engine</strong>
+                      An integrated cross-disciplinary database pairing human sciences, spiritual traditions, evolutionary models, and constants under absolute T × S = C thermodynamic limits.
+                      <span className="absolute top-[-4px] left-8 border-x-4 border-x-transparent border-b-4 border-b-orange-500/40" />
+                    </span>
+                  </div>
                   <span className="text-[8px] font-mono text-orange-500 uppercase tracking-widest bg-orange-500/10 px-1 py-0.5 rounded border border-orange-500/20">METEM_DB v14.0</span>
                 </div>
 
@@ -747,8 +860,8 @@ export default function App() {
                       onClick={() => setSelectedDbCategory(cat)}
                       className={`py-1 rounded text-[9px] font-mono uppercase border transition-all cursor-pointer text-center ${
                         selectedDbCategory === cat
-                          ? "bg-orange-500/15 border-orange-500/60 text-orange-400 font-bold shadow-[0_0_8px_rgba(255,106,0,0.15)]"
-                          : "border-transparent text-gray-500 hover:text-[#eeeae4] hover:bg-white/5"
+                           ? "bg-orange-500/15 border-orange-500/60 text-orange-400 font-bold shadow-[0_0_8px_rgba(255,106,0,0.15)]"
+                           : "border-transparent text-gray-500 hover:text-[#eeeae4] hover:bg-white/5"
                       } ${typing ? "opacity-50 cursor-not-allowed" : ""}`}
                     >
                       {cat === "religions" ? "tradition" : cat === "formulas" ? "formula" : cat}
@@ -790,7 +903,16 @@ export default function App() {
                             <span className="text-[9px] font-mono text-[#c9a84c] font-bold tracking-wider mt-0.5">{item.omegaVal}</span>
                           )}
                         </div>
-                        <span className="text-[8px] font-mono text-orange-400 border border-orange-500/30 px-1.5 py-0.5 rounded bg-orange-500/5 uppercase">{item.subcategory}</span>
+                        {/* Interactive Tooltip on the category / subcategory tags */}
+                        <span className="relative group/tag inline-block">
+                          <span className="text-[8px] font-mono text-orange-400 border border-orange-500/30 px-1.5 py-0.5 rounded bg-orange-500/5 uppercase cursor-help hover:bg-orange-500/10 transition-colors">
+                            {item.subcategory}
+                          </span>
+                          <span className="pointer-events-none absolute right-0 bottom-full mb-1.5 w-52 p-2.5 bg-black border border-orange-500/40 text-[9.5px] text-[#dacbb6] font-mono rounded shadow-[0_0_12px_rgba(255,95,0,0.25)] opacity-0 group-hover/tag:opacity-100 transition-opacity duration-200 z-50 text-right leading-normal">
+                            Classification: <strong className="text-orange-400 uppercase font-bold">{selectedDbCategory === "religions" ? "Tradition" : selectedDbCategory === "formulas" ? "Formula" : selectedDbCategory}</strong>. Integrated calibration index value: <strong className="text-amber-400">{item.omegaVal || "Ω = Dynamic"}</strong>.
+                            <span className="absolute bottom-[-4px] right-4 border-x-4 border-x-transparent border-t-4 border-t-orange-500/40" />
+                          </span>
+                        </span>
                       </div>
                       <p className="text-[11px] text-[#afbbc9] mt-1 line-clamp-2 leading-relaxed font-serif italic">{item.summary}</p>
                       <div className="flex items-center justify-between mt-2 pt-1 border-t border-orange-500/5">
@@ -888,10 +1010,10 @@ export default function App() {
                   
                   {/* DEVICE 1: S = C / T */}
                   <div className="bg-black border border-orange-500/15 rounded-xl p-4 space-y-3">
-                    <div className="flex items-center justify-between border-b border-orange-500/15 pb-1">
-                      <span className="font-mono text-[9px] text-orange-400 font-bold uppercase">
+                    <div className="flex items-center justify-between border-b border-[#ff5f00]/15 pb-1">
+                      <span className="font-mono text-[9px] text-[#ff5f00] font-bold uppercase">
                         <Tooltip content="Derivative detailing that as temporal refresh speed increases (smaller T), the physical system's capacity to contain dynamic information states (S) mounts proportionally.">
-                          Derivative 1: S = C / T
+                          Entropy Derivative: S = C / T
                         </Tooltip>
                       </span>
                       <span className="text-[8px] font-mono text-gray-500">Calculate Entropy from Subjective Time</span>
@@ -911,14 +1033,21 @@ export default function App() {
                       <span className="text-[8px] font-mono text-gray-500 block uppercase">Calculated Molar Entropy (S = C / T)</span>
                       <span className="text-orange-400 font-mono text-xs font-bold">{computedSFromT} <span className="text-[9px] text-orange-500/70 font-normal">J / mol·K</span></span>
                     </div>
+                    <button
+                      disabled={typing}
+                      onClick={() => !typing && handleSendMessage(`Analyze the Entropy Derivative (S = C / T) under current input constraint of Subjective Time T = ${calcT} seconds. Under current absolute constant C = ${CONST_C}, this yields a dynamically calculated Molar Entropy S of ${computedSFromT} J/mol·K. Elaborate on the metemphysical meaning of this entropic profile.`)}
+                      className="w-full py-2 bg-orange-500/15 hover:bg-orange-500/25 border border-orange-500/40 text-orange-400 font-mono text-[10px] tracking-widest uppercase rounded-lg cursor-pointer font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_0_10px_rgba(255,95,0,0.1)] hover:shadow-[0_0_15px_rgba(255,95,0,0.2)]"
+                    >
+                      ✦ Entropy Value ✦
+                    </button>
                   </div>
 
                   {/* DEVICE 2: T = C / S */}
                   <div className="bg-black border border-orange-500/15 rounded-xl p-4 space-y-3">
-                    <div className="flex items-center justify-between border-b border-orange-500/15 pb-1">
-                      <span className="font-mono text-[9px] text-amber-500 font-bold uppercase">
+                    <div className="flex items-center justify-between border-b border-[#d4af37]/15 pb-1">
+                      <span className="font-mono text-[9px] text-[#d4af37] font-bold uppercase">
                         <Tooltip content="Derivative calculating absolute subjective epoch span (T) required by the system's current entropy profile. High entropy states compress experienced time.">
-                          Derivative 2: T = C / S
+                          Time Derivative: T = C / S
                         </Tooltip>
                       </span>
                       <span className="text-[8px] font-mono text-gray-500">Calculate Time Epochs from Entropy</span>
@@ -938,15 +1067,14 @@ export default function App() {
                       <span className="text-[8px] font-mono text-gray-450 block uppercase mb-1">Calculated Subjective Time (T = C / S)</span>
                       <span className="text-amber-300 font-mono text-xs font-bold">{computedT1FromS} <span className="text-[9px] text-[#eeeae4]/70 font-normal">s</span></span>
                     </div>
+                    <button
+                      disabled={typing}
+                      onClick={() => !typing && handleSendMessage(`Analyze the Time Derivative (T = C / S) under current input constraint of Standard Molar Entropy S = ${calcS} J/mol·K. Under current absolute constant C = ${CONST_C}, this yields a dynamically calculated Subjective Clock Duration T of ${computedT1FromS} seconds. Explain the metemphysical context of this temporal duration.`)}
+                      className="w-full py-2 bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 text-amber-300 font-mono text-[10px] tracking-widest uppercase rounded-lg cursor-pointer font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_0_10px_rgba(212,175,55,0.1)] hover:shadow-[0_0_15px_rgba(212,175,55,0.2)]"
+                    >
+                      ✦ Time ✦
+                    </button>
                   </div>
-
-                  <button
-                    disabled={typing}
-                    onClick={() => !typing && handleSendMessage(`Analyze the core axiom of T × S = C and its derivatives (S = C / T and T = C / S) under input constraints of T = ${calcT}s and S = ${calcS} J/mol·K.`)}
-                    className="w-full py-2.5 bg-orange-500/15 hover:bg-orange-600/20 border border-orange-500/40 text-orange-400 font-mono text-[10px] tracking-widest uppercase rounded-lg cursor-pointer font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_0_12px_rgba(255,95,0,0.1)]"
-                  >
-                    ✦ Submit Real-time Values to Oracle ✦
-                  </button>
 
                 </div>
               </div>
@@ -1278,36 +1406,49 @@ export default function App() {
           {/* Scrolling launcher list with slightly smaller buttons */}
           <div className="flex-1 overflow-y-auto space-y-2.5 pr-1 custom-scroll">
             {[
-              { id: "chakra", name: "Music & Chakra Atlas", desc: "Solfeggio and H calibrations", icon: Flame, color: "hover:border-orange-500/60 hover:bg-orange-500/5 hover:shadow-[0_0_12px_rgba(255,95,0,0.1)]" },
-              { id: "entropy", name: "Entropy Periodic Table", desc: "Molar & thermodynamic values", icon: BarChart, color: "hover:border-orange-500/60 hover:bg-orange-500/5 hover:shadow-[0_0_12px_rgba(255,95,0,0.1)]" },
-              { id: "bio", name: "Biological Entropy Atlas", desc: "Metabolic & ecosystem limits", icon: Dna, color: "hover:border-orange-500/60 hover:bg-orange-500/5 hover:shadow-[0_0_12px_rgba(255,95,0,0.1)]" },
-              { id: "systems", name: "All Systems Database", desc: "18 Developmental matrices", icon: Compass, color: "hover:border-orange-500/60 hover:bg-orange-500/5 hover:shadow-[0_0_12px_rgba(255,95,0,0.1)]" },
-              { id: "calc", name: "Metemphysics Calculator", desc: "6 dynamic 5D solvers", icon: Calculator, color: "hover:border-orange-500/60 hover:bg-orange-500/5 hover:shadow-[0_0_12px_rgba(255,95,0,0.1)]" },
-              { id: "codereader", name: "Casting Personal Code", desc: "T × S = C dynamic calculations", icon: FileText, color: "hover:border-orange-500/60 hover:bg-orange-500/5 hover:shadow-[0_0_12px_rgba(255,95,0,0.1)]" },
-              { id: "reftables", name: "References Tables DB", desc: "Constants & traditions maps", icon: Database, color: "hover:border-orange-500/60 hover:bg-orange-500/5 hover:shadow-[0_0_12px_rgba(212,175,55,0.1)]" },
-              { id: "reftools", name: "Tools of References", desc: "Solfeggio synthesizer & tools", icon: Activity, color: "hover:border-orange-500/60 hover:bg-orange-500/5 hover:shadow-[0_0_12px_rgba(212,175,55,0.1)]" },
-              { id: "hawkinsprogram", name: "Hawkins Map Program", desc: "Logarithmic field calibrator", icon: Cpu, color: "hover:border-orange-500/60 hover:bg-orange-500/5 hover:shadow-[0_0_12px_rgba(212,175,55,0.1)]" },
-              { id: "celestialscale", name: "Celestial Scale (FMCS)", desc: "Cosmic Metemphysical Scales", icon: Sparkles, color: "hover:border-orange-500/60 hover:bg-orange-500/5 hover:shadow-[0_0_12px_rgba(212,175,55,0.15)]" },
-              { id: "numerology", name: "Numerology Scale", desc: "Number & Shape archetypes scale", icon: Hash, color: "hover:border-orange-500/60 hover:bg-orange-500/5 hover:shadow-[0_0_12px_rgba(255,106,0,0.15)]" },
-            ].map((p) => {
+              { id: "chakra", name: "Music & Chakra Atlas", desc: "Solfeggio and H calibrations", icon: Flame, color: "hover:border-orange-500/60 hover:bg-orange-500/5 hover:shadow-[0_0_12px_rgba(255,95,0,0.1)]", tip: "Acoustic calibration grid coupling natural vibration intervals (Hz), human chakra energy levels, or cognitive EEG brainwave ranges." },
+              { id: "entropy", name: "Entropy Periodic Table", desc: "Molar & thermodynamic values", icon: BarChart, color: "hover:border-orange-500/60 hover:bg-orange-500/5 hover:shadow-[0_0_12px_rgba(255,95,0,0.1)]", tip: "Thermodynamic reference database listing accurate molar weights, phase states, and entropy indexes (S°) across elements." },
+              { id: "bio", name: "Biological Entropy Atlas", desc: "Metabolic & ecosystem limits", icon: Dna, color: "hover:border-orange-500/60 hover:bg-orange-500/5 hover:shadow-[0_0_12px_rgba(255,95,0,0.1)]", tip: "A biological ledger mapping living processes such as protein synthesis, Krebs cycle, and ecosystem boundaries against dissipation limits." },
+              { id: "systems", name: "All Systems Database", desc: "18 Developmental matrices", icon: Compass, color: "hover:border-orange-500/60 hover:bg-orange-500/5 hover:shadow-[0_0_12px_rgba(255,95,0,0.1)]", tip: "The cosmic comparative register matching eighteen different psychological, spiritual, and moral maturation scales." },
+              { id: "calc", name: "Metemphysics Calculator", desc: "6 dynamic 5D solvers", icon: Calculator, color: "hover:border-orange-500/60 hover:bg-orange-500/5 hover:shadow-[0_0_12px_rgba(255,95,0,0.1)]", tip: "Multi-dimensional mathematical solvers resolving state decay, spatial boundary bounds, or time dilatation equations." },
+              { id: "codereader", name: "Casting Personal Code", desc: "T × S = C dynamic calculations", icon: FileText, color: "hover:border-orange-500/60 hover:bg-orange-500/5 hover:shadow-[0_0_12px_rgba(255,95,0,0.1)]", tip: "Interactive personal code caster that evaluates birthdates or custom inputs, issuing verified PDF certificates." },
+              { id: "reftables", name: "References Tables DB", desc: "Constants & traditions maps", icon: Database, color: "hover:border-orange-500/60 hover:bg-orange-500/5 hover:shadow-[0_0_12px_rgba(212,175,55,0.1)]", tip: "Extensive indexes grouping physical constants, historical metrics, and traditional resonance coefficients." },
+              { id: "reftools", name: "Tools of References", desc: "Solfeggio synthesizer & tools", icon: Activity, color: "hover:border-orange-500/60 hover:bg-orange-500/5 hover:shadow-[0_0_12px_rgba(212,175,55,0.1)]", tip: "Practical calibration utilities hosting adjustable acoustic oscillators, phase modifiers, and real-time waveform testers." },
+              { id: "hawkinsprogram", name: "David Hawkins Program", desc: "Logarithmic field calibrator", icon: Cpu, color: "hover:border-orange-500/60 hover:bg-orange-500/5 hover:shadow-[0_0_12px_rgba(212,175,55,0.1)]", tip: "Thermodynamic simulation modeling level of attractor fields (H-numbers) on logarithmic scale matrices." },
+              { id: "celestialscale", name: "Celestial Scale (FMCS)", desc: "Cosmic Metemphysical Scales", icon: Sparkles, color: "hover:border-orange-500/60 hover:bg-orange-500/5 hover:shadow-[0_0_12px_rgba(212,175,55,0.15)]", tip: "Astrophysical tracker evaluating planetary masses, stellar outputs, and Schwarzschild densities for deep space calibration." },
+              { id: "numerology", name: "Numerology Scale", desc: "Number & Shape archetypes scale", icon: Hash, color: "hover:border-orange-500/60 hover:bg-orange-500/5 hover:shadow-[0_0_12px_rgba(255,106,0,0.15)]", tip: "Analytical grid using Pythagorean digit reductions (0-9) to output geometrical and archetypal descriptors." },
+            ].sort((a, b) => a.name.localeCompare(b.name)).map((p) => {
               const IconComp = p.icon;
               return (
-                <button
-                  key={p.id}
-                  onClick={() => setActivePanel(p.id)}
-                  className={`w-full bg-[#050505] p-2 rounded-lg border border-orange-500/15 text-left transition-all duration-350 transform hover:-translate-y-0.5 cursor-pointer flex items-center justify-between shadow-[0_0_6px_rgba(255,95,0,0.01)] ${p.color}`}
-                >
-                  <div className="flex items-center gap-2 min-w-0">
-                    <div className="flex-shrink-0 w-7 h-7 rounded bg-orange-950/15 border border-orange-500/20 flex items-center justify-center">
-                      <IconComp className="w-3.5 h-3.5 text-orange-450" />
+                <div key={p.id} className="relative group/lab-item">
+                  <button
+                    onClick={() => setActivePanel(p.id)}
+                    className={`w-full bg-[#050505] p-2 rounded-lg border border-orange-500/15 text-left transition-[#e4d9c0] duration-350 transform hover:-translate-y-0.5 cursor-pointer flex items-center justify-between shadow-[0_0_6px_rgba(255,95,0,0.01)] ${p.color}`}
+                  >
+                    <div className="flex items-center gap-2 min-w-0">
+                      <div className="flex-shrink-0 w-7 h-7 rounded bg-orange-950/15 border border-orange-500/20 flex items-center justify-center">
+                        <IconComp className="w-3.5 h-3.5 text-orange-450" />
+                      </div>
+                      <div className="min-w-0">
+                        <h4 className="font-serif font-bold text-[10.5px] text-white tracking-wide line-clamp-1">{p.name}</h4>
+                        <p className="text-[8.5px] text-gray-500 font-mono truncate mt-0.5">{p.desc}</p>
+                      </div>
                     </div>
-                    <div className="min-w-0">
-                      <h4 className="font-serif font-bold text-[10.5px] text-white tracking-wide line-clamp-1">{p.name}</h4>
-                      <p className="text-[8.5px] text-gray-500 font-mono truncate mt-0.5">{p.desc}</p>
-                    </div>
-                  </div>
-                  <ChevronRight className="w-3.5 h-3.5 text-gray-600 flex-shrink-0 ml-1" />
-                </button>
+                    <ChevronRight className="w-3.5 h-3.5 text-gray-600 flex-shrink-0 ml-1" />
+                  </button>
+
+                  {/* Desktop view absolute left-side tooltip */}
+                  <span className="pointer-events-none absolute right-[103%] top-1/2 -translate-y-1/2 w-52 p-2.5 bg-black/95 border border-orange-500/40 text-[9.5px] text-[#dacbb6] font-mono rounded shadow-[0_0_15px_rgba(255,95,0,0.3)] opacity-0 group-hover/lab-item:opacity-100 transition-opacity duration-200 z-50 text-left leading-normal whitespace-normal break-words hidden lg:block">
+                    {p.tip}
+                    <span className="absolute left-full top-1/2 -translate-y-1/2 border-y-4 border-y-transparent border-l-4 border-l-orange-500/40" />
+                  </span>
+
+                  {/* Mobile view top-side tooltip */}
+                  <span className="pointer-events-none absolute left-1/2 -translate-x-1/2 bottom-[105%] mb-1 w-48 p-2 bg-black border border-orange-500/45 text-[9px] text-[#dacbb6] font-mono rounded shadow-[0_0_12px_rgba(255,95,0,0.25)] opacity-0 group-hover/lab-item:opacity-100 transition-opacity duration-200 z-50 text-center leading-normal whitespace-normal break-words lg:hidden">
+                    {p.tip}
+                    <span className="absolute top-full left-1/2 -translate-x-1/2 border-x-4 border-x-transparent border-t-4 border-t-orange-500/45" />
+                  </span>
+                </div>
               );
             })}
           </div>
@@ -1318,7 +1459,14 @@ export default function App() {
 
       {/* FOOTER RAILS */}
       <footer className="border-t border-orange-500/20 bg-black px-6 py-4 flex flex-col sm:flex-row items-center justify-between text-[11px] font-mono text-gray-500 gap-4 mt-8">
-        <span>© 2026 Metemphysics Integrative Framework. All Rights Conserved.</span>
+        <a 
+          href="https://metemphysics.com/" 
+          target="_blank" 
+          rel="noopener noreferrer" 
+          className="text-orange-500 hover:text-orange-400 hover:underline transition-colors duration-200"
+        >
+          © 2026 Metemphysics Integrative Framework. All Rights Conserved.
+        </a>
         <div className="flex gap-4">
           <button
             onClick={downloadChatAsPDF}
