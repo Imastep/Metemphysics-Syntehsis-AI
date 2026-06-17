@@ -951,7 +951,7 @@ export default function App() {
   const isInputLimitReached = messages.filter((m) => m.role === "user").length >= 25;
 
   return (
-    <div className="min-h-screen bg-[#050505] text-[#eeeae4] flex flex-col font-sans selection:bg-[#ff5f00]/30 selection:text-white">
+    <div className="min-h-screen w-full max-w-full overflow-x-hidden bg-[#050505] text-[#eeeae4] flex flex-col font-sans selection:bg-[#ff5f00]/30 selection:text-white">
       
       {/* GLOWING AMBIENT TOPHEADER */}
       <header className="border-b-2 border-orange-500/30 bg-black shadow-[0_4px_30px_rgba(255,95,0,0.12)] sticky top-0 z-50 px-6 py-4 flex flex-wrap items-center justify-between gap-4">
@@ -994,7 +994,7 @@ export default function App() {
       </header>
 
       {/* MAIN CONTAINER */}
-      <main className="flex-1 w-full max-w-none p-4 lg:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 min-h-0">
+      <main className="flex-1 w-full max-w-full overflow-x-hidden p-4 lg:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 min-h-0">
         
         {/* LEFT COLUMN: PRIMARY DYNAMIC DIRECTORY (GRID 3) */}
         <div className="lg:col-span-3 flex flex-col lg:h-[calc(100vh-195px)] lg:min-h-[750px] h-auto bg-black border border-orange-500/25 rounded-xl shadow-[0_0_20px_rgba(212,175,55,0.06)] relative">
@@ -1598,12 +1598,12 @@ export default function App() {
           </div>
 
           {/* Terminal Input Bar */}
-          <div className="p-4 border-t border-orange-500/25 bg-black rounded-b-xl flex gap-3 shadow-[0_-4px_12px_rgba(0,0,0,0.5)] flex-shrink-0">
+          <div className="p-3 sm:p-4 border-t border-orange-500/25 bg-black rounded-b-xl flex gap-2 sm:gap-3 shadow-[0_-4px_12px_rgba(0,0,0,0.5)] flex-shrink-0">
             <button
               disabled={typing}
               onClick={() => !typing && handleResetChat()}
               title={typing ? "Transmission active — reset disabled" : "Reset and clear chat to original welcoming state"}
-              className="px-3 py-3 bg-orange-500/10 hover:bg-orange-500/20 text-orange-400 hover:text-orange-300 border border-orange-500/35 hover:border-orange-500/60 rounded-xl transition-all duration-200 flex items-center justify-center shadow-[0_0_10px_rgba(255,95,0,0.055)] disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-orange-500/10 disabled:hover:text-orange-400 disabled:border-orange-500/20 disabled:scale-100 cursor-pointer active:scale-95"
+              className="px-2.5 sm:px-3 py-2.5 sm:py-3 bg-orange-500/10 hover:bg-orange-500/20 text-orange-400 hover:text-orange-300 border border-orange-500/35 hover:border-orange-500/60 rounded-xl transition-all duration-200 flex items-center justify-center shadow-[0_0_10px_rgba(255,95,0,0.055)] disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-orange-500/10 disabled:hover:text-orange-400 disabled:border-orange-500/20 disabled:scale-100 cursor-pointer active:scale-95 flex-shrink-0"
             >
               <RotateCcw className="w-4 h-4" />
             </button>
@@ -1620,14 +1620,15 @@ export default function App() {
                   ? "Metemphysics is formulating its response..." 
                   : "Ask Metemphysics or query any physical-consciousness transition..."
               }
-              className="flex-1 bg-[#0a0a0a50] border border-orange-500/20 rounded-xl px-4 py-3 text-sm outline-none text-[#eeeae4] focus:border-orange-500/60 font-serif shadow-inner placeholder-gray-650 transition-all focus:bg-[#0c0c0c] disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 min-w-0 bg-[#0a0a0a50] border border-orange-500/20 rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm outline-none text-[#eeeae4] focus:border-orange-500/60 font-serif shadow-inner placeholder-gray-650 transition-all focus:bg-[#0c0c0c] disabled:opacity-50 disabled:cursor-not-allowed"
             />
             <button
               disabled={typing || isInputLimitReached}
               onClick={() => !typing && !isInputLimitReached && handleSendMessage()}
-              className="bg-gradient-to-r from-orange-600 to-amber-600 border border-orange-500/60 hover:from-orange-500 hover:to-amber-500 rounded-xl px-5 py-3 text-sm font-mono tracking-widest font-bold text-black flex items-center gap-2 cursor-pointer uppercase transition-all duration-300 transform active:scale-95 shadow-[0_0_12px_rgba(255,95,0,0.2)] disabled:opacity-40 disabled:cursor-not-allowed"
+              className="bg-gradient-to-r from-orange-600 to-amber-600 border border-orange-500/60 hover:from-orange-500 hover:to-amber-500 rounded-xl px-3 sm:px-5 py-2.5 sm:py-3 text-xs sm:text-sm font-mono tracking-widest font-bold text-black flex items-center justify-center gap-1.5 sm:gap-2 cursor-pointer uppercase transition-all duration-300 transform active:scale-95 shadow-[0_0_12px_rgba(255,95,0,0.2)] disabled:opacity-40 disabled:cursor-not-allowed flex-shrink-0"
             >
-              <Send className="w-3.5 h-3.5 text-black" /> Transmit
+              <Send className="w-3.5 h-3.5 text-black" />
+              <span className="hidden xs:inline">Transmit</span>
             </button>
           </div>
 
@@ -1647,7 +1648,7 @@ export default function App() {
           </div>
 
           {/* Scrolling launcher list with slightly smaller buttons */}
-          <div className="flex-1 overflow-y-auto space-y-2.5 pr-1 custom-scroll">
+          <div className="flex-1 overflow-y-auto space-y-2.5 lg:space-y-0 lg:flex lg:flex-col lg:justify-between lg:h-full pr-1 custom-scroll">
             {[
               { id: "chakra", name: "Music & Chakra Atlas", desc: "Solfeggio and H calibrations", icon: Flame, color: "hover:border-orange-500/60 hover:bg-orange-500/5 hover:shadow-[0_0_12px_rgba(255,95,0,0.1)]", tip: "Acoustic calibration grid coupling natural vibration intervals (Hz), human chakra energy levels, or cognitive EEG brainwave ranges." },
               { id: "entropy", name: "Entropy Periodic Table", desc: "Molar & thermodynamic values", icon: BarChart, color: "hover:border-orange-500/60 hover:bg-orange-500/5 hover:shadow-[0_0_12px_rgba(255,95,0,0.1)]", tip: "Thermodynamic reference database listing accurate molar weights, phase states, and entropy indexes (S°) across elements." },
@@ -1663,18 +1664,18 @@ export default function App() {
             ].sort((a, b) => a.name.localeCompare(b.name)).map((p) => {
               const IconComp = p.icon;
               return (
-                <div key={p.id} className="relative group/lab-item">
+                <div key={p.id} className="relative group/lab-item lg:flex-1 lg:flex lg:flex-col lg:justify-center">
                   <button
                     onClick={() => setActivePanel(p.id)}
-                    className={`w-full bg-[#050505] p-2 rounded-lg border border-orange-500/15 text-left transition-[#e4d9c0] duration-350 transform hover:-translate-y-0.5 cursor-pointer flex items-center justify-between shadow-[0_0_6px_rgba(255,95,0,0.01)] ${p.color}`}
+                    className={`w-full bg-[#050505] p-2.5 lg:py-2.5 lg:px-3 rounded-lg border border-orange-500/15 text-left transition-[#e4d9c0] duration-350 transform hover:-translate-y-0.5 cursor-pointer flex items-center justify-between shadow-[0_0_6px_rgba(255,95,0,0.01)] ${p.color}`}
                   >
-                    <div className="flex items-center gap-2 min-w-0">
-                      <div className="flex-shrink-0 w-7 h-7 rounded bg-orange-950/15 border border-orange-500/20 flex items-center justify-center">
-                        <IconComp className="w-3.5 h-3.5 text-orange-450" />
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <div className="flex-shrink-0 w-7 h-7 lg:w-8 lg:h-8 rounded bg-orange-950/15 border border-orange-500/20 flex items-center justify-center">
+                        <IconComp className="w-3.5 h-3.5 lg:w-4 lg:h-4 text-orange-450" />
                       </div>
                       <div className="min-w-0">
-                        <h4 className="font-serif font-bold text-[10.5px] text-white tracking-wide line-clamp-1">{p.name}</h4>
-                        <p className="text-[8.5px] text-gray-500 font-mono truncate mt-0.5">{p.desc}</p>
+                        <h4 className="font-serif font-bold text-[10.5px] lg:text-[11px] text-white tracking-wide line-clamp-1">{p.name}</h4>
+                        <p className="text-[8.5px] lg:text-[9px] text-gray-500 font-mono truncate mt-0.5">{p.desc}</p>
                       </div>
                     </div>
                     <ChevronRight className="w-3.5 h-3.5 text-gray-600 flex-shrink-0 ml-1" />
