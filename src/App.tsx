@@ -27,7 +27,8 @@ import {
   Activity,
   Cpu,
   RotateCcw,
-  Hash
+  Hash,
+  X
 } from "lucide-react";
 import { METEM_DB, GRAPH } from "./data/metemDb";
 import ChakraPanel from "./components/ChakraPanel";
@@ -541,6 +542,13 @@ export default function App() {
       setMessages(selectedChat.messages);
     }
     setSavedChats(updatedSavedChats);
+  };
+
+  const [chatsDropdownOpen, setChatsDropdownOpen] = useState(false);
+
+  const handleDeleteSavedChat = (e: React.MouseEvent, chatId: string) => {
+    e.stopPropagation();
+    setSavedChats((prev) => prev.filter((c) => c.id !== chatId));
   };
 
   // Responsive Abort and Transmission Throttling configurations
@@ -1636,11 +1644,11 @@ export default function App() {
           rel="noopener noreferrer" 
           className="text-orange-500 hover:text-orange-400 hover:underline transition-colors duration-200 md:flex-1 text-center md:text-left"
         >
-          © 2026 Metemphysics Integrative Framework. All Rights Conserved.
+          © 2026 Metemphysics Synthesis AI. All Rights Reserved.
         </a>
 
         {/* MIDDLE COLUMN FOR SAVED SESSIONS */}
-        <div className="flex items-center gap-2 px-4 py-1.5 bg-[#0a0a0d] border border-orange-500/20 rounded-xl shadow-[0_0_15px_rgba(255,95,0,0.04)] justify-center md:flex-1">
+        <div className="relative flex items-center gap-2 px-4 py-1.5 bg-[#0a0a0d] border border-orange-500/20 rounded-xl shadow-[0_0_15px_rgba(255,95,0,0.04)] justify-center md:flex-1">
           <div className="group relative inline-flex items-center cursor-help">
             <span className="text-orange-500 font-extrabold tracking-widest uppercase text-[10.5px] border-b border-dashed border-orange-500/40 pb-0.5">
               Chats
@@ -1658,21 +1666,65 @@ export default function App() {
               (No saved sessions)
             </span>
           ) : (
-            <select
-              onChange={(e) => {
-                const selectedId = e.target.value;
-                if (selectedId) handleLoadSavedChat(selectedId);
-              }}
-              value=""
-              className="bg-black border border-orange-500/25 hover:border-orange-500/60 rounded px-2 py-0.5 text-[9.5px] font-mono text-orange-450 outline-none cursor-pointer tracking-wide max-w-[160px] sm:max-w-[240px] truncate"
-            >
-              <option value="" disabled className="text-gray-500 bg-black">-- SAVED SESSIONS ({savedChats.length}/25) --</option>
-              {savedChats.map((chat) => (
-                <option key={chat.id} value={chat.id} className="bg-black text-gray-300">
-                  {chat.name}
-                </option>
-              ))}
-            </select>
+            <div className="relative">
+              <button
+                onClick={() => setChatsDropdownOpen(!chatsDropdownOpen)}
+                className="bg-black border border-orange-500/25 hover:border-orange-500/60 rounded px-2.5 py-1 text-[9.5px] font-mono text-orange-400 hover:text-orange-300 outline-none cursor-pointer tracking-wide flex items-center gap-1.5 transition-all duration-200"
+              >
+                <span>SAVED SESSIONS ({savedChats.length}/25)</span>
+                <span className={`transition-transform duration-200 ${chatsDropdownOpen ? 'rotate-180' : ''}`}>▾</span>
+              </button>
+
+              {chatsDropdownOpen && (
+                <>
+                  {/* Backdrop overlay to close when clicking outside */}
+                  <div 
+                    className="fixed inset-0 z-[997]" 
+                    onClick={() => setChatsDropdownOpen(false)} 
+                  />
+                  
+                  {/* Dropup list rising above footer */}
+                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-[998] w-64 md:w-72 max-h-56 overflow-y-auto bg-[#0b0806] border border-orange-500/50 rounded-xl p-2 shadow-2xl custom-scroll">
+                    <div className="text-[9px] font-mono font-bold text-orange-500 uppercase tracking-widest px-2 py-1 border-b border-orange-500/20 mb-1 text-center">
+                      Saved Sessions Queue
+                    </div>
+                    {savedChats.map((chat) => (
+                      <div 
+                        key={chat.id} 
+                        className="group/item flex items-center gap-1 px-2 py-1.5 hover:bg-orange-500/10 rounded-lg border-b border-orange-500/5 last:border-0 transition-colors"
+                      >
+                        {/* Delete button at the start of the text */}
+                        <button
+                          onClick={(e) => handleDeleteSavedChat(e, chat.id)}
+                          className="group/del relative p-1 hover:bg-red-500/20 rounded transition-colors flex items-center justify-center flex-shrink-0 cursor-pointer"
+                        >
+                          <X className="w-3 h-3 text-red-500/85 group-hover/del:text-red-400" />
+                          <span className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover/del:block z-[999] w-12 rounded bg-black border border-red-500/50 py-0.5 text-[8px] font-mono text-center text-red-400 shadow-xl leading-none font-bold">
+                            DELETE
+                          </span>
+                        </button>
+
+                        {/* Chat selection link */}
+                        <div
+                          onClick={() => {
+                            handleLoadSavedChat(chat.id);
+                            setChatsDropdownOpen(false);
+                          }}
+                          className="flex-1 text-[10px] font-mono text-[#eeeae4] group-hover/item:text-orange-400 hover:underline cursor-pointer truncate text-left"
+                        >
+                          {chat.name}
+                        </div>
+
+                        {/* Timestamp */}
+                        <span className="text-[8px] text-gray-600 font-mono flex-shrink-0 pl-1">
+                          {chat.timestamp}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
           )}
         </div>
 
