@@ -1646,7 +1646,8 @@ export default function App() {
               Chats
             </span>
             <span className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block z-[999] w-48 rounded-lg bg-[#0b0806] border border-orange-500/50 p-2.5 text-[9.5px] tracking-wide font-mono leading-tight text-amber-50 shadow-2xl text-center">
-              Limit of 25 Responses
+              <div>Limit of 25 Responses</div>
+              <div className="mt-1 text-orange-400 border-t border-orange-500/15 pt-1 text-[8.5px] uppercase tracking-wider">Chat Imports on Reset</div>
             </span>
           </div>
 
