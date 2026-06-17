@@ -360,7 +360,7 @@ export default function CelestialScalePanel({ onClose, onSendPrompt }: { onClose
   };
 
   return (
-    <div className="absolute inset-0 bg-[#040406] text-[#eeeae4] overflow-y-auto z-[200] p-6 border-2 border-orange-500/25 rounded-2xl flex flex-col">
+    <div className="fixed lg:absolute inset-0 bg-[#040406] text-[#eeeae4] overflow-y-auto z-[200] p-6 border-2 border-orange-500/25 rounded-2xl flex flex-col">
       <div className="max-w-5xl mx-auto w-full flex-1 flex flex-col">
         
         {/* Header */}

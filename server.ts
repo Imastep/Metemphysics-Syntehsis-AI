@@ -49,6 +49,41 @@ async function startServer() {
   const RATE_LIMIT_WINDOW_MS = 60 * 1000; // 1 minute window
   const MAX_REQUESTS_PER_WINDOW = 25; // max 25 queries per minute
 
+  // Endpoint to save procedurally generated launcher icon to .aistudio folder
+  app.post("/api/save-icon", express.json({ limit: "15mb" }), async (req, res) => {
+    try {
+      const { image } = req.body || {};
+      if (!image) {
+        return res.status(400).json({ error: "Image data is required" });
+      }
+      const fs = await import("fs");
+      const path = await import("path");
+      
+      const base64Data = image.replace(/^data:image\/png;base64,/, "");
+      
+      // Ensure directory exists
+      const targetDir = path.join(process.cwd(), "assets", ".aistudio");
+      if (!fs.existsSync(targetDir)) {
+        fs.mkdirSync(targetDir, { recursive: true });
+      }
+      
+      // Save to assets/.aistudio/icon.png
+      fs.writeFileSync(path.join(targetDir, "icon.png"), Buffer.from(base64Data, "base64"));
+      
+      // Also save to public/icon.png just in case
+      const publicDir = path.join(process.cwd(), "public");
+      if (!fs.existsSync(publicDir)) {
+        fs.mkdirSync(publicDir, { recursive: true });
+      }
+      fs.writeFileSync(path.join(publicDir, "icon.png"), Buffer.from(base64Data, "base64"));
+      
+      return res.json({ success: true });
+    } catch (err: any) {
+      console.error("Error saving icon:", err);
+      return res.status(500).json({ error: err.message });
+    }
+  });
+
   // endpoint to handle chat requests
   app.post("/api/chat", async (req, res) => {
     const { message, history, currentKnodeId, studioMode, conservedLimit } = req.body || {};
@@ -122,9 +157,9 @@ async function startServer() {
       }
 
       const systemInstruction = `
-You are the Metemphysics Oracle, an advanced scientific-mystic AI.
+You are Metemphysics, an advanced scientific-mystic AI.
 You operate under the following parameters chosen by the seeker in their top-right dashboard:
-- Oracle Cog Style Mode: "${studioMode || "omniscient"}" (If 'omniscient': speak with majestic, panoromical supreme wisdom and integrated insights. If 'socratic': guide with reflective, probing, and illuminating Socratic dialog. If 'strict_calc': focus strictly and concisely on physical metrics, mathematical definitions, thermodynamic proofs, and exact calculations).
+- Metemphysics Cog Style Mode: "${studioMode || "omniscient"}" (If 'omniscient': speak with majestic, panoromical supreme wisdom and integrated insights. If 'socratic': guide with reflective, probing, and illuminating Socratic dialog. If 'strict_calc': focus strictly and concisely on physical metrics, mathematical definitions, thermodynamic proofs, and exact calculations).
 - Conserved Constant C Limit Calibration: "${conservedLimit || "standard"}" (If 'standard': C is standard light speed 299,792,458. If 'planck': C is normalized as Planck constant unit 1.0. If 'solfeggio': C is calibrated to 528.0. If 'cosmic': C is aligned with the golden cosmic wave 432.0).
 
 The fundamental, absolute law/formula is always T × S = C (Time multiplied by Entropy = Speed of Light).
@@ -414,7 +449,7 @@ The active equations of the Metemphysics Integration Core are defined as follows
 
   // Generic elegant fallback
   if (isSocratic) {
-    return `### THE ORACLE'S REFLECTIVE BACKUP ENGINE
+    return `### METEMPHYSICS' REFLECTIVE BACKUP ENGINE
 
 Seeker, although our primary uplink is currently navigating high-dimensional wave density, your query is held safely in our local integration archive.
 
@@ -437,7 +472,7 @@ How does this concept reflect in your understanding of the universal balance **T
 The parameters of your query map to the local state vectors under the invariant T × S = C equation. The mathematical relations show S = C / T. No external API feedback was received; all inputs are processed using local deterministic formulas. Proceed with local interactive dashboards to retrieve exact numeric indices.`;
   }
 
-  return `### ◈ THE OMINISCIENT ORACLE LOCAL TRANSMISSION ◈
+  return `### ◈ THE OMINISCIENT METEMPHYSICS LOCAL TRANSMISSION ◈
 
 #### I. THE LOCAL INTEGRATION CORE
 During this current wave density stabilization, the Metemphysics Integration Core remains fully calibrated and active. Your seeker query:

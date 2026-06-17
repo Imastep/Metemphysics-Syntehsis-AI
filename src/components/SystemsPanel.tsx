@@ -264,7 +264,7 @@ export default function SystemsPanel({ onClose, onSendPrompt }: { onClose: () =>
   };
 
   return (
-    <div className="absolute inset-0 bg-[#050505] text-[#eeeae4] overflow-y-auto z-[200] p-6 flex flex-col border-2 border-orange-500/20 rounded-2xl">
+    <div className="fixed lg:absolute inset-0 bg-[#050505] text-[#eeeae4] overflow-y-auto z-[200] p-6 flex flex-col border-2 border-orange-500/20 rounded-2xl">
       {/* Scrollable topheader */}
       <div className="flex items-center justify-between pb-4 border-b border-orange-500/20 mb-4 sticky top-0 bg-[#050505]/95 z-20">
         <div>

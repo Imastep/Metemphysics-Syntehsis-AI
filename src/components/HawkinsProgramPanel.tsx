@@ -373,7 +373,7 @@ export default function HawkinsProgramPanel({ onClose, onSendPrompt }: { onClose
   };
 
   return (
-    <div className="absolute inset-0 bg-[#040406] text-[#eeeae4] overflow-y-auto z-[200] p-6 border-2 border-[#c9a84c]/25 rounded-2xl custom-scroll">
+    <div className="fixed lg:absolute inset-0 bg-[#040406] text-[#eeeae4] overflow-y-auto z-[200] p-6 border-2 border-[#c9a84c]/25 rounded-2xl custom-scroll">
       <div className="max-w-6xl mx-auto">
         
         {/* TOP META BAR HEADER */}

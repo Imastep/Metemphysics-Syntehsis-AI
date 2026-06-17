@@ -445,7 +445,7 @@ export default function CalcPanel({ onClose, onSendPrompt }: { onClose: () => vo
   };
 
   return (
-    <div className="absolute inset-0 bg-[#050505] text-[#eeeae4] overflow-y-auto z-[200] p-6 flex flex-col font-serif border-2 border-orange-500/20 rounded-2xl">
+    <div className="fixed lg:absolute inset-0 bg-[#050505] text-[#eeeae4] overflow-y-auto z-[200] p-6 flex flex-col font-serif border-2 border-orange-500/20 rounded-2xl">
       <div className="max-w-4xl mx-auto w-full">
         {/* Header bar */}
         <div className="flex items-center justify-between pb-6 border-b border-orange-500/20 mb-6">

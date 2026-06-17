@@ -37,7 +37,7 @@ export default function RefTablesPanel({ onClose, onSendPrompt }: { onClose: () 
   ];
 
   return (
-    <div className="absolute inset-0 bg-[#040406] text-[#eeeae4] overflow-y-auto z-[200] p-6 border-2 border-orange-500/25 rounded-2xl">
+    <div className="fixed lg:absolute inset-0 bg-[#040406] text-[#eeeae4] overflow-y-auto z-[200] p-6 border-2 border-orange-500/25 rounded-2xl">
       <div className="max-w-6xl mx-auto">
         
         {/* Header */}

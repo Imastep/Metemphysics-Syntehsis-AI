@@ -494,6 +494,70 @@ export default function App() {
     }
   }, [messages]);
 
+  // Procedural application launcher icon generation of gold/orange 'M' + 'Metemphysics'
+  useEffect(() => {
+    const generateAndUploadIcon = async () => {
+      try {
+        const canvas = document.createElement("canvas");
+        canvas.width = 512;
+        canvas.height = 512;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) return;
+
+        // 1. Paint backdrop black
+        ctx.fillStyle = "#000000";
+        ctx.fillRect(0, 0, 512, 512);
+
+        // 2. Create the linear color gradient for the "M"
+        const grad = ctx.createLinearGradient(0, 50, 0, 440);
+        grad.addColorStop(0, "#ff6a00");   // Neon orange top
+        grad.addColorStop(0.55, "#f59e0b"); // Luxurious golden-amber mid
+        grad.addColorStop(1, "#fbbf24");   // Yellow-gold bottom
+
+        // 3. Ambient neon glow effect
+        ctx.shadowColor = "rgba(249, 115, 22, 0.45)";
+        ctx.shadowBlur = 18;
+
+        // 4. Draw stylized geometric "M"
+        ctx.strokeStyle = grad;
+        ctx.lineWidth = 11;
+        ctx.lineCap = "round";
+        ctx.lineJoin = "round";
+
+        ctx.beginPath();
+        // Left vertical leg
+        ctx.moveTo(95, 440);
+        ctx.lineTo(95, 60);
+        // Middle dipping vertex
+        ctx.lineTo(256, 268);
+        // Right top peak
+        ctx.lineTo(417, 60);
+        // Right vertical leg
+        ctx.lineTo(417, 440);
+        ctx.stroke();
+
+        // 5. Drawcentered gold 'Metemphysics' text
+        ctx.shadowBlur = 0; // Turn off glow for text block for high legibility
+        ctx.fillStyle = "#f5c35c"; // Light warm gold text matches screenshot
+        ctx.font = '500 37px "Inter", "Space Grotesk", "Segoe UI", sans-serif';
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText("Metemphysics", 256, 350);
+
+        // 6. Transmit saved icon to server filesystem
+        const dataUrl = canvas.toDataURL("image/png");
+        await fetch("/api/save-icon", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ image: dataUrl })
+        });
+      } catch (err) {
+        console.warn("[Icon Auto-Gen] Client upload deferred:", err);
+      }
+    };
+    generateAndUploadIcon();
+  }, []);
+
   const [savedChats, setSavedChats] = useState<SavedChat[]>(() => {
     try {
       const saved = localStorage.getItem("metemphysics_saved_chats");

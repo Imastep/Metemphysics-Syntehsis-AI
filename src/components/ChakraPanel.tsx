@@ -540,7 +540,7 @@ export default function ChakraPanel({ onClose, onSendPrompt }: { onClose: () => 
   }, []);
 
   return (
-    <div className="absolute inset-0 bg-[#050505] text-[#eeeae4] overflow-y-auto z-[200] p-6 border-2 border-orange-500/20 rounded-2xl animate-fadeIn">
+    <div className="fixed lg:absolute inset-0 bg-[#050505] text-[#eeeae4] overflow-y-auto z-[200] p-6 border-2 border-orange-500/20 rounded-2xl animate-fadeIn">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between pb-6 border-b border-[#c9a84c]/20 mb-6 gap-4">

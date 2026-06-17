@@ -430,7 +430,7 @@ export default function CodeReaderPanel({ onClose, onLaunchChat }: { onClose: ()
   };
 
   return (
-    <div className="absolute inset-0 bg-[#050505] text-[#eeeae4] overflow-y-auto p-6 z-[200] border-2 border-orange-500/20 rounded-2xl">
+    <div className="fixed lg:absolute inset-0 bg-[#050505] text-[#eeeae4] overflow-y-auto p-6 z-[200] border-2 border-orange-500/20 rounded-2xl">
       <div className="max-w-xl mx-auto flex flex-col items-center justify-center min-h-[85vh]">
         {/* Close and title */}
         <div className="w-full flex justify-between items-center border-b border-orange-500/20 pb-4 mb-6">
