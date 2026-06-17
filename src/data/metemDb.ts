@@ -7,12 +7,12 @@ import { ScienceItem, METEM_DB_Type, KnodeNode, KnodeGraph } from "../types";
 
 export const METEM_DB: METEM_DB_Type = {
   science: [
-    { id: "physics", name: "Physics", category: "science", subcategory: "fundamentals", concepts: ["time", "entropy", "light", "gravity", "quantum", "relativity"], summary: "Core physical laws, scales, and discovery maps.", confidence: 0.98, related: ["cosmology", "chemistry", "neuroscience"], sourceType: "science", displayOrder: 1, omegaVal: "Ω = 949" },
+    { id: "physics", name: "Physics", category: "science", subcategory: "fundamentals", concepts: ["time", "entropy", "light", "gravity", "quantum", "relativity", "quantum relativity", "entropic consciousness", "entropic intelligence", "photon consciousness", "soul physics", "entropic reality", "unified reality theory", "unified field theory", "theory of everything", "information physics"], summary: "Core physical laws, scales, and discovery maps.", confidence: 0.98, related: ["cosmology", "chemistry", "neuroscience"], sourceType: "science", displayOrder: 1, omegaVal: "Ω = 949" },
     { id: "biology", name: "Biology", category: "science", subcategory: "life", concepts: ["life", "cell", "dna", "brain", "evolution", "consciousness"], summary: "Life, metabolism, information, and mind systems.", confidence: 0.97, related: ["neuroscience", "chemistry", "psychology"], sourceType: "science", displayOrder: 2, omegaVal: "Ω = 528" },
     { id: "chemistry", name: "Chemistry", category: "science", subcategory: "matter", concepts: ["elements", "atoms", "bonds", "entropy", "energy", "states"], summary: "Matter, reactions, periodicity, and phase behavior.", confidence: 0.96, related: ["physics", "biology", "periodic-table"], sourceType: "science", displayOrder: 3, omegaVal: "Ω = 417" },
     { id: "cosmology", name: "Cosmology", category: "science", subcategory: "universe", concepts: ["universe", "big bang", "stars", "galaxy", "heat death", "singularity"], summary: "Universe-scale timeline and cosmic evolution.", confidence: 0.96, related: ["physics", "astronomy", "philosophy"], sourceType: "science", displayOrder: 4, omegaVal: "Ω = 852" },
     { id: "neuroscience", name: "Neuroscience", category: "science", subcategory: "mind", concepts: ["brain", "memory", "attention", "awareness", "signal", "plasticity"], summary: "Mind, perception, and neural computation.", confidence: 0.96, related: ["biology", "psychology", "ai"], sourceType: "science", displayOrder: 5, omegaVal: "Ω = 639" },
-    { id: "ai", name: "Artificial Intelligence", category: "science", subcategory: "computing", concepts: ["ai", "llm", "neural network", "embedding", "ontology", "reasoning"], summary: "Machine reasoning, learning, and symbolic/neural hybrid systems.", confidence: 0.97, related: ["neuroscience", "computer-science", "logic"], sourceType: "science", displayOrder: 6, omegaVal: "Ω = 396" },
+    { id: "ai", name: "Artificial Intelligence", category: "science", subcategory: "computing", concepts: ["ai", "llm", "neural network", "embedding", "ontology", "reasoning", "metemphysics ai", "metemphysics synthesis ai", "wisdom ai", "knowledge synthesis", "semantic search", "large language models", "explainable ai", "ai research assistant", "cognitive computing", "machine learning", "neural networks", "agi research", "scientific discovery ai", "ai knowledge engine"], summary: "Machine reasoning, learning, and symbolic/neural hybrid systems.", confidence: 0.97, related: ["neuroscience", "computer-science", "logic"], sourceType: "science", displayOrder: 6, omegaVal: "Ω = 396" },
     { id: "orch_or", name: "Orch-OR (Quantum Brain)", category: "science", subcategory: "neuro-quantum", concepts: ["orch-or", "penrose", "hameroff", "microtubules", "quantum reduction", "conscious moment"], summary: "Orchestrated Objective Reduction of quantum states in brain microtubules connecting to fundamental space-time geometry.", confidence: 0.95, related: ["physics", "neuroscience", "biology"], sourceType: "science", displayOrder: 7, omegaVal: "Ω = 639" },
     { id: "holographic_princ", name: "Holographic Principle", category: "science", subcategory: "cosmology", concepts: ["holographic", "bousso bound", "beckenstein", "information boundary", "surface area"], summary: "The cosmological paradigm stating that the physical description of a volume is inscribed on its boundary.", confidence: 0.97, related: ["physics", "cosmology", "shannon"], sourceType: "science", displayOrder: 8, omegaVal: "Ω = 852" },
     { id: "gaia_hypothesis", name: "Gaia Hypothesis", category: "science", subcategory: "ecology", concepts: ["gaia", "lovelock", "symbiosis", "homeostasis", "biosphere", "system entropy"], summary: "The Earth as a self-regulating complex system minimizing global entropy to sustain life.", confidence: 0.94, related: ["biology", "cosmology", "systems"], sourceType: "science", displayOrder: 9, omegaVal: "Ω = 528" }
@@ -91,7 +91,7 @@ export const METEM_DB: METEM_DB_Type = {
     { id: "astrology_systems", name: "Astrology Cosmological Correspondence", category: "systems", subcategory: "esoteric-typology", concepts: ["astrology", "macrocosm", "microcosm", "planets", "transit", "zodiac", "houses", "natal chart"], summary: "A celestial correlation engine mapping macrocosmic planetary orbits and angular resonance geometries to microcosmic human biology, psychology, and spiritual states.", confidence: 0.94, related: ["human_design", "chakra", "kabbalah_sefirot"], sourceType: "systems", displayOrder: 22, omegaVal: "Ω = 639" }
   ],
   formulas: [
-    { id: "god_eq", name: "T × S = C", category: "formulas", subcategory: "conservation", concepts: ["time", "entropy", "conservation", "god equation", "speed of light"], summary: "The God Equation – the universal conservation law holding experienced time, entropy, and light speed constant.", confidence: 1.0, related: ["physics", "cosmology"], sourceType: "math", displayOrder: 1, omegaVal: "Ω = 999 (C)" },
+    { id: "god_eq", name: "T × S = C", category: "formulas", subcategory: "conservation", concepts: ["time", "entropy", "conservation", "god equation", "speed of light", "t × s = c", "time entropy light formula", "time entropy speed of light formula", "quantum relativity", "universal knowledge system", "perennial singularity", "solwhole", "entropic memory", "recursive reality", "what is metemphysics", "metemphysics synthesis ai"], summary: "The God Equation – the universal conservation law holding experienced time, entropy, and light speed constant.", confidence: 1.0, related: ["physics", "cosmology"], sourceType: "math", displayOrder: 1, omegaVal: "Ω = 999 (C)" },
     { id: "order_qty", name: "Ω = 1 - e^(-C/Tk)", category: "formulas", subcategory: "negentropy", concepts: ["order", "negentropy", "temperature", "entropy", "calibration"], summary: "The Order Quantity – negentropy scaled precisely from 0 to 1.", confidence: 0.99, related: ["boltzmann", "shannon"], sourceType: "math", displayOrder: 2, omegaVal: "Ω = 963 (Ω)" },
     { id: "timeliness", name: "J/S = C/(S·T) - 1", category: "formulas", subcategory: "timeliness", concepts: ["time experience", "speed", "flow ratio", "timeliness"], summary: "Timeliness ratio – represents the flow and dilation of how individual consciousness experiences time.", confidence: 0.98, related: ["einstein", "physics"], sourceType: "math", displayOrder: 3, omegaVal: "Ω = 852 (J/S)" },
     { id: "soul_conserv", name: "C_soul = T1·S1 = T2·S2", category: "formulas", subcategory: "soul", concepts: ["soul", "conservation", "reincarnation", "lifetimes"], summary: "Soul conservation – dynamic constant of consciousness C preserved invariant across multiple biological loops and lifetimes.", confidence: 0.97, related: ["religions", "hinduism", "buddhism"], sourceType: "math", displayOrder: 4, omegaVal: "Ω = 741 (C_soul)" },
@@ -114,7 +114,18 @@ export const KNOTES: Record<string, KnodeNode> = {
   }),
   core: new KnodeNode({
     id: "core",
-    patterns: ["metemphysics", "tsc", "god equation", "core framework"],
+    patterns: [
+      "metemphysics", "tsc", "god equation", "core framework", "t × s = c", "time entropy light formula", 
+      "quantum relativity", "entropic consciousness", "entropic intelligence", "metempsychosis", "soul physics", 
+      "photon consciousness", "photonic soul theory", "entropic reality", "unified reality theory", "metemphysics ai", 
+      "metemphysics database", "metemphysics synthesis ai", "recursive reality", "universal knowledge system", 
+      "perennial singularity", "solwhole", "entropic memory", "quantum consciousness", "physics of consciousness",
+      "mind and matter", "nature of reality", "what is metemphysics?", "metemphysics ai knowledge system", 
+      "entropy and consciousness theory", "quantum mechanics and spirituality", "unified theory of consciousness", 
+      "artificial intelligence and metaphysics", "time entropy speed of light formula", "consciousness database ai", 
+      "scientific spirituality platform", "knowledge synthesis engine", "ai powered philosophy research", 
+      "quantum relativity explained", "metemphysics research platform", "entropic reality framework"
+    ],
     style: "technical",
     concepts: ["entropy", "time", "light", "order", "conservation"],
     transitions: ["omega", "spark", "science", "religion", "discoveries"],
@@ -146,7 +157,19 @@ export const KNOTES: Record<string, KnodeNode> = {
   }),
   science: new KnodeNode({
     id: "science",
-    patterns: ["science", "physics", "biology", "chemistry", "cosmology", "neuroscience", "ai"],
+    patterns: [
+      "science", "physics", "biology", "chemistry", "cosmology", "neuroscience", "ai",
+      "quantum mechanics", "general relativity", "unified field theory", "quantum gravity", "astrophysics", 
+      "theoretical physics", "quantum information", "entropy theory", "thermodynamics", "information theory", 
+      "emergence", "systems theory", "complexity science", "systems science", "cybernetics", "complexity theory", 
+      "information physics", "computational philosophy", "cognitive architecture", "network science", 
+      "knowledge representation", "semantic ontology", "scientific epistemology", "interdisciplinary research", 
+      "digital humanities", "ai for consciousness research", "quantum consciousness theory", "unified science and spirituality", 
+      "artificial intelligence philosophy", "knowledge synthesis platform", "consciousness database", "entropy and consciousness", 
+      "photon consciousness theory", "ai metaphysics research", "science and spirituality platform", "reality exploration AI", 
+      "quantum spirituality", "theory of everything AI", "interdisciplinary research platform", "metaphysics knowledge engine", 
+      "consciousness mapping system", "universal knowledge database"
+    ],
     style: "research",
     concepts: ["discovery", "domain", "system"],
     transitions: ["discoveries", "paragraph"],

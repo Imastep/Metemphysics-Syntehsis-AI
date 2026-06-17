@@ -28,7 +28,9 @@ import {
   Cpu,
   RotateCcw,
   Hash,
-  X
+  X,
+  Copy,
+  Check
 } from "lucide-react";
 import { METEM_DB, GRAPH } from "./data/metemDb";
 import ChakraPanel from "./components/ChakraPanel";
@@ -484,6 +486,15 @@ export default function App() {
   const [currentNodeId, setCurrentNodeId] = useState<string>("greeting");
   const [typing, setTyping] = useState(false);
   const [offlineMode, setOfflineMode] = useState(false);
+  const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
+
+  const handleCopyText = (text: string, index: number) => {
+    navigator.clipboard.writeText(text);
+    setCopiedIndex(index);
+    setTimeout(() => {
+      setCopiedIndex((prev) => prev === index ? null : prev);
+    }, 2000);
+  };
 
   // Sync up to 25 chat responses to Local Storage
   useEffect(() => {
@@ -954,21 +965,28 @@ export default function App() {
     <div className="min-h-screen w-full max-w-full overflow-x-hidden bg-[#050505] text-[#eeeae4] flex flex-col font-sans selection:bg-[#ff5f00]/30 selection:text-white">
       
       {/* GLOWING AMBIENT TOPHEADER */}
-      <header className="border-b-2 border-orange-500/30 bg-black shadow-[0_4px_30px_rgba(255,95,0,0.12)] sticky top-0 z-50 px-6 py-4 flex flex-wrap items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <div className="relative flex items-center justify-center w-10 h-10 rounded-full border border-orange-500/40 bg-gradient-to-br from-orange-500/10 to-amber-950/40 shadow-[0_0_15px_rgba(255,95,0,0.25)]">
-            <Atom className="w-5 h-5 text-orange-500 animate-spin-slow" />
-            <span className="absolute -top-1 -right-1 flex h-3.5 w-3.5">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-orange-500"></span>
-            </span>
-          </div>
+      <header className="border-b-2 border-orange-500/30 bg-black shadow-[0_4px_30px_rgba(255,95,0,0.12)] sticky top-0 z-50 px-6 py-4 flex items-center justify-between gap-4">
+        {/* Left segment */}
+        <div className="flex items-center gap-3 min-w-[50px] sm:min-w-[150px]">
+          <a
+            href="https://metemphysics.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-3 hover:opacity-80 transition-all cursor-pointer"
+          >
+            <div className="relative flex items-center justify-center w-10 h-10 rounded-full border border-orange-500/40 bg-gradient-to-br from-orange-500/10 to-amber-950/40 shadow-[0_0_15px_rgba(255,95,0,0.25)]">
+              <Atom className="w-5 h-5 text-orange-500 animate-spin-slow" />
+              <span className="absolute -top-1 -right-1 flex h-3.5 w-3.5">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-orange-500"></span>
+              </span>
+            </div>
+            <span className="hidden md:inline font-serif font-bold text-xs tracking-wider text-[#eeeae4]">METEMPHYSICS</span>
+          </a>
         </div>
 
-        {/* Dynamic State Rails & Settings Dropdowns */}
-        <div className="flex flex-wrap items-center gap-3">
-          
-          {/* Mode Selector */}
+        {/* Center segment - Metemphysics Cog Mode Selector */}
+        <div className="flex justify-center items-center">
           <div className="flex items-center gap-1.5 px-2.5 py-1 bg-[#0a0a0c] border border-orange-500/35 rounded shadow-[0_0_10px_rgba(255,106,0,0.05)]">
             <span className="text-[9px] font-mono text-gray-500 uppercase tracking-tight">Metemphysics Cog:</span>
             <select
@@ -985,7 +1003,10 @@ export default function App() {
               <option value="strict_calc" className="bg-black text-orange-400">Strict Calculator</option>
             </select>
           </div>
+        </div>
 
+        {/* Right segment - Status Rails */}
+        <div className="flex items-center justify-end min-w-[50px] sm:min-w-[150px]">
           <div className="hidden sm:flex items-center gap-1.5 px-2 py-1 bg-black border border-gray-800 font-mono text-[9px] rounded">
             <span className="w-2 h-2 rounded-full bg-orange-500 animate-pulse"></span>
             <span className="text-gray-400 uppercase font-bold">{offlineMode ? "Local Backup" : "Omniscient Active"}</span>
@@ -1467,9 +1488,28 @@ export default function App() {
                       <div className="flex items-center gap-1.5 px-0.5 pb-2 mb-2.5 border-b border-orange-500/20 text-[10px] font-mono uppercase tracking-wider text-orange-400">
                         <Sparkles className="w-3 h-3 text-orange-500" />
                         <span>Metemphysics Console</span>
-                        <span className="text-gray-600">·</span>
+                        <span className="text-gray-650">·</span>
                         <span className="text-gray-400">Coherence: 94.9%</span>
-                        <span className="ml-auto text-orange-500 font-bold">Ω-Matrix Calibrated</span>
+                        <span className="ml-auto flex items-center gap-2">
+                          <span className="text-orange-500 font-bold hidden xs:inline">Ω-Matrix Calibrated</span>
+                          <button
+                            onClick={() => handleCopyText(m.text, idx)}
+                            className="px-1.5 py-0.5 rounded bg-orange-500/10 hover:bg-orange-500/20 text-orange-400 hover:text-orange-300 border border-orange-500/25 hover:border-orange-500/50 transition-all cursor-pointer flex items-center gap-1 active:scale-95 text-[9px] font-bold tracking-widest font-mono"
+                            title="Copy response to clipboard"
+                          >
+                            {copiedIndex === idx ? (
+                              <>
+                                <Check className="w-2.5 h-2.5 text-green-400" />
+                                <span className="text-[8px] text-green-400 font-bold">COPIED</span>
+                              </>
+                            ) : (
+                              <>
+                                <Copy className="w-2.5 h-2.5" />
+                                <span className="text-[8px]">COPY</span>
+                              </>
+                            )}
+                          </button>
+                        </span>
                       </div>
                     )}
 
