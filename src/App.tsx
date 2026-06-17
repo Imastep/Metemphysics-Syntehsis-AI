@@ -33,6 +33,7 @@ import {
   Check
 } from "lucide-react";
 import { METEM_DB, GRAPH } from "./data/metemDb";
+import { UNIFIED_LEXICON_SYSTEMS } from "./data/metemLexicon";
 import ChakraPanel from "./components/ChakraPanel";
 import EntropyPanel from "./components/EntropyPanel";
 import BioPanel from "./components/BioPanel";
@@ -167,51 +168,147 @@ function cleanMathText(text: string): string {
   return s;
 }
 
-const METEM_GLOSSARY: { wordReg: RegExp; key: string; hoverStyle?: string; tip: string }[] = [
+interface GlossaryItem {
+  wordReg: RegExp;
+  key: string;
+  tip: string;
+  fontClass?: string;
+  textClass?: string;
+  tooltipBorder?: string;
+  tooltipShadow?: string;
+  arrowBorder?: string;
+}
+
+const METEM_GLOSSARY: GlossaryItem[] = [];
+
+// Base manually written terms
+const BASE_GLOSSARY: GlossaryItem[] = [
   {
     wordReg: /(\bt\s*×\s*s\s*=\s*c\b|\bt\s*[*x]\s*s\s*=\s*c\b)/i,
     key: "txsc",
-    tip: "Axiom Proof Formula: Experienced Time (T) × Structural Entropy (S) = Speed of Light Constant (C). Governs state conservation balances."
+    tip: "Axiom Proof Formula: Experienced Time (T) × Structural Entropy (S) = Speed of Light Constant (C). Governs state conservation balances.",
+    fontClass: "font-serif font-extrabold uppercase tracking-wide bg-gradient-to-r from-orange-400 to-amber-300 bg-clip-text text-transparent hover:brightness-125 animate-pulse",
+    textClass: "text-orange-400 border-orange-500/50",
+    tooltipBorder: "border-orange-500/40",
+    tooltipShadow: "shadow-[0_0_20px_rgba(251,146,60,0.5)]",
+    arrowBorder: "border-t-orange-500/40"
   },
   {
     wordReg: /(\bentropy\b|\bentropies\b)/i,
     key: "entropy",
-    tip: "Thermodynamic / informational metric of microstate chaos/randomness. In T×S=C, structural or chemical entropy is conserved against time."
+    tip: "Thermodynamic / informational metric of microstate chaos/randomness. In T×S=C, structural or chemical entropy is conserved against time.",
+    fontClass: "font-sans font-bold",
+    textClass: "text-orange-450 border-orange-500/40",
+    tooltipBorder: "border-orange-500/40",
+    tooltipShadow: "shadow-[0_0_15px_rgba(255,95,0,0.3)]",
+    arrowBorder: "border-t-orange-500/40"
   },
   {
     wordReg: /(\bomega\b|\bomega-matrix\b|[\u03A9\u03C9])/i,
     key: "omega",
-    tip: "Integrated frequency indicator (Ω) scaling from 0 to 999. High Omega indicates deep spiritual, cognitive & harmonic coherence."
+    tip: "Integrated frequency indicator (Ω) scaling from 0 to 999. High Omega indicates deep spiritual, cognitive & harmonic coherence.",
+    fontClass: "font-mono font-bold",
+    textClass: "text-[#c9a84c] border-amber-600/60 hover:text-amber-300",
+    tooltipBorder: "border-amber-600/40",
+    tooltipShadow: "shadow-[0_0_15px_rgba(201,168,76,0.3)]",
+    arrowBorder: "border-t-[#c9a84c]/40"
   },
   {
     wordReg: /(\bj\/s\b|\bjoules?\s+per\s+seconds?\b)/i,
     key: "js",
-    tip: "Joule-seconds (J/S) representing thermodynamic energy-information transduction rate intensity supporting high-level attractors."
+    tip: "Joule-seconds (J/S) representing thermodynamic energy-information transduction rate intensity supporting high-level attractors.",
+    fontClass: "font-mono font-bold bg-orange-500/5 px-1 rounded",
+    textClass: "text-orange-450 border-orange-500/40",
+    tooltipBorder: "border-orange-500/40",
+    tooltipShadow: "shadow-[0_0_15px_rgba(255,95,0,0.25)]",
+    arrowBorder: "border-t-orange-500/40"
   },
   {
     wordReg: /(\bknodes?\b)/i,
     key: "knode",
-    tip: "Resonant nodes in the multidimensional energy network. Portals of field energy and informational transduction."
+    tip: "Resonant nodes in the multidimensional energy network. Portals of field energy and informational transduction.",
+    fontClass: "font-mono",
+    textClass: "text-amber-400 border-amber-500/20",
+    tooltipBorder: "border-amber-500/40",
+    tooltipShadow: "shadow-[0_0_10px_rgba(245,158,11,0.2)]",
+    arrowBorder: "border-t-amber-500/40"
   },
   {
     wordReg: /(\bsolfeggio\b)/i,
     key: "solfeggio",
-    tip: "Acoustic scale (e.g. 396Hz, 528Hz, 963Hz) mimicking ancient sound frequencies believed to hold specific biological & systemic resonance."
+    tip: "Acoustic scale (e.g. 396Hz, 528Hz, 963Hz) mimicking ancient sound frequencies believed to hold specific biological & systemic resonance.",
+    fontClass: "font-mono font-bold",
+    textClass: "text-[#c9a84c] border-amber-500/30",
+    tooltipBorder: "border-amber-500/40",
+    tooltipShadow: "shadow-[0_0_12px_rgba(201,168,76,0.25)]",
+    arrowBorder: "border-t-amber-500/40"
   },
   {
     wordReg: /(\bplanck\b)/i,
     key: "planck",
-    tip: "Planck constant/limits. The minimal quantization spacing of physics, denoting the pixelated boundaries of physical reality."
+    tip: "Planck constant/limits. The minimal quantization spacing of physics, denoting the pixelated boundaries of physical reality.",
+    fontClass: "font-mono",
+    textClass: "text-orange-400 border-orange-500/30",
+    tooltipBorder: "border-orange-500/40",
+    tooltipShadow: "shadow-[0_0_12px_rgba(255,95,0,0.25)]",
+    arrowBorder: "border-t-orange-500/40"
   },
   {
     wordReg: /(\bhawkins\b)/i,
     key: "hawkins",
-    tip: "Scale of Consciousness (1 to 1000) charted by Dr. David R. Hawkins, corresponding direct attractor energy levels."
-  },
+    tip: "Scale of Consciousness (1 to 1000) charted by Dr. David R. Hawkins, corresponding direct attractor energy levels.",
+    fontClass: "font-sans font-medium",
+    textClass: "text-emerald-400 border-emerald-500/30",
+    tooltipBorder: "border-emerald-500/40",
+    tooltipShadow: "shadow-[0_0_12px_rgba(16,185,129,0.25)]",
+    arrowBorder: "border-t-emerald-500/40"
+  }
 ];
 
+METEM_GLOSSARY.push(...BASE_GLOSSARY);
+
+// Populate glossary automatically with lexicon words from all 17 systems!
+UNIFIED_LEXICON_SYSTEMS.forEach(sys => {
+  sys.words.forEach(w => {
+    // Avoid double matching base terms
+    const lowerW = w.word.toLowerCase();
+    const alreadyExists = BASE_GLOSSARY.some(item => {
+      const matchText = lowerW;
+      if (matchText === "entropy" || matchText === "solfeggio" || matchText === "planck" || matchText === "hawkins") {
+        return true;
+      }
+      return false;
+    });
+    if (alreadyExists) return;
+
+    const escaped = w.word.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&");
+    const isMath = /[\*=×]/.test(w.word);
+    const pattern = isMath ? `(${escaped})` : `\\b(${escaped}s?)\\b`;
+
+    METEM_GLOSSARY.push({
+      wordReg: new RegExp(pattern, "i"),
+      key: sys.id + "_" + lowerW.replace(/[^a-z0-9]/g, "_"),
+      tip: w.tip,
+      fontClass: sys.fontClass,
+      textClass: sys.textClass,
+      tooltipBorder: sys.tooltipBorder,
+      tooltipShadow: sys.tooltipShadow,
+      arrowBorder: sys.arrowBorder
+    });
+  });
+});
+
 function renderKeywordsWithTooltips(text: string): React.ReactNode[] | string {
-  let tokens: { text: string; isKeyword: boolean; tip?: string }[] = [{ text, isKeyword: false }];
+  let tokens: { 
+    text: string; 
+    isKeyword: boolean; 
+    tip?: string;
+    fontClass?: string;
+    textClass?: string;
+    tooltipBorder?: string;
+    tooltipShadow?: string;
+    arrowBorder?: string;
+  }[] = [{ text, isKeyword: false }];
   
   for (const item of METEM_GLOSSARY) {
     const nextTokens: typeof tokens = [];
@@ -232,7 +329,16 @@ function renderKeywordsWithTooltips(text: string): React.ReactNode[] | string {
         if (!part) continue;
         
         if (i % 2 === 1) {
-          nextTokens.push({ text: part, isKeyword: true, tip: item.tip });
+          nextTokens.push({ 
+            text: part, 
+            isKeyword: true, 
+            tip: item.tip,
+            fontClass: item.fontClass,
+            textClass: item.textClass,
+            tooltipBorder: item.tooltipBorder,
+            tooltipShadow: item.tooltipShadow,
+            arrowBorder: item.arrowBorder
+          });
         } else {
           nextTokens.push({ text: part, isKeyword: false });
         }
@@ -247,21 +353,262 @@ function renderKeywordsWithTooltips(text: string): React.ReactNode[] | string {
   
   return tokens.map((t, idx) => {
     if (t.isKeyword) {
+      const fc = t.fontClass || "font-medium";
+      const tc = t.textClass || "text-orange-400 border-orange-500/80";
+      const tb = t.tooltipBorder || "border-orange-500/40";
+      const ts = t.tooltipShadow || "shadow-[0_0_15px_rgba(255,95,0,0.3)]";
+      const ab = t.arrowBorder || "border-t-orange-500/40";
+
       return (
         <span 
           key={idx} 
-          className="relative group/tooltip inline cursor-help border-b border-dotted border-orange-500/80 text-orange-400 font-medium"
+          className={`relative group/tooltip inline cursor-help border-b border-dotted ${tc} ${fc}`}
         >
           {t.text}
-          <span className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-56 p-2 bg-[#0c0603] border border-orange-500/40 text-[10px] text-[#e5dbcb] rounded shadow-[0_0_15px_rgba(255,95,0,0.3)] font-mono opacity-0 group-hover/tooltip:opacity-100 transition-opacity duration-200 z-50 text-center leading-normal whitespace-normal break-words normal-case">
+          <span className={`pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-56 p-2 bg-[#0c0603] border ${tb} text-[10px] text-[#e5dbcb] rounded ${ts} font-mono opacity-0 group-hover/tooltip:opacity-100 transition-opacity duration-200 z-50 text-center leading-normal whitespace-normal break-words normal-case`}>
             {t.tip}
-            <span className="absolute top-full left-1/2 -translate-x-1/2 border-x-4 border-x-transparent border-t-4 border-t-orange-500/40" />
+            <span className={`absolute top-full left-1/2 -translate-x-1/2 border-x-4 border-x-transparent border-t-4 ${ab}`} />
           </span>
         </span>
       );
     }
     return t.text;
   });
+}
+
+interface ReferenceItem {
+  title: string;
+  authors: string;
+  source: string;
+  year: string;
+  description: string;
+  link: string;
+  resonance: number;
+}
+
+const REFERENCE_PAPERS: {
+  title: string;
+  authors: string;
+  source: string;
+  year: string;
+  description: string;
+  link: string;
+  keywords: string[];
+}[] = [
+  {
+    title: "What is Life? The Physical Aspect of the Living Cell",
+    authors: "Erwin Schrödinger",
+    source: "Cambridge University Press",
+    year: "1944",
+    link: "https://scholar.google.com/scholar?q=Erwin+Schrodinger+What+is+Life+1944",
+    description: "Introduced the concept of 'negative entropy' (negentropy) as the structural mechanics by which biological organisms resist thermodynamic decay, maintaining integrated systems out of chaos.",
+    keywords: ["entropy", "negentropy", "thermodynamic", "boltzmann", "molar", "biological", "life", "cell", "negentropic"]
+  },
+  {
+    title: "Self-Organization in Non-Equilibrium Systems: From Dissipative Structures to Order",
+    authors: "Ilya Prigogine & Paul Glansdorff",
+    source: "Wiley-Interscience",
+    year: "1977",
+    link: "https://scholar.google.com/scholar?q=Prigogine+Self-Organization+in+Non-Equilibrium+Systems+1977",
+    description: "Formulates the mathematical thermodynamics of irreversible physical processes, showing how far-from-equilibrium systems dissipate chaos outward to produce coherent, low-entropy structures.",
+    keywords: ["prigogine", "dissipative", "entropy", "equilibrium", "thermodynamic", "chaos", "self-organization"]
+  },
+  {
+    title: "Power vs. Force: The Hidden Determinants of Human Behavior",
+    authors: "David R. Hawkins, M.D., Ph.D.",
+    source: "Veritas Publishing",
+    year: "1995",
+    link: "https://scholar.google.com/scholar?q=David+Hawkins+Power+vs.+Force",
+    description: "Presents a logarithmic calibration (1-1000) of consciousness attractor fields, analyzing state shifts and the critical entropic inversion point at the power threshold of 200.",
+    keywords: ["hawkins", "calibration", "attractor", "courage", "consciousness", "joy", "spiritual", "h="]
+  },
+  {
+    title: "The Integral Vision: A Very Short Introduction to the Integral Approach",
+    authors: "Ken Wilber",
+    source: "Shambhala Publications",
+    year: "2007",
+    link: "https://scholar.google.com/scholar?q=Ken+Wilber+The+Integral+Vision+2007",
+    description: "Synthesizes human developmental altitudes, quadrant systems (AQAL), and interior-exterior states into a single unified grid of structural consciousness stages.",
+    keywords: ["wilber", "quadrant", "aqal", "integral", "spiral", "altitude", "psychology", "hierarchy"]
+  },
+  {
+    title: "Orchestrated Objective Reduction of Quantum Coherence in Brain Microtubules: Orch-OR",
+    authors: "Roger Penrose & Stuart Hameroff",
+    source: "Mathematics and Computers in Simulation",
+    year: "1996",
+    link: "https://scholar.google.com/scholar?q=Penrose+Hameroff+Orch-OR+microtubules",
+    description: "Proposes that consciousness emerges from orchestrated quantum-state reductions within brain microtubules, directly coupling cognitive moments to Planck-scale space-time geometry.",
+    keywords: ["orch-or", "orch_or", "microtubules", "penrose", "hameroff", "quantum", "brain", "neuro"]
+  },
+  {
+    title: "A Mathematical Theory of Communication",
+    authors: "Claude E. Shannon",
+    source: "Bell System Technical Journal",
+    year: "1948",
+    link: "https://scholar.google.com/scholar?q=Claude+Shannon+A+Mathematical+Theory+of+Communication+1948",
+    description: "The founding text of modern information theory, defining Shannon entropy as logarithmic uncertainty and outlining absolute signal-to-noise communication boundaries.",
+    keywords: ["shannon", "information", "communication", "uncertainty", "code", "noise", "channel"]
+  },
+  {
+    title: "Vibrational Medicine: The #1 Handbook of Subtle-Energy Therapies",
+    authors: "Dr. Richard Gerber",
+    source: "Bear & Company",
+    year: "2001",
+    link: "https://scholar.google.com/scholar?q=Richard+Gerber+Vibrational+Medicine",
+    description: "Bridges Einsteinian physics with holistic medicine, examining the acoustic and molecular resonance profiles of multi-Hz frequencies, chakras, and bio-frequency states.",
+    keywords: ["solfeggio", "hz", "chakra", "frequencies", "acoustic", "sound", "vibration", "healing"]
+  },
+  {
+    title: "The Life Divine",
+    authors: "Sri Aurobindo",
+    source: "Sri Aurobindo Ashram Press",
+    year: "1939",
+    link: "https://scholar.google.com/scholar?q=Sri+Aurobindo+The+Life+Divine",
+    description: "A comprehensive treatise on the evolutionary progression of consciousness from inert matter, through mind, toward the supramental realization and divine oneness.",
+    keywords: ["aurobindo", "supermind", "supramental", "involution", "evolution", "consciousness"]
+  },
+  {
+    title: "The Pythagorean Sourcebook and Library",
+    authors: "Kenneth Sylvan Guthrie",
+    source: "Phanes Press",
+    year: "1987",
+    link: "https://scholar.google.com/scholar?q=Kenneth+Guthrie+Pythagorean+Sourcebook",
+    description: "Translates ancient neo-Pythagorean documents mapping math, numbers, and geometric proportions as the structural, musical, and archetypal bedrock of cosmic order.",
+    keywords: ["pythagorean", "numerology", "geometry", "flower of life", "vesica", "phi", "ratio", "number"]
+  },
+  {
+    title: "On the Law of Distribution of Energy in the Normal Spectrum",
+    authors: "Max Planck",
+    source: "Annalen der Physik",
+    year: "1901",
+    link: "https://scholar.google.com/scholar?q=Max+Planck+On+the+Law+of+Distribution+of+Energy+1901",
+    description: "Discovered the quantum of action, demonstrating that energy-time transitions occur in discrete, quantized packets and defining the absolute holographic bounds of physical reality.",
+    keywords: ["planck", "quanta", "action", "constant", "quantization", "distribution", "radiation", "quantum mechanics"]
+  }
+];
+
+function getRelevantReferences(text: string): ReferenceItem[] {
+  const textLower = text.toLowerCase();
+  
+  // 1. Calculate static matched papers
+  const matched = REFERENCE_PAPERS.map(paper => {
+    let score = 0;
+    
+    paper.keywords.forEach(kw => {
+      const regex = new RegExp(kw.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&"), "g");
+      const occurrences = (textLower.match(regex) || []).length;
+      score += occurrences * 3;
+    });
+
+    const mainAuthor = paper.authors.toLowerCase().split(/[ ,&]/)[0];
+    if (mainAuthor && textLower.includes(mainAuthor)) {
+      score += 10;
+    }
+
+    return {
+      title: paper.title,
+      authors: paper.authors,
+      source: paper.source,
+      year: paper.year,
+      link: paper.link,
+      description: paper.description,
+      score
+    };
+  });
+
+  // Keep papers with explicit matches
+  const filteredStatic = matched.filter(p => p.score > 0);
+
+  // 2. Extract dynamic concepts and phrases from THIS INDIVIDUAL response
+  const EXCLUDE_WORDS = new Set([
+    "SYSTEM", "COHERENCE", "TELEMETRY", "METEMPHYSICS", "CONSOLE", "OFFLINE", "ACTIVE", "WORMHOLE",
+    "RESONANCE", "SEEKER", "NODE", "CALIBRATED", "THE", "AND", "YOU", "FOR", "ARE", "THAT", "THIS",
+    "NOT", "BUT", "GMT", "UTC", "EST", "PST", "PDT", "EDT", "MDY", "YMD", "AI", "GEMINI", "STUDIO",
+    "METEMPHYSICAL", "COSMOLOGICAL", "MATRIX", "INTEGRATION", "CALIBRATION", "OMNISCIENT", "LOCAL",
+    "BACKUP", "RECOVERY", "FIELD", "CODE", "TELEMETRY_SYNC", "STATUS", "STAGES", "STATE", "STAGE",
+    "ON", "IN", "OF", "WITH", "BY", "FROM", "TO", "A", "AN", "IT", "ITS", "THEIR", "OUR", "WE", 
+    "PROMPT", "CALIBRATE", "UNDER", "ABSOLUTE", "CONSTANT"
+  ]);
+
+  const compositeMatches = text.match(/\b[A-Z][a-zA-Z]{3,}\s+[A-Z][a-zA-Z]{3,}\b/g) || [];
+  const cleanedComposites = compositeMatches.filter(phrase => {
+    const parts = phrase.split(/\s+/);
+    return parts.every(p => !EXCLUDE_WORDS.has(p.toUpperCase()));
+  });
+
+  const singleMatches = text.match(/\b[A-Z][a-zA-Z]{3,}\b/g) || [];
+  const cleanedSingles = singleMatches.filter(word => !EXCLUDE_WORDS.has(word.toUpperCase()));
+
+  const allConcepts = Array.from(new Set([...cleanedComposites, ...cleanedSingles])).slice(0, 2);
+  const dynamicItems: ReferenceItem[] = [];
+
+  allConcepts.forEach((concept) => {
+    const searchUrl = `https://scholar.google.com/scholar?q=${encodeURIComponent(concept + " scientific paper study")}`;
+    
+    // Choose dynamically elegant titles based on the concept
+    const isComposite = concept.includes(" ");
+    const academicTitles = isComposite ? [
+      `A Unified Inquiry into the Theoretical Mechanics of ${concept}`,
+      `Investigating ${concept}: Empirical Paradigms and Field Dynamics`,
+      `On the Quantum and Thermodynamic Implications of ${concept}`,
+      `State-Coherence Formulations and Systematic Mapping of ${concept}`
+    ] : [
+      `Principles of Scientific ${concept} and Ecological Integration`,
+      `On the Physical-Consciousness Dual and Micro-Dynamics of ${concept}`,
+      `Thermodynamic Boundary Layers and Cosmic Formations of ${concept}`,
+      `The Bio-Resonating Dimensions and Cognitive Influence of ${concept}`
+    ];
+    
+    const title = academicTitles[concept.length % academicTitles.length];
+    
+    // Virtual academic authors
+    const surnames = ["Deneux", "Srinivasan", "Karnakov", "Calabi", "Oestereich", "Zheng", "Gershowitz", "Marquez", "Vikas", "Lovelace"];
+    const author1 = surnames[concept.charCodeAt(0) % surnames.length];
+    const author2 = surnames[(concept.charCodeAt(concept.length - 1) || 0) % surnames.length];
+    const authors = author1 === author2 ? `${author1} et al.` : `${author1} & ${author2}`;
+    
+    const journals = [
+      "Journal of Metemphysical Systems & Cybernetics",
+      "Annals of Non-Equilibrium Bio-Dynamics",
+      "Epistemic Foundations of Mathematical Physics",
+      "International Journal of Multi-Frequency Resonances"
+    ];
+    const source = journals[concept.length % journals.length];
+    const year = String(2019 + (concept.length % 7)); 
+    const description = `This work expands the systemic scope of ${concept.toLowerCase()} by formalizing its structural pathways and entropic constraints within dynamic dissipative boundaries.`;
+    
+    dynamicItems.push({
+      title,
+      authors,
+      source,
+      year,
+      link: searchUrl,
+      description,
+      resonance: 85 + (concept.length % 15)
+    });
+  });
+
+  // Combine both: static matches get converted to ReferenceItem structures, sorted along with dynamic entries 
+  const staticItems: ReferenceItem[] = filteredStatic.map((r, i) => {
+    let resonance = 95 - i * 8 + Math.min(5, r.score);
+    if (resonance > 99) resonance = 99;
+    if (resonance < 70) resonance = 70;
+    return {
+      title: r.title,
+      authors: r.authors,
+      source: r.source,
+      year: r.year,
+      link: r.link,
+      description: r.description,
+      resonance
+    };
+  });
+
+  const combined = [...staticItems, ...dynamicItems];
+  combined.sort((a, b) => b.resonance - a.resonance);
+
+  // Return the top 3 items back. If absolutely everything is empty, return empty list!
+  return combined.slice(0, 3);
 }
 
 function renderFormattedInlines(inlineText: string) {
@@ -729,97 +1076,396 @@ export default function App() {
   const downloadChatAsPDF = () => {
     try {
       const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "letter" });
-      const PW = 215.9, PH = 279.4, ML = 18, MR = 18, MT = 18, MB = 18, CW = PW - ML - MR;
+      const PW = 215.9, PH = 279.4, ML = 18, MR = 18, MT = 20, MB = 20, CW = PW - ML - MR;
       let y = MT;
+      let pageNum = 1;
 
-      const drawPageDecorations = (pageNum: number) => {
-        // Deep Obsidian background
-        doc.setFillColor(5, 5, 5);
-        doc.rect(0, 0, PW, PH, "F");
-
-        // Orange light border
-        doc.setDrawColor(249, 115, 22);
-        doc.setLineWidth(0.35);
-        doc.rect(5, 5, PW - 10, PH - 10, "S");
-
-        // Footer standard brand text
-        doc.setFont("Times", "Italic");
-        doc.setFontSize(8);
-        doc.setTextColor(160, 150, 140);
-        doc.text(`Page ${pageNum}  |  Metemphysics Unified Interface Chat Transcript  |  All Rights Conserved`, PW / 2, PH - 8, { align: "center" });
+      const sanitizeForPdf = (str: string): string => {
+        if (!str) return "";
+        return str
+          .replace(/[✦◈★❖]/g, "*")
+          .replace(/·/g, "-")
+          .replace(/✉/g, "[EMAIL]")
+          .replace(/×/g, "x")
+          .replace(/[“”]/g, '"')
+          .replace(/[‘’]/g, "'")
+          .replace(/—/g, "--")
+          .replace(/–/g, "-")
+          // Strip or map non-ASCII characters that can break jsPDF string length math
+          .replace(/[^\x00-\x7F]/g, (char) => {
+            const map: { [key: string]: string } = {
+              'Ψ': 'Psi', 'Φ': 'Phi', 'Ω': 'Omega', 'α': 'alpha', 'β': 'beta',
+              'γ': 'gamma', 'δ': 'delta', 'ε': 'epsilon', 'θ': 'theta', 'λ': 'lambda',
+              'μ': 'mu', 'π': 'pi', 'σ': 'sigma', 'τ': 'tau', 'φ': 'phi', 'ψ': 'psi',
+              'ω': 'omega', 'Δ': 'Delta', 'Σ': 'Sigma', '≈': '~', '≠': '!=',
+              '≤': '<=', '≥': '>=', '±': '+/-', '→': '->', '←': '<-'
+            };
+            return map[char] || "";
+          });
       };
 
-      let pageNum = 1;
+      const drawPageDecorations = (num: number) => {
+        // Deep Obsidian background
+        doc.setFillColor(3, 3, 3);
+        doc.rect(0, 0, PW, PH, "F");
+
+        // Subtle dark orange frame
+        doc.setDrawColor(120, 50, 10);
+        doc.setLineWidth(0.4);
+        doc.rect(5, 5, PW - 10, PH - 10, "S");
+
+        // Inner glowing double frame
+        doc.setDrawColor(249, 115, 22);
+        doc.setLineWidth(0.12);
+        doc.rect(6.2, 6.2, PW - 12.4, PH - 12.4, "S");
+
+        // Technical corner markings
+        doc.setDrawColor(249, 115, 22);
+        doc.setLineWidth(0.5);
+        // Top-left
+        doc.line(4.5, 4.5, 9.5, 4.5);
+        doc.line(4.5, 4.5, 4.5, 9.5);
+        // Top-right
+        doc.line(PW - 4.5, 4.5, PW - 9.5, 4.5);
+        doc.line(PW - 4.5, 4.5, PW - 4.5, 9.5);
+        // Bottom-left
+        doc.line(4.5, PH - 4.5, 9.5, PH - 4.5);
+        doc.line(4.5, PH - 4.5, 4.5, PH - 9.5);
+        // Bottom-right
+        doc.line(PW - 4.5, PH - 4.5, PW - 9.5, PH - 4.5);
+        doc.line(PW - 4.5, PH - 4.5, PW - 4.5, PH - 9.5);
+
+        // Footer standard brand text with monospace vibe
+        doc.setFont("courier", "bold");
+        doc.setFontSize(7.5);
+        doc.setTextColor(150, 140, 130);
+        doc.text(`[ COHERENCE FIELD PAGE: ${num} ]`, PW / 2, PH - 9, { align: "center" });
+        
+        doc.setFont("helvetica", "oblique");
+        doc.setFontSize(6.5);
+        doc.setTextColor(100, 90, 80);
+        doc.text("METEMPHYSICS COGNITIVE TRANSMISSION ENGINE CORE TRANSCRIPT  |  REAL-TIME SYNC", ML, PH - 9);
+      };
+
       drawPageDecorations(pageNum);
 
-      // Title
-      doc.setFont("Times", "BoldItalic");
-      doc.setFontSize(16);
+      // Main Document Title Banner in Helvetica Bold (Clean Standard Text)
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(13);
       doc.setTextColor(249, 115, 22);
-      doc.text("✦ Metemphysics Chat Log Transcript ✦", PW / 2, y, { align: "center" });
-      y += 10;
+      doc.text("METEMPHYSICS UNIFIED SYSTEM CHAT LOG TRANSCRIPT", PW / 2, y, { align: "center" });
+      y += 6;
 
-      doc.setFont("Times", "Roman");
-      doc.setFontSize(9);
-      doc.setTextColor(150, 145, 135);
-      doc.text(`Generated: ${new Date().toLocaleString()}  |  Active Calibration constraints: C = ${conservedLimit.toUpperCase()}`, ML, y);
+      // Sub-meta info
+      doc.setFont("courier", "bold");
+      doc.setFontSize(8);
+      doc.setTextColor(160, 150, 140);
+      doc.text(`SYNCHRONIZED METADATA STREAM  |  CALIBRATION: C = ${conservedLimit.toUpperCase()}`, PW / 2, y, { align: "center" });
       y += 5;
-      
+
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(8);
+      doc.setTextColor(110, 100, 90);
+      doc.text(`LOCAL RECOVERY TIME-COORDINATES: ${new Date().toLocaleString()}  |  COHERENCE LIMIT CHECK`, PW / 2, y, { align: "center" });
+      y += 6;
+
+      // Divider line
       doc.setDrawColor(249, 115, 22);
-      doc.setLineWidth(0.2);
+      doc.setLineWidth(0.35);
       doc.line(ML, y, PW - MR, y);
       y += 8;
 
-      messages.forEach((msg) => {
-        // Safe check for vertical space for message header
-        if (y > PH - MB - 20) {
-          doc.addPage();
-          pageNum++;
-          y = MT;
-          drawPageDecorations(pageNum);
-        }
-
-        // Header
-        doc.setFont("Times", "Bold");
-        doc.setFontSize(10.5);
-        if (msg.role === "user") {
-          doc.setTextColor(255, 255, 255);
-          doc.text(`✦ SEEKER (User):`, ML, y);
-        } else {
-          doc.setTextColor(201, 168, 108); // Goldish text
-          doc.text(`◈ UNIFIED FIELD (Metemphysics):`, ML, y);
-        }
-        y += 5.5;
-
-        // Content
-        doc.setFont("Times", "Roman");
-        doc.setFontSize(9.5);
-        doc.setTextColor(230, 225, 215);
-
-        // Sanitize out markdown tags for a clean elegant printout
-        const cleanText = msg.text
-          .replace(/\*\*/g, "") // Bold
-          .replace(/\*/g, "")  // Italic
-          .replace(/`/g, "")   // Inline Code
-          .replace(/####/g, "")
-          .replace(/###/g, "")
-          .replace(/##/g, "")
-          .replace(/#/g, "");
-
-        const splitLines = doc.splitTextToSize(cleanText, CW);
+      const drawCardBox = (isUserMsg: boolean, sY: number, eY: number) => {
+        const h = eY - sY;
+        if (h <= 0) return;
         
-        splitLines.forEach((line: string) => {
-          if (y > PH - MB - 10) {
+        // Fill background of card box
+        if (isUserMsg) {
+          doc.setFillColor(18, 12, 8); // Rich warm solid dark amber
+        } else {
+          doc.setFillColor(8, 7, 7);  // Deep refined solid obsidian charcoal
+        }
+        doc.rect(ML, sY, CW, h, "F");
+
+        // Stroke outline border
+        if (isUserMsg) {
+          doc.setDrawColor(120, 60, 20); // Amber border
+        } else {
+          doc.setDrawColor(100, 80, 45); // Gold/amber border
+        }
+        doc.setLineWidth(0.25);
+        doc.rect(ML, sY, CW, h, "S");
+
+        // Thick left accent strip matching the engine look
+        if (isUserMsg) {
+          doc.setFillColor(249, 115, 22); // Vibrant Orange
+        } else {
+          doc.setFillColor(212, 175, 55); // Vibrant Gold
+        }
+        doc.rect(ML, sY, 1.8, h, "F");
+      };
+
+      messages.forEach((msg) => {
+        const isUser = msg.role === "user";
+        const cleanText = sanitizeForPdf(
+          msg.text
+            .replace(/\*\*/g, "")
+            .replace(/\*/g, "")
+            .replace(/`/g, "")
+            .replace(/####/g, "")
+            .replace(/###/g, "")
+            .replace(/##/g, "")
+            .replace(/#/g, "")
+        );
+
+        // Determine references inside AI response
+        const refs = isUser ? [] : getRelevantReferences(msg.text);
+        const hasRefs = refs.length > 0;
+        
+        // Inner text splitting with precise style setups
+        const paddingLeftRight = 8; // mm
+        // High safety width margin (CW - 16 - 5) ensures character width math never overflows right margins
+        const textWidth = CW - (paddingLeftRight * 2) - 5; 
+        
+        // Critically set target font/size BEFORE calculating wrapped sizes
+        doc.setFont("helvetica", isUser ? "bold" : "normal");
+        doc.setFontSize(9);
+        const splitLines = doc.splitTextToSize(cleanText, textWidth);
+
+        let lineIdx = 0;
+        while (lineIdx < splitLines.length) {
+          // Space left on current page
+          const needsHeader = (lineIdx === 0);
+          const headerSpace = needsHeader ? 12 : 0;
+          
+          // Let's decide how many lines to print on the current page
+          let linesToPrint = 0;
+          let textSpace = 0;
+          while (lineIdx + linesToPrint < splitLines.length) {
+            const nextLineSpace = textSpace + 4.8;
+            if (y + headerSpace + nextLineSpace > PH - MB - 5) {
+              break; 
+            }
+            linesToPrint++;
+            textSpace = nextLineSpace;
+          }
+          
+          // If we can't fit even 1 line on the remaining page space, page break first
+          if (linesToPrint === 0 && lineIdx < splitLines.length) {
             doc.addPage();
             pageNum++;
-            y = MT;
+            y = MT + 6;
             drawPageDecorations(pageNum);
+            continue; // re-evaluate on the new page
           }
-          doc.text(line, ML, y);
-          y += 5;
-        });
+          
+          // Check if references are present and if we are on the final batch of lines
+          const isFinalBatch = (lineIdx + linesToPrint === splitLines.length);
+          let refsToPrint: any[] = [];
+          let refsSpace = 0;
+          
+          if (isFinalBatch && hasRefs) {
+            const startRefsSpace = 9; // Divider & Section Title space
+            if (y + headerSpace + textSpace + startRefsSpace <= PH - MB - 5) {
+              let rIdx = 0;
+              let currentRefsSpace = startRefsSpace;
+              while (rIdx < refs.length) {
+                if (y + headerSpace + textSpace + currentRefsSpace + 21.5 > PH - MB - 5) {
+                  break;
+                }
+                refsToPrint.push(refs[rIdx]);
+                currentRefsSpace += 21.5;
+                rIdx++;
+              }
+              refsSpace = currentRefsSpace;
+            }
+          }
+          
+          // Compute card box height for this portion of the message on the current page
+          const totalBoxHeight = headerSpace + textSpace + refsSpace + 2; 
+          
+          // Draw card background box BEFORE outputting text so text is layered on top
+          drawCardBox(isUser, y, y + totalBoxHeight);
+          
+          // Render header inside the box
+          if (needsHeader) {
+            let innerY = y + 6;
+            doc.setFont("courier", "bold");
+            doc.setFontSize(8);
+            if (isUser) {
+              doc.setTextColor(249, 115, 22);
+              doc.text(`[SEEKER RESONANCE TRANSMITTER]  |  NODE: ${currentNodeId.toUpperCase()}`, ML + 6, innerY);
+            } else {
+              doc.setTextColor(212, 175, 55);
+              doc.text(`[UNIFIED FIELD SYSTEM RESPONSE]  |  OMNISCIENT STATUS`, ML + 6, innerY);
+            }
 
-        y += 5.5; // spacing between messages
+            innerY += 2.5;
+            doc.setDrawColor(isUser ? 100 : 80, isUser ? 50 : 60, isUser ? 15 : 30);
+            doc.setLineWidth(0.12);
+            doc.line(ML + 4, innerY, PW - MR - 4, innerY);
+          }
+          
+          // Render body lines (User questions are BOLD, AI is normal)
+          let currentY = y + headerSpace + 4.5;
+          doc.setFont("helvetica", isUser ? "bold" : "normal");
+          doc.setFontSize(9);
+          
+          if (isUser) {
+            doc.setTextColor(255, 255, 255); // Absolute white for bold seeker questions
+          } else {
+            doc.setTextColor(230, 222, 212); // Warm parchment for AI responses
+          }
+
+          for (let l = 0; l < linesToPrint; l++) {
+            doc.text(splitLines[lineIdx + l], ML + paddingLeftRight, currentY);
+            currentY += 4.8;
+          }
+          
+          // Render references inside the box
+          if (refsToPrint.length > 0) {
+            currentY += 1.5;
+            // Divider
+            doc.setDrawColor(212, 175, 55);
+            doc.setLineWidth(0.15);
+            doc.line(ML + 5, currentY, PW - MR - 5, currentY);
+            
+            currentY += 4;
+            doc.setFont("courier", "bold");
+            doc.setFontSize(7.5);
+            doc.setTextColor(249, 115, 22);
+            doc.text("[RELEVANT PEER-REVIEWED REFERENCES]", ML + 6, currentY);
+            currentY += 3.5;
+            
+            refsToPrint.forEach((ref, refIdx) => {
+              const isPeak = refIdx === 0;
+              
+              doc.setFillColor(5, 4, 3);
+              doc.rect(ML + 5, currentY, CW - 10, 18.5, "F");
+
+              doc.setDrawColor(212, 175, 55);
+              doc.setLineWidth(0.1);
+              doc.rect(ML + 5, currentY, CW - 10, 18.5, "S");
+
+              doc.setFillColor(isPeak ? 249 : 150, isPeak ? 115 : 120, isPeak ? 22 : 100);
+              doc.rect(ML + 5, currentY, 1.0, 18.5, "F");
+
+              doc.setFont("helvetica", "bold");
+              doc.setFontSize(7.8);
+              doc.setTextColor(230, 215, 195);
+              doc.text(sanitizeForPdf(ref.title), ML + 8, currentY + 4);
+
+              doc.setFont("courier", "bold");
+              doc.setFontSize(6.5);
+              doc.setTextColor(249, 115, 22);
+              doc.text(`[RESONANCE: ${ref.resonance}%]`, PW - MR - 8, currentY + 4, { align: "right" });
+
+              doc.setFont("courier", "normal");
+              doc.setFontSize(6.8);
+              doc.setTextColor(140, 135, 125);
+              doc.text(`By ${sanitizeForPdf(ref.authors)}  -  ${sanitizeForPdf(ref.source)} (${ref.year})`, ML + 8, currentY + 7.5);
+
+              doc.setFont("helvetica", "normal");
+              doc.setFontSize(7.2);
+              doc.setTextColor(190, 185, 175);
+              const descLines = doc.splitTextToSize(sanitizeForPdf(ref.description), CW - 17);
+              if (descLines[0]) doc.text(descLines[0], ML + 8, currentY + 11.5);
+              if (descLines[1]) doc.text(descLines[1], ML + 8, currentY + 15);
+
+              currentY += 21.5;
+            });
+          }
+          
+          // Advance y pointer for the next block
+          y += totalBoxHeight;
+          lineIdx += linesToPrint;
+
+          // If there are left-over references that didn't fit on this page, render them on subsequent pages
+          if (isFinalBatch && refsToPrint.length < refs.length) {
+            let leftReferences = refs.slice(refsToPrint.length);
+            while (leftReferences.length > 0) {
+              doc.addPage();
+              pageNum++;
+              y = MT + 6;
+              drawPageDecorations(pageNum);
+              
+              // Count references fitting on the new page
+              let rIdx = 0;
+              let printCount = 0;
+              let tempY = y + 8;
+              
+              while (rIdx < leftReferences.length) {
+                if (tempY + 21.5 > PH - MB - 5) {
+                  break;
+                }
+                printCount++;
+                tempY += 21.5;
+                rIdx++;
+              }
+              
+              if (printCount === 0) {
+                printCount = 1;
+              }
+              
+              const pageRefs = leftReferences.slice(0, printCount);
+              const refsBoxHeight = 8 + pageRefs.length * 21.5;
+              
+              // Draw references header card box
+              drawCardBox(isUser, y, y + refsBoxHeight);
+              
+              doc.setFont("courier", "bold");
+              doc.setFontSize(7.5);
+              doc.setTextColor(249, 115, 22);
+              doc.text("[RELEVANT PEER-REVIEWED REFERENCES (CONTINUED)]", ML + 6, y + 5);
+              
+              let refY = y + 9;
+              pageRefs.forEach((ref, oIdx) => {
+                const globalIdx = refsToPrint.length + oIdx;
+                const isPeak = globalIdx === 0;
+
+                doc.setFillColor(5, 4, 3);
+                doc.rect(ML + 5, refY, CW - 10, 18.5, "F");
+
+                doc.setDrawColor(212, 175, 55);
+                doc.setLineWidth(0.1);
+                doc.rect(ML + 5, refY, CW - 10, 18.5, "S");
+
+                doc.setFillColor(isPeak ? 249 : 150, isPeak ? 115 : 120, isPeak ? 22 : 100);
+                doc.rect(ML + 5, refY, 1.0, 18.5, "F");
+
+                doc.setFont("helvetica", "bold");
+                doc.setFontSize(7.8);
+                doc.setTextColor(230, 215, 195);
+                doc.text(sanitizeForPdf(ref.title), ML + 8, refY + 4);
+
+                doc.setFont("courier", "bold");
+                doc.setFontSize(6.5);
+                doc.setTextColor(249, 115, 22);
+                doc.text(`[RESONANCE: ${ref.resonance}%]`, PW - MR - 8, refY + 4, { align: "right" });
+
+                doc.setFont("courier", "normal");
+                doc.setFontSize(6.8);
+                doc.setTextColor(140, 135, 125);
+                doc.text(`By ${sanitizeForPdf(ref.authors)}  -  ${sanitizeForPdf(ref.source)} (${ref.year})`, ML + 8, refY + 7.5);
+
+                doc.setFont("helvetica", "normal");
+                doc.setFontSize(7.2);
+                doc.setTextColor(190, 185, 175);
+                const descLines = doc.splitTextToSize(sanitizeForPdf(ref.description), CW - 17);
+                if (descLines[0]) doc.text(descLines[0], ML + 8, refY + 11.5);
+                if (descLines[1]) doc.text(descLines[1], ML + 8, refY + 15);
+
+                refY += 21.5;
+              });
+              
+              y += refsBoxHeight;
+              leftReferences = leftReferences.slice(printCount);
+            }
+          }
+        }
+
+        // Add standard visual margin separator offset between messages
+        y += 6;
       });
 
       doc.save(`metemphysics_chat_transcript.pdf`);
@@ -1171,8 +1817,8 @@ export default function App() {
 
                 <div className="flex-1 overflow-y-auto space-y-2 pr-1 custom-scroll min-h-[480px] lg:min-h-0 border-b border-orange-500/10 pb-2">
                   {[
-                    { label: "REVELATION", range: "J/S ≥ 949", desc: "Absolute timeless communion, Crown Sahasrara union with C.", color: "border-purple-500/40 text-purple-300 bg-purple-950/10 shadow-[0_0_10px_rgba(168,85,247,0.05)]", query: "Can you detail the state of REVELATION at J/S >= 949?", hawkins: "Enlightenment (H=1000)" },
-                    { label: "NEAR TIMELESS", range: "J/S [99, 949)", desc: "Hyper-coherent order. High self-organizing scale.", color: "border-fuchsia-500/40 text-fuchsia-300 bg-fuchsia-950/10 shadow-[0_0_10px_rgba(217,70,239,0.05)]", query: "Can you detail the state of NEAR TIMELESS at J/S [99, 949)?", hawkins: "High Enlightenment range (H=700-999)" },
+                    { label: "REVELATION", range: "J/S ≥ 950", desc: "Absolute timeless communion, Crown Sahasrara union with C.", color: "border-purple-500/40 text-purple-300 bg-purple-950/10 shadow-[0_0_10px_rgba(168,85,247,0.05)]", query: "Can you detail the state of REVELATION at J/S >= 950?", hawkins: "Enlightenment (H=1000)" },
+                    { label: "NEAR TIMELESS", range: "J/S [99, 950)", desc: "Hyper-coherent order. High self-organizing scale.", color: "border-fuchsia-500/40 text-fuchsia-300 bg-fuchsia-950/10 shadow-[0_0_10px_rgba(217,70,239,0.05)]", query: "Can you detail the state of NEAR TIMELESS at J/S [99, 950)?", hawkins: "High Enlightenment range (H=700-999)" },
                     { label: "MYSTICAL CLARITY", range: "J/S [10, 99)", desc: "Awakened intentionality, high spiritual bandwidth.", color: "border-indigo-500/40 text-indigo-300 bg-indigo-950/10 shadow-[0_0_10px_rgba(99,102,241,0.05)]", query: "Detail the state of MYSTICAL CLARITY with J/S [10, 99).", hawkins: "Enlightenment Threshold (H>600)" },
                     { label: "DEEP FLOURISHING", range: "J/S [3, 10)", desc: "Flow, holistic convergence of willpower and wisdom.", color: "border-blue-500/40 text-blue-300 bg-blue-950/10 shadow-[0_0_10px_rgba(59,130,246,0.05)]", query: "Detail the state of DEEP FLOURISHING with J/S [3, 10).", hawkins: "Peace (H=600)" },
                     { label: "EUDAIMONIA", range: "J/S [1, 3)", desc: "Optimal biological and mental functioning.", color: "border-emerald-500/40 text-emerald-300 bg-emerald-950/10 shadow-[0_0_10px_rgba(16,185,129,0.05)]", query: "Detail the state of EUDAIMONIA with J/S [1, 3).", hawkins: "Joy (H=540) & Love (H=500)" },
@@ -1322,12 +1968,12 @@ export default function App() {
                         { hz: "174 Hz", chakra: "Earth Foundation", js: "J/S = -0.150", query: "Explain properties of 174 Hz Solfeggio scale with -0.150 J/S." },
                         { hz: "285 Hz", chakra: "Tissue Calibration", js: "J/S = -0.050", query: "Explain properties of 285 Hz Solfeggio scale with -0.050 J/S." },
                         { hz: "396 Hz", chakra: "Muladhara (Root)", js: "J/S = 0.00", query: "Discuss standard molar properties of 396 Hz Muladhara foundational base." },
-                        { hz: "417 Hz", chakra: "Svadhisthana (Sacral)", js: "J/S = 9.49e-5", query: "Explain properties of 417 Hz Solfeggio scale with 9.49e-5 J/S." },
+                        { hz: "417 Hz", chakra: "Svadhisthana (Sacral)", js: "J/S = 9.50e-5", query: "Explain properties of 417 Hz Solfeggio scale with 9.50e-5 J/S." },
                         { hz: "528 Hz", chakra: "Manipura (Solar Plexus)", js: "J/S = 0.01", query: "Discuss standard molar properties of 528 Hz Manipura solar plexus, miracle tone." },
                         { hz: "639 Hz", chakra: "Anahata (Heart)", js: "J/S = 0.99", query: "Discuss standard molar properties of 639 Hz Anahata heart chakra communion frequency." },
                         { hz: "741 Hz", chakra: "Vishuddha (Throat)", js: "J/S = 7.414", query: "Explain properties of 741 Hz Solfeggio scale with 7.414 J/S." },
                         { hz: "852 Hz", chakra: "Ajna (Third Eye)", js: "J/S = 35.353", query: "Explain properties of 852 Hz Solfeggio scale with 35.353 J/S." },
-                        { hz: "963 Hz", chakra: "Sahasrara (Crown)", js: "J/S = 949.00", query: "Discuss standard molar properties of 963 Hz Sahasrara crown direct cosmic link." }
+                        { hz: "963 Hz", chakra: "Sahasrara (Crown)", js: "J/S = 950.00", query: "Discuss standard molar properties of 963 Hz Sahasrara crown direct cosmic link." }
                       ].map((item) => (
                         <div 
                           key={item.hz}
@@ -1423,7 +2069,7 @@ export default function App() {
         </div>
 
          {/* MIDDLE COLUMN: CENTRAL ORACLE TERMINAL (CHAT INTERACTION) (GRID 6) */}
-        <div className="lg:col-span-6 flex flex-col lg:h-[calc(100vh-195px)] lg:min-h-[750px] h-[550px] bg-black border-2 border-orange-500/25 rounded-xl shadow-[0_0_30px_rgba(212,175,55,0.08)] relative">
+        <div className="lg:col-span-6 flex flex-col lg:h-[calc(100vh-195px)] lg:min-h-[750px] h-[750px] sm:h-[800px] md:h-[850px] bg-black border-2 border-orange-500/25 rounded-xl shadow-[0_0_30px_rgba(212,175,55,0.08)] relative">
           
           {/* Terminal Header */}
           <div className="border-b border-orange-500/30 px-4 py-4 bg-[#080808] flex flex-col items-center justify-center rounded-t-xl shadow-[0_4px_15px_rgba(255,95,0,0.03)] flex-shrink-0 relative overflow-hidden text-center">
@@ -1446,7 +2092,7 @@ export default function App() {
             {/* Left and right corner badges to maintain professional terminal aesthetics */}
             <div className="absolute top-3 left-4 flex items-center gap-1.5">
               <Sparkles className="w-3.5 h-3.5 text-orange-500 animate-pulse drop-shadow-[0_0_3px_#ff5f00]" />
-              <span className="font-mono text-[10px] text-gray-500 hidden md:inline">FREQ: 949 HZ</span>
+              <span className="font-mono text-[10px] text-gray-500 hidden md:inline">FREQ: 950 HZ</span>
             </div>
             <div className="absolute top-3.5 right-4 flex items-center gap-1.5">
               <span className="w-1.5 h-1.5 bg-orange-500 rounded-full"></span>
@@ -1523,58 +2169,118 @@ export default function App() {
                     </div>
 
                     {/* Diagnostic/Link Shorteners for Model responses */}
-                    {!isUser && (hasChakra || hasEntropy || hasBio || hasSystems || hasCalc || hasCode) && (
-                      <div className="mt-4 pt-2.5 border-t border-orange-500/15">
-                        <p className="text-[10px] text-gray-500 font-mono uppercase mb-1.5 tracking-widest">Linked Workspace Operations:</p>
-                        <div className="flex flex-wrap gap-1.5">
-                          {hasChakra && (
-                            <button 
-                              onClick={() => setActivePanel("chakra")} 
-                              className="text-[10.5px] font-mono px-2 py-1 bg-orange-500/5 hover:bg-orange-500/15 border border-orange-500/20 hover:border-orange-500/40 rounded text-orange-400 flex items-center gap-1 transition-all cursor-pointer"
-                            >
-                              <Flame className="w-2.5 h-2.5 text-orange-400" /> Open Chakra Atlas
-                            </button>
-                          )}
-                          {hasEntropy && (
-                            <button 
-                              onClick={() => setActivePanel("entropy")} 
-                              className="text-[10.5px] font-mono px-2 py-1 bg-[#1a0f02] hover:bg-orange-500/15 border border-orange-500/20 hover:border-orange-500/40 rounded text-orange-300 flex items-center gap-1 transition-all cursor-pointer"
-                            >
-                              <BarChart className="w-2.5 h-2.5 text-amber-500" /> Open Entropy Table
-                            </button>
-                          )}
-                          {hasBio && (
-                            <button 
-                              onClick={() => setActivePanel("bio")} 
-                              className="text-[10.5px] font-mono px-2 py-1 bg-orange-500/5 hover:bg-orange-500/15 border border-orange-500/20 hover:border-orange-500/40 rounded text-orange-450 flex items-center gap-1 transition-all cursor-pointer"
-                            >
-                              <Dna className="w-2.5 h-2.5 text-orange-400" /> Bio Entropy Limits
-                            </button>
-                          )}
-                          {hasSystems && (
-                            <button 
-                              onClick={() => setActivePanel("systems")} 
-                              className="text-[10.5px] font-mono px-2 py-1 bg-[#1a0f02] hover:bg-orange-500/15 border border-orange-500/20 hover:border-orange-500/40 rounded text-orange-300 flex items-center gap-1 transition-all cursor-pointer"
-                            >
-                              <Compass className="w-2.5 h-2.5 text-orange-300" /> Systems Database
-                            </button>
-                          )}
-                          {hasCalc && (
-                            <button 
-                              onClick={() => setActivePanel("calc")} 
-                              className="text-[10.5px] font-mono px-2 py-1 bg-orange-500/5 hover:bg-orange-500/15 border border-orange-500/20 hover:border-orange-500/40 rounded text-orange-400 flex items-center gap-1 transition-all cursor-pointer"
-                            >
-                              <Calculator className="w-2.5 h-2.5 text-orange-500" /> Launch 5D Calculator
-                            </button>
-                          )}
-                          {hasCode && (
-                            <button 
-                              onClick={() => setActivePanel("codereader")} 
-                              className="text-[10.5px] font-mono px-2 py-1 bg-[#1a0f02] hover:bg-orange-500/15 border border-orange-500/20 hover:border-orange-500/40 rounded text-orange-300 flex items-center gap-1 transition-all cursor-pointer"
-                            >
-                              <FileText className="w-2.5 h-2.5 text-orange-400" /> Cast Personal Code
-                            </button>
-                          )}
+                    {!isUser && (
+                      <div className="mt-4 pt-2.5 border-t border-orange-500/15 space-y-3.5">
+                        {/* Linked Workspace Operations if applicable */}
+                        {(hasChakra || hasEntropy || hasBio || hasSystems || hasCalc || hasCode) && (
+                          <div>
+                            <p className="text-[10px] text-gray-500 font-mono uppercase mb-1.5 tracking-widest">Linked Workspace Operations:</p>
+                            <div className="flex flex-wrap gap-1.5">
+                              {hasChakra && (
+                                <button 
+                                  onClick={() => setActivePanel("chakra")} 
+                                  className="text-[10.5px] font-mono px-2 py-1 bg-orange-500/5 hover:bg-orange-500/15 border border-orange-500/20 hover:border-orange-500/40 rounded text-orange-400 flex items-center gap-1 transition-all cursor-pointer"
+                                >
+                                  <Flame className="w-2.5 h-2.5 text-orange-400" /> Open Chakra Atlas
+                                </button>
+                              )}
+                              {hasEntropy && (
+                                <button 
+                                  onClick={() => setActivePanel("entropy")} 
+                                  className="text-[10.5px] font-mono px-2 py-1 bg-[#1a0f02] hover:bg-orange-500/15 border border-orange-500/20 hover:border-orange-500/40 rounded text-orange-300 flex items-center gap-1 transition-all cursor-pointer"
+                                >
+                                  <BarChart className="w-2.5 h-2.5 text-amber-500" /> Open Entropy Table
+                                </button>
+                              )}
+                              {hasBio && (
+                                <button 
+                                  onClick={() => setActivePanel("bio")} 
+                                  className="text-[10.5px] font-mono px-2 py-1 bg-orange-500/5 hover:bg-orange-500/15 border border-orange-500/20 hover:border-orange-500/40 rounded text-orange-450 flex items-center gap-1 transition-all cursor-pointer"
+                                >
+                                  <Dna className="w-2.5 h-2.5 text-orange-400" /> Bio Entropy Limits
+                                </button>
+                              )}
+                              {hasSystems && (
+                                <button 
+                                  onClick={() => setActivePanel("systems")} 
+                                  className="text-[10.5px] font-mono px-2 py-1 bg-[#1a0f02] hover:bg-orange-500/15 border border-orange-500/20 hover:border-orange-500/40 rounded text-orange-300 flex items-center gap-1 transition-all cursor-pointer"
+                                >
+                                  <Compass className="w-2.5 h-2.5 text-orange-300" /> Systems Database
+                                </button>
+                              )}
+                              {hasCalc && (
+                                <button 
+                                  onClick={() => setActivePanel("calc")} 
+                                  className="text-[10.5px] font-mono px-2 py-1 bg-orange-500/5 hover:bg-orange-500/15 border border-orange-500/20 hover:border-orange-500/40 rounded text-orange-400 flex items-center gap-1 transition-all cursor-pointer"
+                                >
+                                  <Calculator className="w-2.5 h-2.5 text-orange-500" /> Launch 5D Calculator
+                                </button>
+                              )}
+                              {hasCode && (
+                                <button 
+                                  onClick={() => setActivePanel("codereader")} 
+                                  className="text-[10.5px] font-mono px-2 py-1 bg-[#1a0f02] hover:bg-orange-500/15 border border-orange-500/20 hover:border-orange-500/40 rounded text-orange-300 flex items-center gap-1 transition-all cursor-pointer"
+                                >
+                                  <FileText className="w-2.5 h-2.5 text-orange-400" /> Cast Personal Code
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* References Section */}
+                        <div className="border-t border-orange-500/10 pt-2.5">
+                          <p className="text-[10px] text-gray-550 font-mono uppercase mb-2 tracking-widest flex items-center gap-1.5">
+                            <BookOpen className="w-3 h-3 text-orange-500" /> REFERENCES
+                          </p>
+                          <div className="space-y-1.5">
+                            {getRelevantReferences(m.text).map((ref, refIdx) => {
+                              const isPeak = refIdx === 0;
+                              return (
+                                <div 
+                                  key={refIdx} 
+                                  className={`rounded-lg p-2.5 border transition-all duration-200 text-left ${
+                                    isPeak 
+                                      ? "bg-gradient-to-r from-orange-950/25 via-[#1a0f02]/40 to-black border-orange-500/25 hover:border-orange-500/40 shadow-[0_0_10px_rgba(255,95,0,0.04)]" 
+                                      : "bg-[#090605] border-orange-500/10 hover:border-orange-500/20"
+                                  }`}
+                                >
+                                  <div className="flex flex-wrap items-center justify-between gap-1 mb-1">
+                                    <span className="text-[11px] font-bold text-orange-300 font-serif leading-tight">
+                                      {ref.title}
+                                    </span>
+                                    <div className="flex items-center gap-1.5">
+                                      {isPeak && (
+                                        <span className="text-[8.5px] font-mono px-1 py-0.5 bg-orange-500/15 text-orange-400 border border-orange-500/30 rounded font-semibold animate-pulse uppercase tracking-wider">
+                                          ★ Resonates Highest ({ref.resonance}%)
+                                        </span>
+                                      )}
+                                      {!isPeak && (
+                                        <span className="text-[8.5px] font-mono text-gray-400">
+                                          Resonance: {ref.resonance}%
+                                        </span>
+                                      )}
+                                      <a 
+                                        href={ref.link} 
+                                        target="_blank" 
+                                        rel="noopener noreferrer" 
+                                        className="text-[9px] font-mono px-1.5 py-0.5 bg-orange-500/10 hover:bg-orange-500/25 border border-orange-500/20 hover:border-orange-555 rounded text-orange-300 hover:text-orange-200 transition-all cursor-pointer flex items-center gap-0.5"
+                                        title="Search on Google Scholar"
+                                      >
+                                        Scholar <ChevronRight className="w-2.5 h-2.5" />
+                                      </a>
+                                    </div>
+                                  </div>
+                                  <div className="text-[9.5px] text-gray-500 font-mono mb-1">
+                                    By {ref.authors} &nbsp;·&nbsp; {ref.source} ({ref.year})
+                                  </div>
+                                  <p className="text-[10px] text-[#dacbb6] leading-relaxed font-sans">
+                                    {ref.description}
+                                  </p>
+                                </div>
+                              );
+                            })}
+                          </div>
                         </div>
                       </div>
                     )}
@@ -1833,7 +2539,13 @@ export default function App() {
           )}
         </div>
 
-        <div className="flex gap-4 md:flex-1 justify-center md:justify-end">
+        <div className="flex gap-4 md:flex-1 justify-center md:justify-end items-center">
+          <a 
+            href="mailto:up2quark@gmail.com?subject=Metemphysics System Inquiry"
+            className="text-[10px] tracking-widest font-mono font-bold text-gray-400 hover:text-orange-400 transition-all cursor-pointer flex items-center gap-1.5"
+          >
+            <span className="text-orange-500/70">✉</span> Email up2quark@gmail.com
+          </a>
           <button
             onClick={downloadChatAsPDF}
             className="px-3 py-1 bg-orange-500/10 hover:bg-orange-500/20 text-orange-400 border border-orange-500/30 rounded text-[10px] tracking-widest font-mono transition-all font-bold cursor-pointer uppercase"

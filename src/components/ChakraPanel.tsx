@@ -188,7 +188,7 @@ const CHAKRAS: Chakra[] = [
     hz: 963, 
     note: "B", 
     H: 1000, 
-    js: 949, 
+    js: 950, 
     omega: 0.9933, 
     phase: 5, 
     state: "REVELATION", 
@@ -205,7 +205,7 @@ const CHAKRAS: Chakra[] = [
 ];
 
 const INTERVALS: MusicalInterval[] = [
-  { name: "Unison", ratio: "1:1", cents: 0, H: 1000, js: 949, omega: 0.9933, phase: 5, state: "REVELATION", char: "Perfect identity — maximum order" },
+  { name: "Unison", ratio: "1:1", cents: 0, H: 1000, js: 950, omega: 0.9933, phase: 5, state: "REVELATION", char: "Perfect identity — maximum order" },
   { name: "Octave", ratio: "2:1", cents: 1200, H: 950, js: 604.04, omega: 0.9913, phase: 5, state: "Near Timeless", char: "Double frequency — near-perfect order" },
   { name: "Perfect Fifth", ratio: "3:2", cents: 702, H: 800, js: 126.68, omega: 0.9817, phase: 5, state: "Near Timeless", char: "Most consonant — Pythagorean base", hi: true },
   { name: "Perfect Fourth", ratio: "4:3", cents: 498, H: 720, js: 46.52, omega: 0.9727, phase: 5, state: "Mystical Clarity", char: "Strong consonance — Pythagorean" },
@@ -348,7 +348,7 @@ const SOLFEGGIO: SolfeggioItem[] = [
     hz: 963, 
     chakra: "Crown / Sahasrara", 
     H: 963, 
-    js: 949, 
+    js: 950, 
     omega: 0.99, 
     meta: "Sovereignty & direct Cosmic Union with C.", 
     color: "#e8d5a3", 
@@ -371,7 +371,7 @@ interface ScaleItem {
 }
 
 const SCALES: ScaleItem[] = [
-  { name: "Solfeggio Harmonic Scale", tones: 9, struct: "174-285-396-417-528-639-741-852-963", js: 949.00, omega: 0.99, char: "Highest coherent spiritual alignment.", hi: true },
+  { name: "Solfeggio Harmonic Scale", tones: 9, struct: "174-285-396-417-528-639-741-852-963", js: 950.00, omega: 0.99, char: "Highest coherent spiritual alignment.", hi: true },
   { name: "Major Diatonic (C-Major)", tones: 7, struct: "W-W-H-W-W-W-H", js: 2.38, omega: 0.93, char: "Eudaimonic balance, light, and natural joy." },
   { name: "Minor Pentatonic", tones: 5, struct: "1.5W-W-W-1.5W-W", js: 0.15, omega: 0.88, char: "Reflective, seeking, melancholic seeking." },
   { name: "Chromatic", tones: 12, struct: "H-H-H-H-H-H-H-H-H-H-H-H", js: "0.01", omega: 0.81, char: "Neutral entropic state, ready for structure." },
@@ -405,7 +405,7 @@ const GENRES: GenreItem[] = [
   { name: "Overtone Chanting", H: 800, js: "126.68", omega: "0.9817", phase: 5, state: "Near Timeless", drain: "0.78%", char: "Accessing the harmonic series directly" },
   { name: "Tibetan Singing Bowls", H: 850, js: "221.83", omega: "0.9857", phase: 5, state: "Near Timeless", drain: "0.45%", char: "Pure resonance, standing wave order" },
   { name: "Binaural Beats (Theta)", H: 900, js: "372.67", omega: "0.9889", phase: 5, state: "Near Timeless", drain: "0.27%", char: "4-8Hz entrainment – deep meditation" },
-  { name: "Pure Sinewave / 432Hz", H: 949, js: "949", omega: "0.9999", phase: 5, state: "REVELATION", drain: "0.01%", char: "Pure coherence generator, primary frequency pulse" }
+  { name: "Pure Sinewave / 432Hz", H: 950, js: "950", omega: "0.9999", phase: 5, state: "REVELATION", drain: "0.01%", char: "Pure coherence generator, primary frequency pulse" }
 ];
 
 interface ComposerItem {
@@ -438,7 +438,7 @@ const BRAINWAVES: BrainwaveItem[] = [
   { name: "Theta", hz: "4 - 8 Hz", js: 35.35, omega: 0.97, music: "Binaural sweeps, slow pads", meta: "High spiritual receptivity and holistic integration." },
   { name: "Gamma", hz: "30 - 100 Hz", js: 126.68, omega: 0.98, music: "Fast rhythmic phase locked sounds", meta: "Synthesized binding, transcendence, epiphany bounds." },
   { name: "Beta", hz: "12 - 30 Hz", js: 0.15, omega: 0.86, music: "Regular high frequency drums", meta: "Logical reasoning, alertness, localized attention." },
-  { name: "Delta", hz: "0.5 - 4 Hz", js: 949.00, omega: 0.99, music: "Ultra slow deep drone", meta: "Deep timeless sleep, cellular maintenance." }
+  { name: "Delta", hz: "0.5 - 4 Hz", js: 950.00, omega: 0.99, music: "Ultra slow deep drone", meta: "Deep timeless sleep, cellular maintenance." }
 ];
 
 interface FindingItem {
@@ -449,7 +449,7 @@ interface FindingItem {
 
 const FINDINGS: FindingItem[] = [
   { n: 1, title: "Solfeggio Convergence", text: "The Solfeggio frequencies directly align with primary Omega states of structural order when mapped against standardized Hawkins calibrations." },
-  { n: 2, title: "Consciousness Boundary", text: "S = C / T mathematically shows that as T (subjective epoch duration) drops to zero, Shannon Entropy H converges to absolute infinite negentropy J/S = 949." }
+  { n: 2, title: "Consciousness Boundary", text: "S = C / T mathematically shows that as T (subjective epoch duration) drops to zero, Shannon Entropy H converges to absolute infinite negentropy J/S = 950." }
 ];
 
 export default function ChakraPanel({ onClose, onSendPrompt }: { onClose: () => void; onSendPrompt: (p: string) => void }) {
@@ -620,7 +620,7 @@ export default function ChakraPanel({ onClose, onSendPrompt }: { onClose: () => 
               <div className="bg-[#0a0a0a]/80 border border-orange-500/15 rounded p-4 animate-fadeIn">
                 <h4 className="font-mono text-xs tracking-widest text-[#c9a84c] uppercase mb-2">Chakra Metemphysics</h4>
                 <p className="text-sm text-[#8898aa] leading-relaxed">
-                  Each chakra is a specific J/S configuration of the living system. Root chakra = tipping point (J/S=0). Heart chakra = eudaimonia (J/S=1.0). Crown = revelation (J/S=949). The seven chakras are seven Omega phase states made physical.
+                  Each chakra is a specific J/S configuration of the living system. Root chakra = tipping point (J/S=0). Heart chakra = eudaimonia (J/S=1.0). Crown = revelation (J/S=950). The seven chakras are seven Omega phase states made physical.
                 </p>
               </div>
               <div className="bg-[#0a0a0a]/80 border border-orange-500/15 rounded p-4 animate-fadeIn">
@@ -805,7 +805,7 @@ export default function ChakraPanel({ onClose, onSendPrompt }: { onClose: () => 
               <div className="bg-[#0a0a0a]/80 border border-orange-500/20 rounded p-4 text-center">
                 <div className="font-serif text-3xl font-bold text-[#f5edd0] mb-1">963Hz</div>
                 <div className="font-mono text-[10px] text-[#8898aa] uppercase tracking-wider mb-2">Crown Chakra Apex</div>
-                <div className="font-mono text-sm text-[#f5edd0]">J/S = 949</div>
+                <div className="font-mono text-sm text-[#f5edd0]">J/S = 950</div>
                 <p className="text-xs text-[#8898aa] mt-2 leading-relaxed">
                   Revelation threshold. Direct union with the speed of light constant, C.
                 </p>

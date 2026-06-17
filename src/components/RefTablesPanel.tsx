@@ -1,9 +1,10 @@
 import React, { useState } from "react";
-import { Table, X, Book, Database, RefreshCw, Layers } from "lucide-react";
+import { Table, X, Book, Database, RefreshCw, Layers, BookOpen } from "lucide-react";
 import { METEM_DB } from "../data/metemDb";
+import { UNIFIED_LEXICON_SYSTEMS } from "../data/metemLexicon";
 
 export default function RefTablesPanel({ onClose, onSendPrompt }: { onClose: () => void; onSendPrompt: (p: string) => void }) {
-  const [activeSubTab, setActiveSubTab] = useState<"constants" | "thermo" | "solfeggio" | "traditions">("constants");
+  const [activeSubTab, setActiveSubTab] = useState<"constants" | "thermo" | "solfeggio" | "traditions" | "lexicon">("constants");
   const [searchQuery, setSearchQuery] = useState("");
 
   const constants = [
@@ -28,12 +29,12 @@ export default function RefTablesPanel({ onClose, onSendPrompt }: { onClose: () 
     { hz: "174 Hz", name: "Anesthetic Grounding", chakra: "Earth Foundation", ratio: "29:32", tSec: "5.74 ms", valueJS: "J/S = -0.150" },
     { hz: "285 Hz", name: "Cellular Blueprint", chakra: "Tissue Calibration", ratio: "95:128", tSec: "3.51 ms", valueJS: "J/S = -0.050" },
     { hz: "396 Hz", name: "Muladhara (Root)", chakra: "Survival / Grounding", ratio: "33:32", tSec: "2.52 ms", valueJS: "J/S = 0.000" },
-    { hz: "417 Hz", name: "Svadhisthana (Sacral)", chakra: "Flow / Creativity", ratio: "139:128", tSec: "2.40 ms", valueJS: "J/S = 9.49e-5" },
+    { hz: "417 Hz", name: "Svadhisthana (Sacral)", chakra: "Flow / Creativity", ratio: "139:128", tSec: "2.40 ms", valueJS: "J/S = 9.50e-5" },
     { hz: "528 Hz", name: "Manipura (Solar Plexus)", chakra: "Power / Transformation", ratio: "11:8", tSec: "1.89 ms", valueJS: "J/S = 0.010" },
     { hz: "639 Hz", name: "Anahata (Heart)", chakra: "Heart / Communion", ratio: "5:3", tSec: "1.56 ms", valueJS: "J/S = 1.000" },
     { hz: "741 Hz", name: "Vishuddha (Throat)", chakra: "Truth / Expression", ratio: "247:128", tSec: "1.35 ms", valueJS: "J/S = 7.414" },
     { hz: "852 Hz", name: "Ajna (Third Eye)", chakra: "Vision / Intuition", ratio: "85:64", tSec: "1.17 ms", valueJS: "J/S = 35.353" },
-    { hz: "963 Hz", name: "Sahasrara (Crown)", chakra: "Unity / Cosmic Light", ratio: "321:256", tSec: "1.04 ms", valueJS: "J/S = 949.000" },
+    { hz: "963 Hz", name: "Sahasrara (Crown)", chakra: "Unity / Cosmic Light", ratio: "321:256", tSec: "1.04 ms", valueJS: "J/S = 950.000" },
   ];
 
   return (
@@ -64,6 +65,7 @@ export default function RefTablesPanel({ onClose, onSendPrompt }: { onClose: () 
             { id: "thermo", label: "🧪 Thermodynamic Molar S" },
             { id: "solfeggio", label: "🔊 Wave Frequencies & J/S" },
             { id: "traditions", label: `📜 ${METEM_DB.religions.length} Ancient Traditions` },
+            { id: "lexicon", label: "📚 17 Unified Lexicons" },
           ].map((subtab) => (
             <button
               key={subtab.id}
@@ -82,14 +84,14 @@ export default function RefTablesPanel({ onClose, onSendPrompt }: { onClose: () 
           ))}
         </div>
 
-        {/* SEARCH BAR FOR TRADITIONS / THERMO */}
-        {(activeSubTab === "traditions" || activeSubTab === "thermo") && (
+        {/* SEARCH BAR FOR TRADITIONS / THERMO / LEXICON */}
+        {(activeSubTab === "traditions" || activeSubTab === "thermo" || activeSubTab === "lexicon") && (
           <div className="mb-4">
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search reference data table records..."
+              placeholder="Search reference data table records or terms..."
               className="w-full max-w-md bg-black border border-white/10 rounded px-3 py-1.5 font-mono text-[11px] text-[#eeeae4] focus:border-orange-500/40 outline-none"
             />
           </div>
@@ -263,6 +265,83 @@ export default function RefTablesPanel({ onClose, onSendPrompt }: { onClose: () 
                       ))}
                   </tbody>
                 </table>
+              </div>
+            </div>
+          )}
+
+          {activeSubTab === "lexicon" && (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between border-b border-white/10 pb-2">
+                <span className="font-serif font-bold text-sm text-[#e4d9c0]">17 Unified Lexicon Systems of Ontology</span>
+                <span className="font-mono text-[9px] text-gray-500">SYSTEMATIC TOOLTIP LEXICON REFERENCE</span>
+              </div>
+              
+              <div className="overflow-y-auto max-h-[420px] pr-1 custom-scroll space-y-4">
+                {UNIFIED_LEXICON_SYSTEMS.map(sys => {
+                  const matchingWords = sys.words.filter(w =>
+                    w.word.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    w.tip.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    sys.name.toLowerCase().includes(searchQuery.toLowerCase())
+                  );
+                  if (matchingWords.length === 0 && searchQuery !== "") return null;
+                  
+                  return (
+                    <div key={sys.id} className="p-4 bg-orange-500/[0.01] border border-white/5 rounded-xl hover:border-white/10 transition-all">
+                      {/* System Header */}
+                      <div className="flex flex-wrap items-center justify-between gap-1.5 border-b border-white/5 pb-1.5 mb-2">
+                        <div className="flex items-center gap-2">
+                          <span className={`${sys.fontClass} text-[11px] uppercase tracking-wider text-orange-400`}>
+                            {sys.name}
+                          </span>
+                          <span className="text-[8px] font-mono text-gray-500 border border-white/5 px-1 rounded uppercase tracking-[0.15em]">NODE</span>
+                        </div>
+                        <span className="text-[8px] font-mono text-gray-500 italic">Hover terms for Metemphysics Tooltips</span>
+                      </div>
+                      
+                      <p className="text-[10px] font-serif text-[#a1aebf] leading-relaxed mb-3 italic">
+                        {sys.description}
+                      </p>
+
+                      {/* Word Tag List */}
+                      <div className="flex flex-wrap gap-2">
+                        {matchingWords.map((w, idx) => (
+                          <span key={idx} className="relative group/tool inline-block">
+                            <button
+                              onClick={() => onSendPrompt(`Detail the precise metemphysical alignment of '${w.word}' belonging to the '${sys.name}' system under the T × S = C equation. Detail its thermodynamic resonance and state integration.`)}
+                              className={`px-2.5 py-1 rounded border text-left cursor-pointer transition-all ${sys.fontClass} ${sys.textClass} bg-white/[0.02] hover:bg-orange-500/10 hover:border-orange-500/40 text-[10.5px] inline-flex items-center gap-1`}
+                            >
+                              <span>{w.word}</span>
+                            </button>
+                            
+                            {/* Rich Floating Tooltip */}
+                            <span className={`pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-60 p-2.5 bg-black/95 border ${sys.tooltipBorder} text-[10px] text-[#eee5d8] rounded-lg ${sys.tooltipShadow} font-mono opacity-0 group-hover/tool:opacity-100 transition-opacity duration-200 z-50 text-center leading-normal whitespace-normal break-words normal-case shadow-2xl`}>
+                              <strong className={`${sys.fontClass} text-white block mb-0.5 border-b border-white/10 pb-0.5`}>
+                                {w.word}
+                              </strong>
+                              {w.tip}
+                              <span className="block mt-1 text-[8px] text-orange-400 font-mono font-bold uppercase tracking-wider">
+                                Click to query engine
+                              </span>
+                              <span className={`absolute top-full left-1/2 -translate-x-1/2 border-x-4 border-x-transparent border-t-4 ${sys.arrowBorder}`} />
+                            </span>
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })}
+
+                {UNIFIED_LEXICON_SYSTEMS.every(sys => 
+                  sys.words.filter(w =>
+                    w.word.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    w.tip.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    sys.name.toLowerCase().includes(searchQuery.toLowerCase())
+                  ).length === 0
+                ) && (
+                  <div className="py-8 text-center text-gray-500 font-mono text-xs">
+                    No matching lexicon terms found for "{searchQuery}".
+                  </div>
+                )}
               </div>
             </div>
           )}

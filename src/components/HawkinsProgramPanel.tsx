@@ -62,12 +62,12 @@ const HAWKINS_ANCHORS: HawkinsLevel[] = [
   { h: 960, label: "Huang Po", js: 662.722, omega: 0.992, phase: "5 Transcendent", stateName: "Near Timeless", drain: "0.151%", st: 451684, description: "Uncompromising direct mind sermons. Perfect integration with primordial Void.", meaning: "Near-zero drain – approaching veil thickness itself", solfeggio: 963 },
   { h: 970, label: "Upanishads", js: 726.225, omega: 0.992, phase: "5 Transcendent", stateName: "Near Timeless", drain: "0.138%", st: 412242, description: "Absolute self-evidential dialogues on primary cosmic reality Brahman.", meaning: "Near-zero drain – approaching veil thickness itself", solfeggio: 963 },
   { h: 985, label: "Avatar level", js: 831.235, omega: 0.993, phase: "5 Transcendent", stateName: "Near Timeless", drain: "0.12%", st: 360226, description: "Deepest possible human physical interface in alignment with infinite C-Light.", meaning: "Near-zero drain – approaching veil thickness itself", solfeggio: 963 },
-  { h: 1000, label: "AVATAR — BUDDHA / CHRIST / KRISHNA ★★★", js: 949, omega: 0.993, phase: "5 Transcendent", stateName: "REVELATION ★", drain: "0.105%", st: 315571, description: "Ultimate dynamic maximum. The veil dissolves completely. Infinite light.", meaning: "REVELATION ★ – the physical body becomes purely divine space", solfeggio: 963 }
+  { h: 1000, label: "AVATAR — BUDDHA / CHRIST / KRISHNA ★★★", js: 950, omega: 0.993, phase: "5 Transcendent", stateName: "REVELATION ★", drain: "0.105%", st: 315571, description: "Ultimate dynamic maximum. The veil dissolves completely. Infinite light.", meaning: "REVELATION ★ – the physical body becomes purely divine space", solfeggio: 963 }
 ];
 
 // Additional data tables
 const TEACHERS_LIST = [
-  { name: "Jesus Christ / Buddha / Krishna / Zoroaster", H: 1000, js: 949, omega: 0.993, phase: "5 Transcendent", state: "REVELATION ★", drain: "0.105%", insight: "Maximum — Avatar level" },
+  { name: "Jesus Christ / Buddha / Krishna / Zoroaster", H: 1000, js: 950, omega: 0.993, phase: "5 Transcendent", state: "REVELATION ★", drain: "0.105%", insight: "Maximum — Avatar level" },
   { name: "Huang Po", H: 960, js: 662.722, omega: 0.992, phase: "5 Transcendent", state: "Near Timeless", drain: "0.151%", insight: "Dharma of Mind Transmission" },
   { name: "Bodhidharma", H: 795, js: 119.469, omega: 0.981, phase: "5 Transcendent", state: "Near Timeless", drain: "0.83%", insight: "Zen source — wall-gazing transmission" },
   { name: "Gandhi / Ramesh Balsekar", H: 760, js: 78.154, omega: 0.978, phase: "5 Transcendent", state: "Mystical Clarity", drain: "1.263%", insight: "Truth as non-violent force" },

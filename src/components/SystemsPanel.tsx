@@ -46,7 +46,7 @@ const MASTER_SYSTEMS_DATA: SystemRow[] = [
   { sys: "Chakra System", level: "Anahata (4. Heart)", H: 500, js: 0.99, omega: 0.9179, phase: 4, state: "Time Passing", drain: "50.26%", notes: "Love, compassion — J/S=1.0 EXACTLY", hi: true },
   { sys: "Chakra System", level: "Vishuddha (5. Throat)", H: 600, js: 7.414, omega: 0.9502, phase: 5, state: "Deep Flourishing", drain: "11.88%", notes: "Expression, truth, communication, peace" },
   { sys: "Chakra System", level: "Ajna (6. Third Eye)", H: 700, js: 35.353, omega: 0.9698, phase: 5, state: "Mystical Clarity", drain: "2.75%", notes: "Enlightenment, intuition, direct knowing" },
-  { sys: "Chakra System", level: "Sahasrara (7. Crown)", H: 1000, js: 949, omega: 0.9933, phase: 5, state: "REVELATION", drain: "0.11%", notes: "Union with C — Avatar — REVELATION J/S=949", hi: true },
+  { sys: "Chakra System", level: "Sahasrara (7. Crown)", H: 1000, js: 950, omega: 0.9933, phase: 5, state: "REVELATION", drain: "0.11%", notes: "Union with C — Avatar — REVELATION J/S=950", hi: true },
 
   // Abraham Hicks
   { sys: "Abraham-Hicks Scale", level: "1. Joy / Appreciation / Love", H: 540, js: 2.377, omega: 0.9328, phase: 4, state: "Eudaimonia", drain: "29.61%", notes: "Highest vibrational alignment", hi: true },
@@ -64,7 +64,7 @@ const MASTER_SYSTEMS_DATA: SystemRow[] = [
   { sys: "Sri Aurobindo", level: "Illumined Mind", H: 600, js: 7.414, omega: 0.9502, phase: 5, state: "Deep Flourishing", drain: "11.88%", notes: "Light consciousness — vision beyond thought", hi: true },
   { sys: "Sri Aurobindo", level: "Intuitive Mind", H: 700, js: 35.353, omega: 0.9698, phase: 5, state: "Mystical Clarity", drain: "2.75%", notes: "Direct knowing — beyond inference", hi: true },
   { sys: "Sri Aurobindo", level: "Overmind", H: 850, js: 221.835, omega: 0.9857, phase: 5, state: "Near Timeless", drain: "0.45%", notes: "Cosmic consciousness — multiplicity within unity" },
-  { sys: "Sri Aurobindo", level: "Supermind", H: 1000, js: 949, omega: 0.9933, phase: 5, state: "REVELATION", drain: "0.11%", notes: "Divine — permanently free of ignorance", hi: true },
+  { sys: "Sri Aurobindo", level: "Supermind", H: 1000, js: 950, omega: 0.9933, phase: 5, state: "REVELATION", drain: "0.11%", notes: "Divine — permanently free of ignorance", hi: true },
 
   // David Hawkins
   { sys: "David Hawkins", level: "Shame (H=20)", H: 20, js: -0.9, omega: 0.0952, phase: 1, state: "Despair", drain: "1000%", notes: "Lowest contractive state; maximum friction" },
@@ -83,28 +83,28 @@ const MASTER_SYSTEMS_DATA: SystemRow[] = [
   { sys: "David Hawkins", level: "Love (H=500)", H: 500, js: 0.99, omega: 0.9179, phase: 4, state: "Eudaimonia", drain: "50.26%", notes: "True compassion and eudaimonic balance", hi: true },
   { sys: "David Hawkins", level: "Joy (H=540)", H: 540, js: 2.377, omega: 0.9328, phase: 4, state: "Eudaimonia", drain: "29.61%", notes: "State of transfiguration; inner completion and ecstasy", hi: true },
   { sys: "David Hawkins", level: "Peace (H=600)", H: 600, js: 7.414, omega: 0.9502, phase: 5, state: "Deep Flourishing", drain: "11.88%", notes: "Stillness, illumination, non-separation" },
-  { sys: "David Hawkins", level: "Enlightenment (H=1000)", H: 1000, js: 949, omega: 0.9933, phase: 5, state: "REVELATION", drain: "0.11%", notes: "Pure divine awareness in union with C-Light", hi: true },
+  { sys: "David Hawkins", level: "Enlightenment (H=1000)", H: 1000, js: 950, omega: 0.9933, phase: 5, state: "REVELATION", drain: "0.11%", notes: "Pure divine awareness in union with C-Light", hi: true },
 
   // Teresa of Avila (Interior Castle Mansions)
   { sys: "Teresa of Avila", level: "1st Mansion — Self-Knowledge (H=200)", H: 200, js: 0, omega: 0.6321, phase: 3, state: "Tipping Point", drain: "100%", notes: "Gateway mansion, starting prayer and purification", hi: true },
   { sys: "Teresa of Avila", level: "4th Mansion — Prayer of Quiet (H=500)", H: 500, js: 0.99, omega: 0.9179, phase: 4, state: "Eudaimonia", drain: "50.26%", notes: "Intellect resting in mystical peace", hi: true },
-  { sys: "Teresa of Avila", level: "7th Mansion — Spiritual Marriage (H=1000)", H: 1000, js: 949, omega: 0.9933, phase: 5, state: "REVELATION", drain: "0.11%", notes: "Union in the innermost sanctuary of the King", hi: true },
+  { sys: "Teresa of Avila", level: "7th Mansion — Spiritual Marriage (H=1000)", H: 1000, js: 950, omega: 0.9933, phase: 5, state: "REVELATION", drain: "0.11%", notes: "Union in the innermost sanctuary of the King", hi: true },
 
   // Sufi Maqamat (Stages)
   { sys: "Sufi Maqamat", level: "Tawba — Repentance / Awakening (H=200)", H: 200, js: 0, omega: 0.6321, phase: 3, state: "Tipping Point", drain: "100%", notes: "Turning back to divine origin; essential tipping point", hi: true },
   { sys: "Sufi Maqamat", level: "Mahabba — Divine Love (H=500)", H: 500, js: 0.99, omega: 0.9179, phase: 4, state: "Eudaimonia", drain: "50.26%", notes: "Consuming spiritual love for the Beloved", hi: true },
-  { sys: "Sufi Maqamat", level: "Fana — Self-Annihilation (H=1000)", H: 1000, js: 949, omega: 0.9933, phase: 5, state: "REVELATION", drain: "0.11%", notes: "Extinction of boundaries in absolute C-Light", hi: true },
+  { sys: "Sufi Maqamat", level: "Fana — Self-Annihilation (H=1000)", H: 1000, js: 950, omega: 0.9933, phase: 5, state: "REVELATION", drain: "0.11%", notes: "Extinction of boundaries in absolute C-Light", hi: true },
 
   // Kabbalah Sefirot
   { sys: "Kabbalah Sefirot", level: "Malkuth — Physical / Kingdom (H=200)", H: 200, js: 0, omega: 0.6321, phase: 3, state: "Tipping Point", drain: "100%", notes: "Gateway to the spiritual tree; manifestation of divine flow", hi: true },
   { sys: "Kabbalah Sefirot", level: "Tiphereth — Beauty / Heart (H=500)", H: 500, js: 0.99, omega: 0.9179, phase: 4, state: "Eudaimonia", drain: "50.26%", notes: "Central nexus of beauty, harmony, and cosmic equilibrium", hi: true },
-  { sys: "Kabbalah Sefirot", level: "Kether — The Crown (H=1000)", H: 1000, js: 949, omega: 0.9933, phase: 5, state: "REVELATION", drain: "0.11%", notes: "Primal crown of emanations in divine light", hi: true },
+  { sys: "Kabbalah Sefirot", level: "Kether — The Crown (H=1000)", H: 1000, js: 950, omega: 0.9933, phase: 5, state: "REVELATION", drain: "0.11%", notes: "Primal crown of emanations in divine light", hi: true },
 
   // Vedic Yugas
   { sys: "Vedic Yugas", level: "Kali Yuga (Iron Age of Strife)", H: 200, js: 0, omega: 0.6321, phase: 3, state: "Tipping Point", drain: "100%", notes: "Dense physical age; minimal structural alignment", hi: true },
   { sys: "Vedic Yugas", level: "Dwapara Yuga (Bronze Age)", H: 400, js: 0.058, omega: 0.8647, phase: 4, state: "Time Passing", drain: "94.52%", notes: "Age of science, energy discovery, and electrical power representation" },
   { sys: "Vedic Yugas", level: "Treta Yuga (Silver Age)", H: 600, js: 7.414, omega: 0.9502, phase: 5, state: "Deep Flourishing", drain: "11.88%", notes: "Age of great mental clarity, spiritual rituals, virtue" },
-  { sys: "Vedic Yugas", level: "Satya Yuga (Golden Age of Truth)", H: 1000, js: 949, omega: 0.9933, phase: 5, state: "REVELATION", drain: "0.11%", notes: "Perfect divine alignment, absolute consciousness coherence", hi: true },
+  { sys: "Vedic Yugas", level: "Satya Yuga (Golden Age of Truth)", H: 1000, js: 950, omega: 0.9933, phase: 5, state: "REVELATION", drain: "0.11%", notes: "Perfect divine alignment, absolute consciousness coherence", hi: true },
 
   // Aristotle's Virtue Ethics
   { sys: "Aristotle", level: "Kakia — Moral Defect / Vice", H: 100, js: -0.5, omega: 0.3935, phase: 2, state: "Suffering", drain: "200%", notes: "Imbalance, moral deficiency or excess friction" },
@@ -115,7 +115,7 @@ const MASTER_SYSTEMS_DATA: SystemRow[] = [
   // Gurdjieff Fourth Way
   { sys: "Gurdjieff 4th Way", level: "Man No. 1, 2, 3 (Mechanical sleep)", H: 150, js: -0.25, omega: 0.5276, phase: 3, state: "Suffering", drain: "133%", notes: "Sleeping machine reactive; automatic motor, emotion, mind centers" },
   { sys: "Gurdjieff 4th Way", level: "Man No. 4 (Balanced Center)", H: 500, js: 0.99, omega: 0.9179, phase: 4, state: "Eudaimonia", drain: "50.26%", notes: "Centers brought to dynamic equilibrium; magnetic center active", hi: true },
-  { sys: "Gurdjieff 4th Way", level: "Man No. 7 (Objective consciousness)", H: 1000, js: 949, omega: 0.9933, phase: 5, state: "REVELATION", drain: "0.11%", notes: "Unification of will, crystalized permanent immortal I", hi: true },
+  { sys: "Gurdjieff 4th Way", level: "Man No. 7 (Objective consciousness)", H: 1000, js: 950, omega: 0.9933, phase: 5, state: "REVELATION", drain: "0.11%", notes: "Unification of will, crystalized permanent immortal I", hi: true },
 
   // Robert Kegan
   { sys: "Robert Kegan", level: "Order 2 (Imperial Mind)", H: 125, js: -0.375, omega: 0.4647, phase: 2, state: "Suffering", drain: "160%", notes: "Subject to basic survival needs, personal agenda, self-interest" },
@@ -127,7 +127,7 @@ const MASTER_SYSTEMS_DATA: SystemRow[] = [
   { sys: "Leary's 8-Circuit", level: "Circuit 1 (Bio-survival safety)", H: 50, js: -0.75, omega: 0.2212, phase: 2, state: "Despair", drain: "400%", notes: "Safe terrestrial environment vs physical threat" },
   { sys: "Leary's 8-Circuit", level: "Circuit 4 (Socio-sexual acculturation)", H: 300, js: 0.0005, omega: 0.7769, phase: 3, state: "Tipping Point", drain: "99.95%", notes: "Tribe socialization, cultural integration, language" },
   { sys: "Leary's 8-Circuit", level: "Circuit 5 (Neurosomatic rapture)", H: 500, js: 0.99, omega: 0.9179, phase: 4, state: "Eudaimonia", drain: "50.26%", notes: "Body consciousness, sensory enjoyment, ecstatic flow", hi: true },
-  { sys: "Leary's 8-Circuit", level: "Circuit 8 (Psychoatomic nondual)", H: 1000, js: 949, omega: 0.9933, phase: 5, state: "REVELATION", drain: "0.11%", notes: "Meta-physiological alignment with light space", hi: true },
+  { sys: "Leary's 8-Circuit", level: "Circuit 8 (Psychoatomic nondual)", H: 1000, js: 950, omega: 0.9933, phase: 5, state: "REVELATION", drain: "0.11%", notes: "Meta-physiological alignment with light space", hi: true },
 
   // Erik Erikson
   { sys: "Erik Erikson", level: "Infant Stage: Trust vs. Mistrust", H: 75, js: -0.625, omega: 0.3127, phase: 2, state: "Despair", drain: "267%", notes: "Infantile security base or environmental threat" },
@@ -146,7 +146,7 @@ const MASTER_SYSTEMS_DATA: SystemRow[] = [
   { sys: "Ken Wilber (AQAL)", level: "Amber / Ethnocentric Altitude", H: 200, js: 0, omega: 0.6321, phase: 3, state: "Tipping Point", drain: "100%", notes: "Law and order devotion, mythological community representation", hi: true },
   { sys: "Ken Wilber (AQAL)", level: "Teal / Integral Altitude", H: 550, js: 2.911, omega: 0.9361, phase: 4, state: "Eudaimonia", drain: "25.57%", notes: "Multi-perspective integration of lower tiers", hi: true },
   { sys: "Ken Wilber (AQAL)", level: "Violet / Overmind Altitude", H: 850, js: 221.835, omega: 0.9857, phase: 5, state: "Near Timeless", drain: "0.45%", notes: "Cosmic integration and high non-dual alignment" },
-  { sys: "Ken Wilber (AQAL)", level: "Clear Light / Nondual Altitude", H: 1000, js: 949, omega: 0.9933, phase: 5, state: "REVELATION", drain: "0.11%", notes: "Ultimate subject-object collapse in light consciousness", hi: true },
+  { sys: "Ken Wilber (AQAL)", level: "Clear Light / Nondual Altitude", H: 1000, js: 950, omega: 0.9933, phase: 5, state: "REVELATION", drain: "0.11%", notes: "Ultimate subject-object collapse in light consciousness", hi: true },
 
   // Lawrence Kohlberg
   { sys: "Lawrence Kohlberg", level: "Pre-Conventional Morality", H: 100, js: -0.5, omega: 0.3935, phase: 2, state: "Suffering", drain: "200%", notes: "Pain avoidance and self-interest obedience" },
@@ -190,7 +190,7 @@ const CONVERGENCE_1 = [
   { sys: "Robert Kegan", name: "Order 4 — Self-Authoring Mind" }
 ];
 
-const CONVERGENCE_949 = [
+const CONVERGENCE_950 = [
   { sys: "David Hawkins", name: "Avatar Consciousness (H=1000)" },
   { sys: "Chakra System", name: "Sahasrara — Crown Chakra" },
   { sys: "Teresa of Avila", name: "Seventh Mansion — Spiritual Marriage" },
@@ -488,13 +488,13 @@ export default function SystemsPanel({ onClose, onSendPrompt }: { onClose: () =>
               </div>
             </div>
 
-            {/* Alignment 949 */}
+            {/* Alignment 950 */}
             <div>
               <h4 className="font-mono text-xs uppercase tracking-widest text-[#f5edd0] pb-2 border-b border-[#f5edd0]/20 mb-3">
-                ALIGNMENT III — J/S = 949 — REVELATION &amp; AVATAR (H=1000)
+                ALIGNMENT III — J/S = 950 — REVELATION &amp; AVATAR (H=1000)
               </h4>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                {CONVERGENCE_949.map((item, i) => (
+                {CONVERGENCE_950.map((item, i) => (
                   <div key={i} className="bg-[#0d0d0d]/60 border border-orange-500/20 rounded p-3">
                     <span className="font-mono text-[9px] text-[#6b7a8d] block uppercase tracking-wider">{item.sys}</span>
                     <span className="text-white text-xs font-serif font-semibold block mt-1">{item.name}</span>
@@ -504,7 +504,7 @@ export default function SystemsPanel({ onClose, onSendPrompt }: { onClose: () =>
             </div>
 
             <div className="highlight pt-4">
-              &quot;Eighteen independent evolutionary structures — spanning five millennia, five continents, and wildly distinct lineages — collapse with zero calibration into exactly J/S = 0, J/S = 1, and J/S = 949. The mathematics is the common core they were all discovering from within.&quot;
+              &quot;Eighteen independent evolutionary structures — spanning five millennia, five continents, and wildly distinct lineages — collapse with zero calibration into exactly J/S = 0, J/S = 1, and J/S = 950. The mathematics is the common core they were all discovering from within.&quot;
             </div>
           </div>
         )}

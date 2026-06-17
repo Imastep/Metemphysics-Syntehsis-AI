@@ -79,7 +79,7 @@ export default function CalcPanel({ onClose, onSendPrompt }: { onClose: () => vo
   };
 
   const cpJSstate = (js: number) => {
-    if (js >= 949) return "REVELATION";
+    if (js >= 950) return "REVELATION";
     if (js >= 99) return "Near Timeless";
     if (js >= 10) return "Mystical Clarity";
     if (js >= 3) return "Deep Flourishing";
@@ -92,7 +92,7 @@ export default function CalcPanel({ onClose, onSendPrompt }: { onClose: () => vo
   };
 
   const cpJSdesc = (js: number) => {
-    if (js >= 949) return "C becomes directly perceptible. The veil of entropy is 0.1053%. The revelation threshold.";
+    if (js >= 950) return "C becomes directly perceptible. The veil of entropy is 0.1053%. The revelation threshold.";
     if (js >= 99) return "Time experience becomes non-linear. Deep meditation, mystical states, creative peak.";
     if (js >= 10) return "Profound clarity and flow. All dimensions of Ω expressing simultaneously.";
     if (js >= 3) return "Deep flourishing. All five Ω dimensions active and integrated.";
@@ -125,7 +125,7 @@ export default function CalcPanel({ onClose, onSendPrompt }: { onClose: () => vo
 
   const hToJS = (H: number) => {
     if (H < 200) return (H / 200) - 1;
-    return 949 * Math.pow((H - 200) / 800, 7);
+    return 950 * Math.pow((H - 200) / 800, 7);
   };
 
   // Run: Solve God Equation
@@ -321,13 +321,13 @@ export default function CalcPanel({ onClose, onSendPrompt }: { onClose: () => vo
     const js = C / (S * T) - 1;
     const ratio = C / (S * T);
     const om = 1 - Math.exp(-ratio);
-    const dist = Math.abs(js - 949);
+    const dist = Math.abs(js - 950);
 
     setJsResult({
       val: fmtN(js, 3),
       state: cpJSstate(js),
       desc: cpJSdesc(js),
-      tier: js >= 949 ? "Tier ∞ — Revelation" : js >= 99 ? "Tier 5" : js >= 10 ? "Tier 4" : js >= 1 ? "Tier 3" : js >= 0 ? "Tier 2" : "Tier 1 — Entropy-Dominated",
+      tier: js >= 950 ? "Tier ∞ — Revelation" : js >= 99 ? "Tier 5" : js >= 10 ? "Tier 4" : js >= 1 ? "Tier 3" : js >= 0 ? "Tier 2" : "Tier 1 — Entropy-Dominated",
       ratio: fmtN(ratio, 4),
       omega: fmtN(om, 6),
       dist: fmtN(dist, 3)

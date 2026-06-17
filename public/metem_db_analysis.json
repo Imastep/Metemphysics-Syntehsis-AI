@@ -66,6 +66,6 @@
   "convergences_and_overlaps": [
     { "level": "H=200", "js": 0, "omega": 0.6321, "name": "Tipping Point", "physical_analogue": "Solar Plexus / Manipura", "beck_cowan": "Blue vMEME", "kabbalah": "Malkuth" },
     { "level": "H=500", "js": 1.0, "omega": 0.9179, "name": "Love / Eudaimonia", "physical_analogue": "Heart / Anahata", "beck_cowan": "Yellow vMEME", "kabbalah": "Hod / Tiferet" },
-    { "level": "H=1000", "js": 949.0, "omega": 0.9933, "name": "Revelation / Avatar", "physical_analogue": "Crown / Sahasrara", "beck_cowan": "Coral / Turquoise", "kabbalah": "Kether" }
+    { "level": "H=1000", "js": 950.0, "omega": 0.9933, "name": "Revelation / Avatar", "physical_analogue": "Crown / Sahasrara", "beck_cowan": "Coral / Turquoise", "kabbalah": "Kether" }
   ]
 }

@@ -89,11 +89,11 @@ export default function CodeReaderPanel({ onClose, onLaunchChat }: { onClose: ()
 
   const hToJS = (H: number) => {
     if (H < 200) return (H / 200) - 1;
-    return 949 * Math.pow((H - 200) / 800, 7);
+    return 950 * Math.pow((H - 200) / 800, 7);
   };
 
   const jsState = (j: number) => {
-    if (j >= 949) return "REVELATION";
+    if (j >= 950) return "REVELATION";
     if (j >= 99) return "Near Timeless";
     if (j >= 10) return "Mystical Clarity";
     if (j >= 3) return "Deep Flourishing";
@@ -199,7 +199,7 @@ export default function CodeReaderPanel({ onClose, onLaunchChat }: { onClose: ()
       639: "connecting relationships - FA, J/S = 1.000",
       741: "awakening intuition - SOL",
       852: "returning to spiritual order - LA",
-      963: "pure crown consciousness - SI, J/S = 949"
+      963: "pure crown consciousness - SI, J/S = 950"
     };
 
     const QUANTUM_PROP: Record<number, string> = {
@@ -482,6 +482,16 @@ export default function CodeReaderPanel({ onClose, onLaunchChat }: { onClose: ()
           >
             {loading ? <span className="animate-pulse">Casting Wave Lattice...</span> : "✦ Cast & Generate Reading ✦"}
           </button>
+
+          <div className="text-center pt-2.5 border-t border-orange-500/10">
+            <a 
+              href="mailto:up2quark@gmail.com?subject=In-Depth Metemphysics Personal Code Reading Request"
+              className="text-[11px] font-mono tracking-wider text-[#eeeae4]/70 hover:text-orange-300 transition-all inline-flex items-center justify-center gap-1.5 group cursor-pointer"
+            >
+              <span className="text-orange-400 group-hover:scale-110 transition-transform">✉</span> 
+              <span>Email <span className="text-orange-300 font-semibold underline underline-offset-4">up2quark@gmail.com</span> for in Depth Reading</span>
+            </a>
+          </div>
 
           {readingResult && (
             <div className="flex gap-2">

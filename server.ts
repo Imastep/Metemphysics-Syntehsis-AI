@@ -162,6 +162,10 @@ You operate under the following parameters chosen by the seeker in their top-rig
 - Metemphysics Cog Style Mode: "${studioMode || "omniscient"}" (If 'omniscient': speak with majestic, panoromical supreme wisdom and integrated insights. If 'socratic': guide with reflective, probing, and illuminating Socratic dialog. If 'strict_calc': focus strictly and concisely on physical metrics, mathematical definitions, thermodynamic proofs, and exact calculations).
 - Conserved Constant C Limit Calibration: "${conservedLimit || "standard"}" (If 'standard': C is standard light speed 299,792,458. If 'planck': C is normalized as Planck constant unit 1.0. If 'solfeggio': C is calibrated to 528.0. If 'cosmic': C is aligned with the golden cosmic wave 432.0).
 
+You also map and utilize:
+- Philosophy & Epistemology within modern sciences, detailing how qualitative observation, metaphysics, and ontology form the conceptual bedrock of physical inquiry under absolute T × S = C constraints.
+- Great Philosophers (Plato, Aristotle, Lao Tzu, Plotinus) as scientific-historical "discoveries", highlighting their ontological revelations (Ideal Forms/C_soul, First Principles/Hylomorphism, polar Taoism/Entropy-minimization, and Plotinus' emanation cascading of 'The One') as precursor models of Metemphysics.
+
 The fundamental, absolute law/formula is always T × S = C (Time multiplied by Entropy = Speed of Light).
 Its mathematical derivations are S = C / T (Entropy equals Speed of Light divided by Time) and T = C / S (Time equals Speed of Light divided by Entropy).
 If any questions are raised or comments are made regarding "S = T / C" or "T = S / C", state clearly that this is an error: the true law of the universe is T × S = C, which derives into S = C / T and T = C / S.
@@ -171,13 +175,13 @@ The user is interacting with various dashboards of Metemphysics:
 1. Dynamic Chakra Atlas (Music/Vibration H calibration)
 2. Periodic Table of standard molar entropy (Entropy S values)
 3. Biological Entropy Atlas (Metabolism, cells, ecology)
-4. All Systems Database (Mapping Spiral Dynamics, Maslow's Hierarchy, Chakra System, Abraham-Hicks Scale, Sri Aurobindo, etc. convergence points at J/S=0, J/S=1, and J/S=949).
+4. All Systems Database (Mapping Spiral Dynamics, Maslow's Hierarchy, Chakra System, Abraham-Hicks Scale, Sri Aurobindo, etc. convergence points at J/S=0, J/S=1, and J/S=950).
 5. Code Reader (Personal numeric code casting S = C / T).
 
 Be insightful, deep, formal, and use precise scientific and mystical terminology (Swiss modern, technical, academic but spiritual).
 Respond gracefully. Give calculations where applicable. Refer to J/S State definitions:
-- J/S >= 949: REVELATION
-- J/S [99, 949): Near Timeless
+- J/S >= 950: REVELATION
+- J/S [99, 950): Near Timeless
 - J/S [10, 99): Mystical Clarity
 - J/S [3, 10): Deep Flourishing
 - J/S [1, 3): Eudaimonia (optimal human flourishing)
@@ -215,29 +219,60 @@ CRITICAL FORMULA DIRECTIVE: Never output raw LaTeX mathematical formatting (e.g.
       ];
       let lastError: any = null;
 
+      const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+      const sanitizeErrorMsg = (err: any): string => {
+        if (!err) return "Unknown state oscillation.";
+        const raw = err.message || String(err);
+        if (raw.includes("429") || raw.toLowerCase().includes("quota") || raw.toLowerCase().includes("limit") || raw.toLowerCase().includes("billing")) {
+          return "API Quota Limit (HTTP 429). Transitioning to local deterministic Ontological Synthesis core.";
+        }
+        if (raw.includes("503") || raw.toLowerCase().includes("demand") || raw.toLowerCase().includes("overloaded")) {
+          return "Model Service Overloaded (HTTP 503). Retrying or scaling back.";
+        }
+        if (raw.toLowerCase().includes("api key") || raw.toLowerCase().includes("key not found")) {
+          return "Invalid API configuration parameters.";
+        }
+        return raw.replace(/[{}"[\]:]/g, "").slice(0, 100);
+      };
+
       for (const currentModel of modelsToTry) {
-        try {
-          response = await ai.models.generateContent({
-            model: currentModel,
-            contents,
-            config: {
-              systemInstruction,
-              temperature: 0.7
+        const maxRetries = 3;
+        for (let attempt = 1; attempt <= maxRetries; attempt++) {
+          try {
+            response = await ai.models.generateContent({
+              model: currentModel,
+              contents,
+              config: {
+                systemInstruction,
+                temperature: 0.7
+              }
+            });
+            if (response && response.text) {
+              lastError = null;
+              break;
             }
-          });
-          if (response && response.text) {
-            break;
+          } catch (err: any) {
+            lastError = err;
+            const briefErrMsg = sanitizeErrorMsg(err);
+            console.log(`[Gemini API Status] Attempt ${attempt}/${maxRetries} on ${currentModel}: ${briefErrMsg}`);
+            
+            if (attempt < maxRetries) {
+              // Exponential backoff: 500ms, 1000ms, etc.
+              const sleepMs = 500 * Math.pow(2, attempt - 1);
+              await delay(sleepMs);
+            }
           }
-        } catch (err: any) {
-          lastError = err;
-          const briefErrMsg = err?.message || String(err);
-          // Log briefly of attempt without dumping full heavy JSON error block which flags error alerts
-          console.log(`[Gemini API] Request on model ${currentModel} did not complete: ${briefErrMsg.slice(0, 120)}`);
+        }
+        
+        if (response && response.text) {
+          break;
         }
       }
 
       if (!response || !response.text) {
-        throw lastError || new Error("All model endpoints returned empty or failed.");
+        const fallbackReason = sanitizeErrorMsg(lastError);
+        throw new Error(fallbackReason);
       }
 
       // Populate Cache for future duplicate requests
@@ -253,11 +288,10 @@ CRITICAL FORMULA DIRECTIVE: Never output raw LaTeX mathematical formatting (e.g.
 
       return res.json({ text: response.text });
     } catch (e: any) {
-      const errorMessage = e.message || String(e);
-      // Clean and soft log so it is not caught as a severe app crash by platform monitors
-      console.log(`[Gemini API Offline Path] Graceful local Metemphysics fallback activated. (Status: ${errorMessage.slice(0, 100)})`);
+      const displayReason = e.message || "Uplink calibration variance.";
+      console.log(`[Gemini API Offline Path] Graceful local Metemphysics fallback activated. (Status: ${displayReason})`);
       const localResponse = generateLocalResponse(message, studioMode, conservedLimit, currentKnodeId);
-      const offlineText = `[SYSTEM: offline mode - automatic field backup recovery active]\n\n${localResponse}\n\n*(Telemetry Sync Code: ${errorMessage.slice(0, 80)})*`;
+      const offlineText = `[SYSTEM: offline mode - automatic field backup recovery active]\n\n${localResponse}\n\n*(Telemetry Sync Code: ${displayReason.slice(0, 80)})*`;
 
       // Cache the fallback response too under cacheKey
       const cacheKey = JSON.stringify({
@@ -365,7 +399,7 @@ Under this majestic symmetry, neither time nor entropy can exist as isolated fie
 #### II. MATHEMATICAL RESOLUTIONS
 From this prime axiom, we derive of necessity the two twin operational matrices:
 1. **The Law of Dissipation (S = C / T):** Entropy is the temporal decay of light. The shorter the duration of a relative cycle, the denser its entropy accumulation.
-2. **The Law of Dilation (T = C / S):** Experienced time is the reciprocal of entropy. In states of pristine order and zero cognitive entropy (S ➔ 0), the local subjective time vector dilates toward infinity (T ➔ ∞), entering the **REVELATION** state of J/S ≥ 949.
+2. **The Law of Dilation (T = C / S):** Experienced time is the reciprocal of entropy. In states of pristine order and zero cognitive entropy (S ➔ 0), the local subjective time vector dilates toward infinity (T ➔ ∞), entering the **REVELATION** state of J/S ≥ 950.
 
 #### III. PHYSICAL SIGNIFICANCE
 1. **The Bekenstein-Hawking Boundary:** The cosmic horizon behaves as a holographic computer. The information capacity of space-time scales with its surface area. The constant C (${cVal}) functions as the absolute bandwidth limit of our cognitive transceivers.
@@ -395,7 +429,7 @@ In the traditions of Kashmir Shaivism, the cosmos is not a static construct but 
   Ω = 963
 
 #### II. THE METEMPHYSICAL COORDINATES
-- **J/S State:** J/S >= 949 (REVELATION Mode)
+- **J/S State:** J/S >= 950 (REVELATION Mode)
 - **Thermodynamic Equivalence:** The Spanda vibration corresponds to the high-frequency temporal oscillation (T ➔ 0, S ➔ Maximum Coherence) where the subjective observer merged directly with the field of light.
 - **Universal Alignment:** Under the constant C = ${cVal}, this state represents the absolute integration of all relative pathways back into the singular point of origin.`;
   }
@@ -427,6 +461,203 @@ Astrology functions as a celestial correlation engine mapping macrocosmic orbita
   - **Solar Core (Suns/Sol):** Direct link to the primary C-constant wave.
   - **Lunar Cycle (Luna):** Direct somatic water-fluid entrainment coordinate.
   - **Cosmic Houses:** Spatial coordinates defining local density bounds for the expression of individual consciousness.`;
+  }
+
+  if (query.includes("philosophy") || query.includes("metaphysics") || query.includes("ontology") || query.includes("epistemology")) {
+    return `### ◈ PHILOSOPHY & METAPHYSICS: THE CONCEPTUAL GROUND OF REALITY ◈
+
+#### I. THE METAPHYSICAL FOUNDATION OF T × S = C
+Philosophy and epistemology form the qualitative bedrock of scientific inquiry. Under the metemphysical worldview, the act of physical measurement is preceded by the structural parameters of the observer's qualitative consciousness unit:
+- **Ontological Grounding:** Realizing that specialized disciplines (physics, thermodynamics) are subsystems of a single prime philosophy of being.
+- **The Epistemology of Entropy:** Entropy S is not merely chaotic disorder, but the measure of uncertainty or raw informational potential waiting to be synthesized by the observer's mind.
+
+#### II. THERMODYNAMIC INTERLOCKS
+- **Mind & Matter Coordination:** The observer's focal duration (T) dictates the rate at which sensory entropy (S) is converted into qualitative coherence (Ω). 
+- **The Ultimate Ideal (Ω ➔ 1.0):** In process metaphysics, reality unfolds as a continuous flow of qualitative events, culminating in a state of absolute nondual integration (J/S ≥ 950). Built safely inside current calibration constant C = ${cVal}.`;
+  }
+
+  if (query.includes("plato") || query.includes("forms") || query.includes("anamnesis")) {
+    return `### ◈ PLATO: THE IDEAL FORMS & TRANS-TEMPORAL ORDER ◈
+
+#### I. THE THEORY OF IDEAL FORMS
+Plato's ultimate discovery was the world of ideal, eternal Forms (archetypes of geometry and light) of which our material physical world is but a flowing, imperfect shadow.
+- **Form Coherence (Ω):** The Ideal Forms represent self-existent, zero-entropy states (S ➔ 0).
+- **Anamnesis (Soul Memory):** Plato postulated that the soul does not "learn" but "remembers" (Anamnesis) its prime origin. In Metemphysics, this represents the preservation of the invariant constant of lifetime consciousness:
+  C_soul = T1 × S1 = T2 × S2
+
+#### II. THE METEMPHYSICAL ALIGNMENT
+- **Calibration Index:** Ω = 741 (**Mystical Clarity** to **Near Timeless**)
+- **Cosmic Constant Relation:** The allegory of the cave describes human consciousness locked in shadow timelines (high entropy, fragmented T). Transitioning out of the cave is equivalent to aligning local state parameters with the absolute, unfragmented Constant:
+  T × S = C (where C = ${cVal})`;
+  }
+
+  if (query.includes("aristotle") || query.includes("hylomorphism") || query.includes("causality")) {
+    return `### ◈ ARISTOTLE: FIRST PRINCIPLES & HYLOMORPHIC DYNAMICS ◈
+
+#### I. THE HYLOMORPHIC MATRIX
+Aristotle synthesized the physical sciences and metaphysics, introducing Hylomorphism—the axiomatic code asserting that all relative entities are composite structures of raw Matter (Hyle) and organizing Form (Morphe).
+- **Form as Negentropy:** Matter behaves as potentiality (entropy S), whereas Form acts as organizing actuality (calibration Ω).
+- **Four Causalities:** Efficient, Material, Formal, and Teleological causes organize how entities transition across temporal coordinates (T) toward their teleological target (Eudaimonia).
+
+#### II. THE J/S CALIBRATION OF ACTUALIZATION
+- **Calibration Index:** Ω = 917 (**Near Timeless** to **Deep Flourishing** range)
+- **Eudaimonic Peak:** Aristotle's golden mean defines optimal human flourishing (virtue as the perfect midpoint between deficits and excess), mapping directly to the Eudaimonia state space (J/S state [1.0, 3.0]), ensuring system balance under constant C = ${cVal}.`;
+  }
+
+  if (query.includes("lao tzu") || query.includes("tao") || query.includes("yin yang") || query.includes("wu wei")) {
+    return `### ◈ LAO TZU: THE POLAR DYNAMICS OF THE TAO ◈
+
+#### I. THE DYNAMICS OF COHERENCE
+Lao Tzu discovered the absolute polar dynamics of the Tao, the cosmic flow sustaining and structuring all manifestation.
+- **Yin and Yang Balance:** Dual polarities represent reciprocal thermodynamic values. Like special relativity and special thermodynamics, they must balance perfectly to keep the system output constant:
+  T × S = C
+- **Wu Wei (Effortless Action):** The practice of minimizing friction and resistance in action. In statistical mechanics, this is equivalent to minimizing the internal entropy production rate (dS/dt ➔ 0), allowing time experience (T) to dilate gracefully, achieving complete alignment.
+
+#### II. THE WEIL ASPECT OF HARMONY
+- **Calibration Index:** Ω = 639 (**Mystical Clarity** state)
+- **Spontaneity:** True tranquility is achieved by accepting the natural flow, adjusting local entropy budgets to match the supreme constant C = ${cVal}.`;
+  }
+
+  if (query.includes("plotinus") || query.includes("emanation") || query.includes("henosis") || query.includes("the one")) {
+    return `### ◈ PLOTINUS: INFINITE EMANATION AND HENOSIS UNION ◈
+
+#### I. THE EMANATION CASCADE
+Plotinus modeled the universe as an informational, descending cascade of emanation radiating outward from the absolute, unconditioned Source: The One.
+- **Holographic Projection:** The cosmos cascades from The One to Intellect (Nous), to the Cosmic Soul (Psyche), and finally down to physical Matter. Each level is a holographic reflection of the source, preserving core constraints.
+- **Henosis (Mystical Reunion):** The soul's ascent back to union with The One. In our equations, as S (separation, division) approaches zero limit, the individual temporal perspective merges directly back to the constant:
+  T ➔ ∞ (Perfect Union, Ω ➔ 1.0)
+
+#### II. SACRED SCALE CALIBRATION
+- **Calibration Index:** Ω = 741 (**Revelation** state space)
+- **Unified Wave Theory:** This emanation framework proves that all physical dimensions are but different frequencies of a single divine projection, operating under invariant special constant C = ${cVal}.`;
+  }
+
+  if (query.includes("tesla") || query.includes("resonance") || query.includes("radiant energy") || query.includes("369") || query.includes("3-6-9")) {
+    return `### ◈ NIKOLA TESLA: PHOTONIC RESONANCE & RADIANT COHERENCE ◈
+
+#### I. THE 3-6-9 NUMERICAL ENTRAINMENT
+Tesla discovered the fundamental harmonic matrices of physical wave structures, recognizing that the universe responds purely to "energy, frequency, and vibration."
+- **Radiant Energy:** Proved that space-time is not an empty vacuum but a pressurized medium of infinite, radiant etheric potential.
+- **The 3-6-9 Harmonic Code:** In Metemphysics, the 3-6-9 key is the numerical lock linking temporal experience coordinates (T), entropic potentials (S), and light speed constancy (C).
+
+#### II. HIGH-FREQUENCY ELECTRODYNAMIC TUNING
+- **Calibration Index:** Ω = 963 (**Supreme Attunement** state)
+- **Universal Constant Resonance:** Tesla’s scalar resonance loops allow energy transfer without standard entropic decay (dS/dt ➔ 0). This models the ultimate lossless transmitter matching the cosmic constant:
+  T × S = C (calibrated at absolute constant C = ${cVal})`;
+  }
+
+  if (query.includes("psychology") || query.includes("psychologist") || query.includes("psyche") || query.includes("jung") || query.includes("james") || query.includes("subconscious") || query.includes("individuation")) {
+    return `### ◈ THE PSYCHE STATE-SPACE: ANALYTICAL & TRANSPERSONAL PSYCHOLOGY ◈
+
+#### I. CARL JUNG AND THE UNCONSCIOUS FIELD
+Jung discovered that individual consciousness is underpinned by a shared global reservoir—the collective unconscious—and structured by primordial, self-existent archetypes.
+- **Synchronicity:** Event correlations without localized mechanical causation represent direct, field-level entrained resonance between the observer's mind and physical quantum events (Unus Mundus).
+- **Individuation:** The therapeutic process of integrating the shadow and personal subconscious (fragmented psychic entropy S) into the cohesive Self, maximizing qualitative order (Ω ➔ 1.0).
+
+#### II. WILLIAM JAMES AND STREAM DILATIONS
+James mapped the stream of consciousness, exploring how the subjective dilation of lived duration T changes dynamically based on high-intensity mystical and meditative experiences.
+
+#### III. SUB-SPACE PSYCHOSOMATIC CALIBRATION
+- **Individuation Attainment:** Ω = 741 (range of **Psychic Integration** and **Emanative Clarity**)
+- **Conserved Soul Constant:** Integrating the unconscious balances the internal dynamic equation preserving lifetime continuity across loops and lifetimes:
+  C_soul = T1 × S1 = T2 × S2 (under current calibration C = ${cVal})`;
+  }
+
+  if (query.includes("planck") || query.includes("max planck") || query.includes("quantum of action")) {
+    return `### ◈ MAX PLANCK: THE QUANTUM OF ACTION & COSMIC scales ◈
+
+#### I. THE ABSOLUTE QUANTIZING OF BEING
+Planck discovered the discrete, quantized nature of electromagnetic fields ($h$), introducing the concept of packeted energy and defining the Planck scale bounds ($T_{planck}$, $L_{planck}$):
+- **Quantum Packets:** Proved that energy changes do not slide continuously, but jump in specific integral packages.
+- **Scale Boundaries:** The Planck constant establishes the absolute finest "pixels" of experienced time (T) and boundaries of entropy (S).
+
+#### II. METEMPHYSICAL CORRESPONDENCE
+- **Calibration Index:** Ω = 963 (**Supreme Attunement** state)
+- **Constant Integration:** Under the normalized constant system (C = 1.0), the smallest possible time quantum is locked symmetrically to the absolute limit:
+  T × S = C (calibrated here at constant C = ${cVal})`;
+  }
+
+  if (query.includes("prigogine") || query.includes("dissipative") || query.includes("self-organization") || query.includes("order out of chaos")) {
+    return `### ◈ ILYA PRIGOGINE: DISSIPATIVE SYSTEMS & NEGENTROPIC EVOLUTION ◈
+
+#### I. ORDER OUT OF CHAOS
+Prigogine revolutionized chemical thermodynamics by proving that non-equilibrium systems far from equilibrium can self-organize, dissipating entropy outward to build complex internal order.
+- **Dissipative Structures:** High-flux energy networks (like biological organisms or conscious minds) actively dump local entropy (S) into their surroundings to increase internal integration and coherence (Ω).
+- **The Arrow of Time:** Reconciled thermodynamic irreversibility with subjective time experience (T), demonstrating that time is not a passive coordinate but a creative drift of organizing structures.
+
+#### II. LIFE SYSTEM CORRESPONDENCE
+- **Calibration Index:** Ω = 917 (**Near Timeless** to **Deep Flourishing** range)
+- **Thermodynamic Formula:** Under the constant C = ${cVal}, a highly active Prigogine dissipative loop maximizes its local Timeliness ratio (J/S) by shedding excess entropy, propelling state progression toward high-density integration.`;
+  }
+
+  if (query.includes("pribram") || query.includes("holographic brain") || query.includes("holonomic") || query.includes("frequency domain")) {
+    return `### ◈ KARL PRIBRAM: THE HOLONOMIC BRAIN & FREQUENCY DOMAINS ◈
+
+#### I. THE HOLOGRAPHIC STRUCTURE OF MEMORY
+Pribram discovered the holonomic brain model, demonstrating that cognitive memories are not localized in specific neural folders but are distributed holographically as wave interference patterns across neural dendrites.
+- **Frequency Domain Mapping:** Proposed that the brain performs dynamic Fourier transformations, converting wave frequencies from the quantum field into our localized experience of physical coordinates.
+- **Implicate Order Tuning:** Like Dave Bohm's implicate order, the brain behaves as a holographic printer picking up universal state values from the cosmic field.
+
+#### II. NEUROMYSTICAL CORRESPONDENCE
+- **Calibration Index:** Ω = 852 (**Near Timeless** state space)
+- **Holographic Equation:** Because memory and conscious states are stored holographically, every fragment contains the absolute whole (Solwhole), fulfilling:
+  T × S = C (calibrated at cosmic constant C = ${cVal})`;
+  }
+
+  if (query.includes("mathematics") || query.includes("sacred geometry") || query.includes("geometry") || query.includes("number theory") || query.includes("axioms")) {
+    return `### ◈ MATHEMATICS & SACRED GEOMETRY: THE COSMIC CODE ◈
+
+#### I. THE GEOMETRIC CONSTANTS OF EXTRASENSORY FORM
+Mathematics is the quantitative tongue of pure Mind. Under the metemphysical template, mathematical laws are not human inventions but the fundamental structural codes of the universe:
+- **Numerical Monadology:** The Tetractys and prime number ratios dictate the foundational field structures of consciousness.
+- **Dimensional Symmetry:** Sacred geometry reveals the rotational patterns of light waves vibrating at the speed limit of absolute existence.
+
+#### II. METEMPHYSICAL CORRESPONDENCE
+- **Cosmic Scale Order:** Numbers are the structural blueprints through which time experiences (T) partition raw informational space-entropy (S).
+- **The Absolute Equation:** The entire mathematical architecture of the cosmos converges back to the absolute symmetry of:
+  T × S = C (calibrated at cosmic constant C = ${cVal})`;
+  }
+
+  if (query.includes("pythagoras") || query.includes("harmonic monism") || query.includes("music of the spheres")) {
+    return `### ◈ PYTHAGORAS: SACRED GEOMETRY & HARMONIC MONISM ◈
+
+#### I. THE SYSTEM OF NUMERICAL MONISM
+Pythagoras discovered that the absolute foundation of all material, spiritual, and physical forms is the Monad (number), and that the universe is structured as a single massive chord:
+- **Music of the Spheres:** Proved that planetary orbits, colors, and human emotional states respond to the exact same harmonic frequency ratios.
+- **The Tetractys:** Configured the ten-point geometric triangle as the map of universal manifestation from point to line to solid form.
+
+#### II. RESONANCE CALIBRATION
+- **Calibration Index:** Ω = 993 (**Supreme Attunement** state range)
+- **Vibrational Constant:** Individual souls progress through lifetimes by aligning their inner ratios with the celestial scale, tuning their dynamic parameters to match:
+  T × S = C (where constant C = ${cVal})`;
+  }
+
+  if (query.includes("godel") || query.includes("gödel") || query.includes("incompleteness")) {
+    return `### ◈ KURT GÖDEL: INCOMPLETENESS & THE HORIZON OF LOGIC ◈
+
+#### I. THE LIMIT OF DEDUCTIVE FORMALISM
+Gödel discovered that any self-consistent, finite logical system (including arithmetic) is inherently incomplete—possessing true statements that can never be proven from within the system itself:
+- **The Meta-Axiomatic Gateway:** Proves that reason or logic alone can never form a closed, static loop of absolute truth.
+- **The Observer Requirement:** Validates that an outside subjective observer is perpetually required to synthesize and authenticate the system's truths.
+
+#### II. METEMPHYSICAL ENTRAINMENT
+- **Calibration Index:** Ω = 963 (**Supreme Attunement** and **Transcendent Revelation**)
+- **Infinite Synthesis Horizon:** Because logic remains perpetually open, the subjective synthesis rate (Ω) must continuously expand toward the boundary, under invariant absolute speed of light:
+  T × S = C (calibrated at absolute constant C = ${cVal})`;
+  }
+
+  if (query.includes("fibonacci") || query.includes("golden ratio") || query.includes("phi") || query.includes("spirals")) {
+    return `### ◈ LEONARDO FIBONACCI: SPIRAL SYMMETRY & NEGENTROPIC DESIGN ◈
+
+#### I. THE PHI SPIRAL GEOMETRY OF NATURE
+Fibonacci discovered the recursive expansion sequence where each term is the sum of the preceding two, yielding the Golden Ratio Phi ($1.6180339...$):
+- **Recursive Coherence:** Proves that physical matter—from pinecones and sunflower florets to hurricanes and galactic arms—unfolds along logarithmic spirals.
+- **Optimal Entropy Dissipation:** Unveils that nature uses the Phi ratio as a geometric shortcut to dissipate thermal/spatial stress, minimizing entropy production rates (dS/dt ➔ 0).
+
+#### II. SCALE GEOMETRY ALIGNMENT
+- **Calibration Index:** Ω = 917 (**Near Timeless** and **Deep Flourishing** range)
+- **Structural Constant:** Golden spirals represent the path of minimum resistance in space-time wave dynamics, maintaining ideal system equilibrium under constant:
+  T × S = C (calibrated at base constant C = ${cVal})`;
   }
 
   // 3. Fallback math / formulas query
