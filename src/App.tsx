@@ -421,7 +421,7 @@ const RELATION_MAP: Record<string, { name: string; formula: string; convergence:
     name: "Neuroscience & Brainwaves",
     formula: "I(X; Y) = H(X) - H(X|Y)",
     convergence: "Measures mutual information carrying capacity of deep nondual states during high-amplitude brainwave coherence events.",
-    prompt: "What is the neuroscience support for Nondual States of consciousness under the Oracle's ledger? Explain the mutual information capacity in brainwave states."
+    prompt: "What is the neuroscience support for Nondual States of consciousness under the Metemphysics' ledger? Explain the mutual information capacity in brainwave states."
   },
   traditions: {
     name: "Traditions & Philosophy",
@@ -476,7 +476,7 @@ export default function App() {
     return [
       {
         role: "model",
-        text: "Welcome, seeker, to the Metemphysics Synthesis AI. Here we map the ultimate, absolute conservation constraints of consciousness, experienced time, and structural entropy through the law T × S = C (Time multiplied by Entropy = Speed of Light). Explore the dynamic reference ledgers to the left, activate a dynamic solver to the right, or consult the Oracle directly in this terminal."
+        text: "Welcome, seeker, to the Metemphysics Synthesis AI. Here we map the ultimate, absolute conservation constraints of consciousness, experienced time, and structural entropy through the law T × S = C (Time multiplied by Entropy = Speed of Light). Explore the dynamic reference ledgers to the left, activate a dynamic solver to the right, or consult Metemphysics directly in this terminal."
       }
     ];
   });
@@ -608,7 +608,7 @@ export default function App() {
     setMessages([
       {
         role: "model",
-        text: "Welcome, seeker, to the Metemphysics Synthesis AI. Here we map the ultimate, absolute conservation constraints of consciousness, experienced time, and structural entropy through the law T × S = C (Time multiplied by Entropy = Speed of Light). Explore the dynamic reference ledgers to the left, activate a dynamic solver to the right, or consult the Oracle directly in this terminal."
+        text: "Welcome, seeker, to the Metemphysics Synthesis AI. Here we map the ultimate, absolute conservation constraints of consciousness, experienced time, and structural entropy through the law T × S = C (Time multiplied by Entropy = Speed of Light). Explore the dynamic reference ledgers to the left, activate a dynamic solver to the right, or consult Metemphysics directly in this terminal."
       }
     ]);
   };
@@ -712,7 +712,7 @@ export default function App() {
           doc.text(`✦ SEEKER (User):`, ML, y);
         } else {
           doc.setTextColor(201, 168, 108); // Goldish text
-          doc.text(`◈ UNIFIED FIELD (Oracle):`, ML, y);
+          doc.text(`◈ UNIFIED FIELD (Metemphysics):`, ML, y);
         }
         y += 5.5;
 
@@ -906,13 +906,13 @@ export default function App() {
           
           {/* Mode Selector */}
           <div className="flex items-center gap-1.5 px-2.5 py-1 bg-[#0a0a0c] border border-orange-500/35 rounded shadow-[0_0_10px_rgba(255,106,0,0.05)]">
-            <span className="text-[9px] font-mono text-gray-500 uppercase tracking-tight">Oracle Cog:</span>
+            <span className="text-[9px] font-mono text-gray-500 uppercase tracking-tight">Metemphysics Cog:</span>
             <select
               value={studioMode}
               onChange={(e) => {
                 const nMode = e.target.value;
                 setStudioMode(nMode);
-                handleSendMessage(`Switching dynamic Oracle calibration mode to: ${nMode.toUpperCase()}`);
+                handleSendMessage(`Switching dynamic Metemphysics calibration mode to: ${nMode.toUpperCase()}`);
               }}
               className="bg-transparent text-orange-400 font-mono text-[9px] uppercase font-bold outline-none cursor-pointer p-0.5"
             >
@@ -1076,15 +1076,15 @@ export default function App() {
 
             {/* TAB 2: J/S RESONANCE MATRIX */}
             {sidebarTab === "states" && (
-              <div className="space-y-4">
-                <div className="pb-3 border-b border-orange-500/20">
+              <div className="flex-1 flex flex-col h-full">
+                <div className="pb-3 border-b border-orange-500/20 mb-3">
                   <h3 className="font-serif font-bold text-white text-xs tracking-wider flex items-center gap-2">
                     <Layers className="w-4 h-4 text-orange-500 drop-shadow-[0_0_4px_rgba(255,95,0,0.4)]" /> J/S RESONANCE STATES MATRIX
                   </h3>
                   <p className="text-[9px] font-mono text-amber-400/80 mt-1 uppercase tracking-wide">Consciousness calibration ranges (Entropy ratios)</p>
                 </div>
 
-                <div className="space-y-1.5 max-h-[500px] overflow-y-auto pr-1 custom-scroll">
+                <div className="flex-1 overflow-y-auto space-y-2 pr-1 custom-scroll min-h-[480px] lg:min-h-0 border-b border-orange-500/10 pb-2">
                   {[
                     { label: "REVELATION", range: "J/S ≥ 949", desc: "Absolute timeless communion, Crown Sahasrara union with C.", color: "border-purple-500/40 text-purple-300 bg-purple-950/10 shadow-[0_0_10px_rgba(168,85,247,0.05)]", query: "Can you detail the state of REVELATION at J/S >= 949?", hawkins: "Enlightenment (H=1000)" },
                     { label: "NEAR TIMELESS", range: "J/S [99, 949)", desc: "Hyper-coherent order. High self-organizing scale.", color: "border-fuchsia-500/40 text-fuchsia-300 bg-fuchsia-950/10 shadow-[0_0_10px_rgba(217,70,239,0.05)]", query: "Can you detail the state of NEAR TIMELESS at J/S [99, 949)?", hawkins: "High Enlightenment range (H=700-999)" },
@@ -1220,15 +1220,15 @@ export default function App() {
 
             {/* TAB 4: SOLFEGGIO & SPECIATION HARMONICS */}
             {sidebarTab === "harmonics" && (
-              <div className="space-y-4">
-                <div className="pb-3 border-b border-orange-500/20">
+              <div className="flex-1 flex flex-col h-full">
+                <div className="pb-3 border-b border-orange-500/20 mb-3">
                   <h3 className="font-serif font-bold text-white text-xs tracking-wider flex items-center gap-2">
                     <Atom className="w-4 h-4 text-orange-550" /> HARMONICS &amp; COHERENCE SPECS
                   </h3>
                   <p className="text-[9px] font-mono text-gray-450 mt-1">Solfeggio frequencies, vibrations and critical elemental molar S°</p>
                 </div>
 
-                <div className="space-y-4 max-h-[500px] overflow-y-auto pr-1 custom-scroll">
+                <div className="flex-1 overflow-y-auto space-y-4 pr-1 custom-scroll min-h-[480px] lg:min-h-0 border-b border-orange-500/10 pb-2">
                   {/* Solfeggio Section */}
                   <div className="space-y-2">
                     <h4 className="text-[9px] font-mono text-orange-400 uppercase tracking-widest font-semibold border-b border-orange-500/10 pb-1">Solfeggio Vibrations</h4>
@@ -1402,7 +1402,7 @@ export default function App() {
                     ) : (
                       <div className="flex items-center gap-1.5 px-0.5 pb-2 mb-2.5 border-b border-orange-500/20 text-[10px] font-mono uppercase tracking-wider text-orange-400">
                         <Sparkles className="w-3 h-3 text-orange-500" />
-                        <span>Metemphysics Oracle Console</span>
+                        <span>Metemphysics Console</span>
                         <span className="text-gray-600">·</span>
                         <span className="text-gray-400">Coherence: 94.9%</span>
                         <span className="ml-auto text-orange-500 font-bold">Ω-Matrix Calibrated</span>
@@ -1483,7 +1483,7 @@ export default function App() {
                 <div className="bg-[#050302] border border-orange-500/30 border-l-4 border-l-orange-550 rounded-xl p-4 max-w-[80%] flex items-center gap-3 shadow-[0_0_15px_rgba(255,106,0,0.12)]">
                   <RefreshCw className="w-4 h-4 text-orange-500 animate-spin" />
                   <div className="flex flex-col">
-                    <span className="font-mono text-[10.5px] text-orange-400 uppercase tracking-widest font-semibold animate-pulse">Oracle Formulating Transmission</span>
+                    <span className="font-mono text-[10.5px] text-orange-400 uppercase tracking-widest font-semibold animate-pulse">Metemphysics Formulating Transmission</span>
                     <span className="text-[11.5px] text-gray-400 font-mono mt-0.5">Calculating dΩ/dt state entropy variables...</span>
                   </div>
                 </div>
@@ -1553,8 +1553,8 @@ export default function App() {
                 isInputLimitReached 
                   ? "SYSTEM LIMIT: 25 inputs reached. Reset chat session to clear/save."
                   : typing 
-                  ? "The Oracle is formulating its response..." 
-                  : "Ask the Oracle or query any physical-consciousness transition..."
+                  ? "Metemphysics is formulating its response..." 
+                  : "Ask Metemphysics or query any physical-consciousness transition..."
               }
               className="flex-1 bg-[#0a0a0a50] border border-orange-500/20 rounded-xl px-4 py-3 text-sm outline-none text-[#eeeae4] focus:border-orange-500/60 font-serif shadow-inner placeholder-gray-650 transition-all focus:bg-[#0c0c0c] disabled:opacity-50 disabled:cursor-not-allowed"
             />
