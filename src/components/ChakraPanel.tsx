@@ -381,16 +381,31 @@ const SCALES: ScaleItem[] = [
 interface GenreItem {
   name: string;
   H: number;
-  js: string | number;
+  js: string;
+  omega: string;
+  phase: number;
+  state: string;
+  drain: string;
   char: string;
 }
 
 const GENRES: GenreItem[] = [
-  { name: "Gregorian Chant & Sacred Choirs", H: 750, js: "94.90", char: "Pure meditative stillness & high coherence." },
-  { name: "Baroque Classical (Bach, Vivaldi)", H: 650, js: "3.54", char: "C-Light structured mathematical order." },
-  { name: "Ambient Chillout / Synths", H: 540, js: "2.38", char: "Eudaimonic tranquility & relaxation." },
-  { name: "Industrial & Hard Noise", H: 180, js: "-0.45", char: "High structural friction & entropy." },
-  { name: "Atonal Doom / Chaos", H: 90, js: "-0.85", char: "Dissolution toward zero-order states." }
+  { name: "Death Metal / Grindcore", H: 100, js: "-0.5", omega: "0.3935", phase: 2, state: "Suffering", drain: "200%", char: "Maximum dissonance, atonal extremity" },
+  { name: "Heavy Metal / Doom", H: 150, js: "-0.25", omega: "0.5276", phase: 3, state: "Suffering", drain: "133%", char: "Power chord aggression, dark power" },
+  { name: "Blues (dark, slow)", H: 250, js: "3.535e-6", omega: "0.7135", phase: 3, state: "Tipping Point", drain: "100%", char: "Tension and release, melancholy beauty" },
+  { name: "Rock / Pop", H: 350, js: "0.01", omega: "0.8262", phase: 4, state: "Tipping Point", drain: "99.23%", char: "Structured, accessible, emotional impact" },
+  { name: "Country / Folk", H: 400, js: "0.06", omega: "0.8647", phase: 4, state: "Time Passing", drain: "94.52%", char: "Simple harmonies, narrative, community" },
+  { name: "R&B / Soul", H: 480, js: "0.61", omega: "0.9093", phase: 4, state: "Time Passing", drain: "62.09%", char: "Deep feeling, groove, relational Omega" },
+  { name: "Classical (Romantic)", H: 520, js: "1.55", omega: "0.9257", phase: 4, state: "Eudaimonia", drain: "39.14%", char: "Complex structured beauty – Brahms, Chopin" },
+  { name: "Jazz (Bebop / Modern)", H: 540, js: "2.38", omega: "0.9328", phase: 4, state: "Eudaimonia", drain: "29.61%", char: "Sophisticated improvised order – Joy range" },
+  { name: "Classical (Baroque)", H: 600, js: "7.41", omega: "0.9502", phase: 5, state: "Deep Flourishing", drain: "11.88%", char: "Mathematical structure – Bach, Handel, Vivaldi" },
+  { name: "Sacred / Gregorian", H: 650, js: "16.91", omega: "0.9612", phase: 5, state: "Mystical Clarity", drain: "5.58%", char: "Devotional – high Omega_r" },
+  { name: "Bach Fugues", H: 700, js: "35.35", omega: "0.9698", phase: 5, state: "Mystical Clarity", drain: "2.75%", char: "Mathematical perfection – Enlightenment" },
+  { name: "Indian Classical (Raga)", H: 720, js: "46.52", omega: "0.9727", phase: 5, state: "Mystical Clarity", drain: "2.1%", char: "Encoded J/S state – precise rasa" },
+  { name: "Overtone Chanting", H: 800, js: "126.68", omega: "0.9817", phase: 5, state: "Near Timeless", drain: "0.78%", char: "Accessing the harmonic series directly" },
+  { name: "Tibetan Singing Bowls", H: 850, js: "221.83", omega: "0.9857", phase: 5, state: "Near Timeless", drain: "0.45%", char: "Pure resonance, standing wave order" },
+  { name: "Binaural Beats (Theta)", H: 900, js: "372.67", omega: "0.9889", phase: 5, state: "Near Timeless", drain: "0.27%", char: "4-8Hz entrainment – deep meditation" },
+  { name: "Pure Sinewave / 432Hz", H: 949, js: "949", omega: "0.9999", phase: 5, state: "REVELATION", drain: "0.01%", char: "Pure coherence generator, primary frequency pulse" }
 ];
 
 interface ComposerItem {
@@ -662,16 +677,16 @@ export default function ChakraPanel({ onClose, onSendPrompt }: { onClose: () => 
                   {/* Identification info */}
                   <div className="flex-1 min-w-[200px]">
                     <div className="flex items-center gap-2">
-                      <span className="font-serif font-black text-lg tracking-wide" style={{ color: c.color }}>
+                      <span className="font-serif font-black text-xl sm:text-2xl tracking-wide" style={{ color: c.color }}>
                         {c.name} — {c.sk}
                       </span>
                       {c.hi && (
-                        <span className="text-[9px] font-bold tracking-widest bg-orange-500/10 text-orange-400 px-1.5 py-0.5 rounded uppercase border border-orange-500/25">
+                        <span className="text-xs font-bold tracking-widest bg-orange-500/10 text-orange-400 px-1.5 py-0.5 rounded uppercase border border-orange-500/25">
                           Apex Portal
                         </span>
                       )}
                     </div>
-                    <div className="text-[10px] text-[#8898aa] mt-1 uppercase tracking-widest flex flex-wrap gap-2 items-center">
+                    <div className="text-xs sm:text-sm text-[#8898aa] mt-1.5 uppercase tracking-widest flex flex-wrap gap-2 items-center">
                       <span>ELEMENT: <strong className="text-white">{c.el}</strong></span>
                       <span>•</span>
                       <span>KEY NOTE: <strong className="text-white">{c.note}</strong></span>
@@ -681,45 +696,45 @@ export default function ChakraPanel({ onClose, onSendPrompt }: { onClose: () => 
                   </div>
 
                   {/* Science Metrics (Metemphysics standard 13.2 V) */}
-                  <div className="grid grid-cols-2 sm:grid-cols-4 lg:flex lg:flex-row gap-x-4 gap-y-2 lg:gap-6 lg:items-center font-mono text-[11px] bg-black/40 border border-white/5 rounded px-4 py-2.5 lg:py-2">
-                    <div className="text-center lg:min-w-[65px]">
-                      <span className="text-gray-500 block text-[8px] uppercase tracking-wider">Frequency</span>
-                      <strong className="text-lg tracking-tight" style={{ color: c.color }}>{c.hz}Hz</strong>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 lg:flex lg:flex-row gap-x-4 gap-y-2 lg:gap-6 lg:items-center font-mono text-xs sm:text-sm bg-black/40 border border-white/5 rounded px-4 py-2.5 lg:py-2.5">
+                    <div className="text-center lg:min-w-[75px]">
+                      <span className="text-gray-500 block text-xs uppercase tracking-wider">Frequency</span>
+                      <strong className="text-xl sm:text-2xl tracking-tight" style={{ color: c.color }}>{c.hz}Hz</strong>
                     </div>
-                    <div className="text-center lg:min-w-[65px]">
-                      <span className="text-gray-500 block text-[8px] uppercase tracking-wider">Ratio</span>
+                    <div className="text-center lg:min-w-[75px]">
+                      <span className="text-gray-500 block text-xs uppercase tracking-wider">Ratio</span>
                       <strong className="text-[#e2b85c]">{c.ratio}</strong>
                     </div>
-                    <div className="text-center lg:min-w-[65px]">
-                      <span className="text-gray-500 block text-[8px] uppercase tracking-wider">Epoch T</span>
+                    <div className="text-center lg:min-w-[75px]">
+                      <span className="text-gray-500 block text-xs uppercase tracking-wider">Epoch T</span>
                       <strong className="text-[#a5b4fc]">{c.tSec}</strong>
                     </div>
-                    <div className="text-center lg:min-w-[65px]">
-                      <span className="text-gray-500 block text-[8px] uppercase tracking-wider">Phase θ</span>
+                    <div className="text-center lg:min-w-[75px]">
+                      <span className="text-gray-500 block text-xs uppercase tracking-wider">Phase θ</span>
                       <strong className="text-amber-500">{c.phaseAngle}</strong>
                     </div>
-                    <div className="text-center lg:min-w-[65px]">
-                      <span className="text-gray-500 block text-[8px] uppercase tracking-wider">J/S Index</span>
+                    <div className="text-center lg:min-w-[75px]">
+                      <span className="text-gray-500 block text-xs uppercase tracking-wider">J/S Index</span>
                       <strong className="text-teal-400">J/S: {c.js}</strong>
                     </div>
-                    <div className="text-center lg:min-w-[65px]">
-                      <span className="text-gray-500 block text-[8px] uppercase tracking-wider">Order Ω</span>
+                    <div className="text-center lg:min-w-[75px]">
+                      <span className="text-gray-500 block text-xs uppercase tracking-wider">Order Ω</span>
                       <strong className="text-[#e8d5a3]">Ω: {c.omega}</strong>
                     </div>
                   </div>
 
                   {/* Anatomical Details and description */}
-                  <div className="flex-1 lg:max-w-[280px] bg-white/[0.02] border border-white/5 rounded-lg p-3 text-xs space-y-1">
-                    <div className="text-[10px] text-gray-400 leading-none">
+                  <div className="flex-1 lg:max-w-[320px] bg-white/[0.02] border border-white/5 rounded-lg p-3.5 text-sm space-y-1.5">
+                    <div className="text-xs sm:text-sm text-gray-400 leading-none">
                       <span className="text-orange-400">GLAND:</span> {c.gland}
                     </div>
-                    <div className="text-[10px] text-gray-400 leading-none">
+                    <div className="text-xs sm:text-sm text-gray-400 leading-none">
                       <span className="text-orange-400">CRYSTALS:</span> {c.crystals}
                     </div>
-                    <div className="text-[10px] text-gray-400 leading-none">
+                    <div className="text-xs sm:text-sm text-gray-400 leading-none">
                       <span className="text-orange-400">SEED MANTRA:</span> <strong className="text-emerald-400 font-serif tracking-widest">{c.mantra}</strong>
                     </div>
-                    <p className="text-gray-450 mt-1 leading-snug italic font-serif">
+                    <p className="text-sm text-gray-450 mt-1 leading-snug italic font-serif">
                       &ldquo;{c.desc}&rdquo;
                     </p>
                   </div>
@@ -915,38 +930,192 @@ export default function ChakraPanel({ onClose, onSendPrompt }: { onClose: () => 
 
         {/* TAB: GENRES */}
         {activeTab === "genres" && (
-          <div className="space-y-6">
-            <div className="bg-[#0a0a0a]/80 border border-orange-500/15 rounded p-4">
+          <div className="space-y-8">
+            {/* Header intro box */}
+            <div className="bg-[#0a0a0a]/80 border border-orange-500/15 rounded p-5 shadow-[inset_0_1px_3px_rgba(255,100,0,0.05)]">
               <h4 className="font-mono text-xs tracking-widest text-[#c9a84c] uppercase mb-2">Entropy &amp; Order in Music Genres</h4>
               <p className="text-sm text-[#8898aa] leading-relaxed">
-                Different musical genres are structured pathways that transport the listener to specific, identifiable J/S states. Listening to Bach Fugues (J/S = 35.35) aligns the mind with high-complexity cosmic clarity, while abrasive/atonal death metal (J/S = -0.5) induces targeted entropic dissolution.
+                Different musical genres act as precise thermodynamic coordinates, transporting the listener to specific, mathematical J/S states. While atonal extremities induce targeted structural dissipation, pure wave coherence acts as an absolute entropy-reversing generator. Connect with any row below to query the oracle.
               </p>
             </div>
 
-            <div className="space-y-3">
-              {GENRES.map((g) => {
-                const isHarmonious = g.H >= 500;
-                return (
-                  <div 
-                    key={g.name}
-                    onClick={() => onSendPrompt(`Describe the genre ${g.name} in terms of J/S ratio and Omega`)}
-                    className="flex items-center gap-4 p-3 bg-[#0d0d0d]/40 border border-orange-500/10 rounded hover:border-[#c9a84c]/20 transition-all cursor-pointer"
-                  >
-                    <div className="w-[180px] font-serif text-sm font-medium text-[#e4d9c0] text-right pr-4">{g.name}</div>
-                    <div className="flex-1 h-3 bg-white/5 rounded overflow-hidden relative">
-                      <div 
-                        className="h-full rounded transition-all" 
-                        style={{ 
-                          width: `${(g.H / 1000) * 100}%`,
-                          backgroundColor: isHarmonious ? "#4caf7d" : g.H >= 350 ? "#e8a84c" : "#c94c4c"
-                        }}
-                      ></div>
+            {/* Part 1: Visual Horizontal Bar Spectrum (Top half of picture) */}
+            <div className="bg-[#080808]/90 border border-white/5 rounded-lg p-5 space-y-3 shadow-2xl">
+              <div className="flex justify-between items-center border-b border-white/10 pb-2 mb-4">
+                <span className="font-serif text-sm font-bold text-[#e4d9c0] tracking-wide">Dynamic Coherence &amp; Entropic Dissolution Spectrum</span>
+                <span className="font-mono text-[9px] text-[#c9a84c] uppercase tracking-widest font-black">Interactive J/S State Map</span>
+              </div>
+              <div className="space-y-2.5">
+                {GENRES.map((g, i) => {
+                  // Determine bar color gradient
+                  let barGradient = "from-amber-500/80 to-[#fbbf24]/80 shadow-[0_0_8px_rgba(251,191,36,0.2)]"; // Gold for timeless / revelation / mystical
+                  if (g.state === "Suffering") {
+                    barGradient = "from-red-600/80 to-red-500/80 shadow-[0_0_8px_rgba(239,68,68,0.2)]";
+                  } else if (g.state === "Tipping Point" || g.state === "Time Passing") {
+                    barGradient = "from-orange-500/80 to-amber-500/80 shadow-[0_0_8px_rgba(249,115,22,0.15)]";
+                  } else if (g.state === "Eudaimonia") {
+                    barGradient = "from-emerald-600/80 to-teal-500/80 shadow-[0_0_8px_rgba(16,185,129,0.2)]";
+                  }
+
+                  // Determine right label text color
+                  let rightLabelColor = "text-[#ffd700]"; // Gold for high levels
+                  if (g.state === "Suffering") {
+                    rightLabelColor = "text-red-400";
+                  } else if (g.state === "Tipping Point") {
+                    rightLabelColor = "text-[#e3e3e3]";
+                  } else if (g.state === "Time Passing") {
+                    rightLabelColor = "text-emerald-500";
+                  } else if (g.state === "Eudaimonia") {
+                    rightLabelColor = "text-blue-400";
+                  } else if (g.state === "Deep Flourishing") {
+                    rightLabelColor = "text-purple-400";
+                  }
+
+                  // Width progress: linear spacing from 12% to 100%
+                  const widthPercent = 12 + (i * 88) / 15;
+
+                  return (
+                    <div 
+                      key={`visual-${g.name}`}
+                      onClick={() => onSendPrompt(`Detailed explanation of the music style "${g.name}" with its Hawkins index of ${g.H}, J/S ratio of ${g.js}, Omega index of ${g.omega}, and state of ${g.state} with ${g.drain} drain.`)}
+                      className="group flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-2 hover:bg-white/[0.02] rounded cursor-pointer transition-all duration-300"
+                    >
+                      {/* Left: Style Name */}
+                      <div className="w-full sm:w-[220px] font-sans text-xs font-semibold text-gray-300 group-hover:text-white transition-colors">
+                        {g.name}
+                      </div>
+
+                      {/* Middle: Custom Progress Bar */}
+                      <div className="flex-1 h-3 bg-white/[0.03] rounded-full overflow-hidden relative border border-white/5">
+                        <div 
+                          className={`h-full rounded-full bg-gradient-to-r ${barGradient} transition-all duration-500 group-hover:brightness-110`} 
+                          style={{ width: `${widthPercent}%` }}
+                        ></div>
+                      </div>
+
+                      {/* Right: State Calibration Value */}
+                      <div className={`w-[160px] text-right font-mono text-xs font-bold ${rightLabelColor} tracking-tight`}>
+                        {g.js} <span className="opacity-90 font-sans text-[10px] font-normal ml-1">({g.state})</span>
+                      </div>
                     </div>
-                    <div className="w-[60px] font-mono text-sm text-right text-teal-400">{g.js}</div>
-                    <div className="w-[120px] text-xs font-mono text-[#8898aa] truncate">{g.char}</div>
-                  </div>
-                );
-              })}
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Part 2: Tabular Database view (Bottom half of picture) */}
+            <div className="bg-[#080808]/90 border border-white/5 rounded-lg p-5 shadow-2xl">
+              <div className="flex justify-between items-center border-b border-white/10 pb-3 mb-4">
+                <div className="space-y-0.5">
+                  <h4 className="font-serif text-sm font-bold text-[#e4d9c0] tracking-wide">Metemphysical Music Genre Database</h4>
+                  <p className="text-[10px] text-gray-500 font-mono uppercase">Full mathematical spectrum calibration spreadsheet</p>
+                </div>
+                <span className="text-[10px] font-mono bg-amber-500/10 text-amber-400 px-2 py-0.5 rounded border border-amber-500/20 font-bold">16 ACTIVE SYSTEMS</span>
+              </div>
+
+              <div className="overflow-x-auto custom-scroll">
+                <table className="w-full text-left border-collapse font-mono text-xs">
+                  <thead>
+                    <tr className="bg-white/5 text-[#c9a84c] border-b border-white/10 uppercase tracking-widest text-[9px] font-bold">
+                      <th className="p-3">GENRE / STYLE</th>
+                      <th className="p-3 text-center">H</th>
+                      <th className="p-3 text-center">J/S</th>
+                      <th className="p-3 text-center">Ω</th>
+                      <th className="p-3 text-center">PHASE</th>
+                      <th className="p-3 text-center">STATE</th>
+                      <th className="p-3 text-center">DRAIN</th>
+                      <th className="p-3">CHARACTER</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {GENRES.map((g) => {
+                      const isHighRealms = g.H >= 600;
+
+                      // Phase badge element
+                      let phaseBadge = (
+                        <span className="border border-red-500/30 text-red-400 bg-red-950/25 h-5 w-5 rounded-full flex items-center justify-center text-[10px] font-bold mx-auto">
+                          {g.phase}
+                        </span>
+                      );
+                      if (g.phase === 3) {
+                        phaseBadge = (
+                          <span className="border border-orange-500/30 text-orange-400 bg-orange-950/25 h-5 w-5 rounded-full flex items-center justify-center text-[10px] font-bold mx-auto">
+                            {g.phase}
+                          </span>
+                        );
+                      } else if (g.phase === 4) {
+                        phaseBadge = (
+                          <span className="border border-teal-500/30 text-teal-400 bg-teal-950/25 h-5 w-5 rounded-full flex items-center justify-center text-[10px] font-bold mx-auto">
+                            {g.phase}
+                          </span>
+                        );
+                      } else if (g.phase === 5) {
+                        phaseBadge = (
+                          <span className="border border-amber-500/45 text-amber-300 bg-amber-950/25 h-5 w-5 rounded-full flex items-center justify-center text-[10px] font-bold mx-auto">
+                            {g.phase}
+                          </span>
+                        );
+                      }
+
+                      // State text label color
+                      let stateTextColor = "text-amber-400";
+                      if (g.state === "Suffering") {
+                        stateTextColor = "text-red-400";
+                      } else if (g.state === "Tipping Point") {
+                        stateTextColor = "text-gray-300";
+                      } else if (g.state === "Time Passing") {
+                        stateTextColor = "text-emerald-500";
+                      } else if (g.state === "Eudaimonia") {
+                        stateTextColor = "text-blue-400 font-bold";
+                      } else if (g.state === "Deep Flourishing") {
+                        stateTextColor = "text-purple-400 font-bold";
+                      } else if (g.state === "Near Timeless") {
+                        stateTextColor = "text-amber-300 font-bold";
+                      } else if (g.state === "REVELATION") {
+                        stateTextColor = "text-[#ffd700] font-black uppercase tracking-wider";
+                      }
+
+                      // Drain text styling
+                      let drainStyle = "text-red-400 font-semibold";
+                      if (g.drain.includes("%") && parseInt(g.drain) < 100) {
+                        const dVal = parseFloat(g.drain);
+                        if (dVal < 1) {
+                          drainStyle = "text-yellow-300 font-black";
+                        } else if (dVal < 15) {
+                          drainStyle = "text-amber-300 font-bold";
+                        } else if (dVal < 50) {
+                          drainStyle = "text-emerald-400 font-semibold";
+                        } else {
+                          drainStyle = "text-teal-400";
+                        }
+                      }
+
+                      return (
+                        <tr 
+                          key={`table-${g.name}`}
+                          onClick={() => onSendPrompt(`Detailed study of ${g.name} with J/S calibration and Hawkins scale resonance.`)}
+                          className={`hover:bg-white/5 cursor-pointer border-b border-white/5 transition-all duration-200 ${
+                            isHighRealms 
+                              ? "bg-amber-500/[0.012] border-l-2 border-l-amber-500/40 hover:bg-amber-500/5" 
+                              : ""
+                          }`}
+                        >
+                          <td className={`p-3 text-sm font-semibold ${isHighRealms ? "text-amber-300/90 font-serif" : "text-[#e4d9c0]"}`}>
+                            {g.name}
+                          </td>
+                          <td className="p-3 text-center text-gray-300 font-bold">{g.H}</td>
+                          <td className={`p-3 text-center ${isHighRealms ? "text-amber-400" : "text-teal-400 font-medium"}`}>{g.js}</td>
+                          <td className="p-3 text-center text-[#e8d5a3]">{g.omega}</td>
+                          <td className="p-3 text-center">{phaseBadge}</td>
+                          <td className={`p-3 text-center ${stateTextColor}`}>{g.state}</td>
+                          <td className={`p-3 text-center ${drainStyle}`}>{g.drain}</td>
+                          <td className="p-3 text-xs text-gray-400 max-w-[280px] truncate-3-lines">{g.char}</td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         )}

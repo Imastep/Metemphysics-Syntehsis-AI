@@ -63,7 +63,7 @@ export default function RefTablesPanel({ onClose, onSendPrompt }: { onClose: () 
             { id: "constants", label: "⚙ Physical Constants" },
             { id: "thermo", label: "🧪 Thermodynamic Molar S" },
             { id: "solfeggio", label: "🔊 Wave Frequencies & J/S" },
-            { id: "traditions", label: "📜 24 Ancient Traditions" },
+            { id: "traditions", label: `📜 ${METEM_DB.religions.length} Ancient Traditions` },
           ].map((subtab) => (
             <button
               key={subtab.id}
@@ -107,10 +107,11 @@ export default function RefTablesPanel({ onClose, onSendPrompt }: { onClose: () 
                 <table className="w-full text-left font-mono text-[11px] border-collapse">
                   <thead>
                     <tr className="border-b border-white/5 text-orange-400">
-                      <th className="py-2.5 w-[20%]">CONSTANT SYMBOL</th>
-                      <th className="py-2.5 w-[30%]">DETERMINATION NAME</th>
-                      <th className="py-2.5 w-[20%]">SI EXACT VALUE</th>
-                      <th className="py-2.5">METEMPHYSICAL CORE IMPORT</th>
+                      <th className="py-2.5 w-[15%]">CONSTANT SYMBOL</th>
+                      <th className="py-2.5 w-[25%]">DETERMINATION NAME</th>
+                      <th className="py-2.5 w-[15%]">SI EXACT VALUE</th>
+                      <th className="py-2.5 w-[33%]">METEMPHYSICAL CORE IMPORT</th>
+                      <th className="py-2.5 text-right w-[12%]">ORACLE ACTION</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-white/5 text-[#dcd7cb]">
@@ -120,6 +121,14 @@ export default function RefTablesPanel({ onClose, onSendPrompt }: { onClose: () 
                         <td className="py-3 text-white font-serif italic">{c.name}</td>
                         <td className="py-3 text-orange-400">{c.value}</td>
                         <td className="py-3 text-gray-400 text-[10px] leading-relaxed">{c.desc}</td>
+                        <td className="py-3 text-right">
+                          <button
+                            onClick={() => onSendPrompt(`Conduct a supreme academic integration review of the fundamental constant: '${c.name}' (${c.symbol}) having SI exact value of ${c.value} and its Metemphysical significance under our absolute constant C formula.`)}
+                            className="bg-orange-500/10 hover:bg-orange-500 hover:text-black border border-orange-500/30 text-orange-400 px-2 py-1 rounded text-[9px] font-mono font-bold transition-all cursor-pointer"
+                          >
+                            Send to Chat
+                          </button>
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -138,11 +147,12 @@ export default function RefTablesPanel({ onClose, onSendPrompt }: { onClose: () 
                 <table className="w-full text-left font-mono text-[11px] border-collapse">
                   <thead>
                     <tr className="border-b border-white/5 text-orange-400">
-                      <th className="py-2.5">COMPOUND NAME</th>
-                      <th className="py-2.5">CHEMICAL FORMULA</th>
-                      <th className="py-2.5 text-center">STANDARD ENTROPY (S°)</th>
-                      <th className="py-2.5">PHYSICAL PHASE</th>
-                      <th className="py-2.5">METABOLIC / MOLECULAR ROLE</th>
+                      <th className="py-2.5 w-[15%]">COMPOUND NAME</th>
+                      <th className="py-2.5 w-[15%]">CHEMICAL FORMULA</th>
+                      <th className="py-2.5 text-center w-[15%]">STANDARD ENTROPY (S°)</th>
+                      <th className="py-2.5 w-[12%]">PHYSICAL PHASE</th>
+                      <th className="py-2.5 w-[28%]">METABOLIC / MOLECULAR ROLE</th>
+                      <th className="py-2.5 text-right w-[15%]">ORACLE ACTION</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-white/5 text-[#dcd7cb]">
@@ -155,6 +165,14 @@ export default function RefTablesPanel({ onClose, onSendPrompt }: { onClose: () 
                           <td className="py-3 text-center text-[#c9a84c] font-bold text-xs">{m.molarS}</td>
                           <td className="py-3"><span className="px-1.5 py-0.5 rounded text-[9px] bg-white/5 border border-white/10 text-gray-400 uppercase">{m.phase}</span></td>
                           <td className="py-3 text-gray-400 text-[10px]">{m.desc}</td>
+                          <td className="py-3 text-right">
+                            <button
+                              onClick={() => onSendPrompt(`Detail the thermodynamic properties of the chemical compound/state: ${m.compound} (${m.formula}) with a standard molar entropy of ${m.molarS} and molecular role '${m.desc}'.`)}
+                              className="bg-orange-500/10 hover:bg-orange-500 hover:text-black border border-orange-500/30 text-orange-400 px-2 py-1 rounded text-[9px] font-mono font-bold transition-all cursor-pointer"
+                            >
+                              Send to Chat
+                            </button>
+                          </td>
                         </tr>
                       ))}
                   </tbody>
@@ -173,12 +191,13 @@ export default function RefTablesPanel({ onClose, onSendPrompt }: { onClose: () 
                 <table className="w-full text-left font-mono text-[11px] border-collapse">
                   <thead>
                     <tr className="border-b border-white/5 text-orange-400">
-                      <th className="py-2.5">FREQUENCY</th>
-                      <th className="py-2.5">RESONANCE DIRECTION</th>
-                      <th className="py-2.5">CHAKRA COUPLING</th>
-                      <th className="py-2.5">HARMONIC RATIO</th>
-                      <th className="py-2.5 text-center">EPOCH SPAN (T)</th>
-                      <th className="py-2.5 text-right">METEMPHYSICS INDEX</th>
+                      <th className="py-2.5 w-[12%]">FREQUENCY</th>
+                      <th className="py-2.5 w-[18%]">RESONANCE DIRECTION</th>
+                      <th className="py-2.5 w-[15%]">CHAKRA COUPLING</th>
+                      <th className="py-2.5 w-[12%]">HARMONIC RATIO</th>
+                      <th className="py-2.5 text-center w-[13%]">EPOCH SPAN (T)</th>
+                      <th className="py-2.5 text-center w-[15%]">METEMPHYSICS INDEX</th>
+                      <th className="py-2.5 text-right w-[15%]">ORACLE ACTION</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-white/5 text-[#dcd7cb]">
@@ -189,7 +208,15 @@ export default function RefTablesPanel({ onClose, onSendPrompt }: { onClose: () 
                         <td className="py-3 text-[#c9a84c]">{f.chakra}</td>
                         <td className="py-3 text-gray-400">{f.ratio}</td>
                         <td className="py-3 text-center text-amber-500">{f.tSec}</td>
-                        <td className="py-3 text-right font-bold text-orange-400 bg-orange-500/5 px-2">{f.valueJS}</td>
+                        <td className="py-3 text-center font-bold text-orange-400 bg-orange-500/5 px-2">{f.valueJS}</td>
+                        <td className="py-3 text-right" onClick={(e) => e.stopPropagation()}>
+                          <button
+                            onClick={() => onSendPrompt(`Analyze Solfeggio frequency ${f.hz} representing '${f.name}' for '${f.chakra}' and its corresponding J/S state value of ${f.valueJS} with cycle time ${f.tSec}.`)}
+                            className="bg-orange-500/10 hover:bg-orange-500 hover:text-black border border-orange-500/30 text-orange-400 px-2 py-1 rounded text-[9px] font-mono font-bold transition-all cursor-pointer"
+                          >
+                            Send to Chat
+                          </button>
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -201,17 +228,18 @@ export default function RefTablesPanel({ onClose, onSendPrompt }: { onClose: () 
           {activeSubTab === "traditions" && (
             <div className="space-y-4">
               <div className="flex items-center justify-between border-b border-white/10 pb-2">
-                <span className="font-serif font-bold text-sm text-[#e4d9c0]">All 24 Major Mystical &amp; Developmental Traditions Ledger</span>
+                <span className="font-serif font-bold text-sm text-[#e4d9c0]">All {METEM_DB.religions.length} Major Mystical &amp; Developmental Traditions Ledger</span>
                 <span className="font-mono text-[9px] text-gray-500">COMPLETE SIDEBAR COMPILATION</span>
               </div>
               <div className="overflow-y-auto max-h-[420px] pr-1 custom-scroll">
                 <table className="w-full text-left font-mono text-[10px] border-collapse">
                   <thead>
                     <tr className="border-b border-white/5 text-orange-400 uppercase text-[9px] tracking-wider">
-                      <th className="py-2 w-[30%]">TRADITION / PATH</th>
-                      <th className="py-2 w-[15%]">CATEGORY</th>
-                      <th className="py-2 w-[15%]">CALIBRATION (Ω)</th>
-                      <th className="py-2">SYNOPTIC METEMPHYSICAL CORE DIRECTIVE</th>
+                      <th className="py-2 w-[22%]">TRADITION / PATH</th>
+                      <th className="py-2 w-[13%]">CATEGORY</th>
+                      <th className="py-2 w-[13%]">CALIBRATION (Ω)</th>
+                      <th className="py-2 w-[37%]">SYNOPTIC METEMPHYSICAL CORE DIRECTIVE</th>
+                      <th className="py-2 text-right w-[15%]">ORACLE ACTION</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-white/5 text-[#dcd7cb]">
@@ -222,7 +250,15 @@ export default function RefTablesPanel({ onClose, onSendPrompt }: { onClose: () 
                           <td className="py-2.5 font-bold text-white font-serif text-xs">{r.name}</td>
                           <td className="py-2.5"><span className="text-orange-400 border border-orange-500/30 px-1 py-0.5 rounded bg-orange-500/5 text-[8px] uppercase">{r.subcategory}</span></td>
                           <td className="py-2.5 font-extrabold text-[#c9a84c] text-[10px]">{r.omegaVal}</td>
-                          <td className="py-2.5 text-gray-450 leading-relaxed italic">{r.summary}</td>
+                          <td className="py-2.5 text-gray-455 leading-relaxed italic">{r.summary}</td>
+                          <td className="py-2.5 text-right" onClick={(e) => e.stopPropagation()}>
+                            <button
+                              onClick={() => onSendPrompt(`Evaluate development tradition: '${r.name}' classified under ${r.subcategory} with integration index of ${r.omegaVal}. Detail its concepts of ${r.concepts.join(', ')} and core metemphysical resonance.`)}
+                              className="bg-orange-500/10 hover:bg-orange-500 hover:text-black border border-orange-500/30 text-orange-400 px-2 py-1 rounded text-[9px] font-mono font-bold transition-all cursor-pointer"
+                            >
+                              Send to Chat
+                            </button>
+                          </td>
                         </tr>
                       ))}
                   </tbody>

@@ -68,10 +68,20 @@ const MASTER_SYSTEMS_DATA: SystemRow[] = [
 
   // David Hawkins
   { sys: "David Hawkins", level: "Shame (H=20)", H: 20, js: -0.9, omega: 0.0952, phase: 1, state: "Despair", drain: "1000%", notes: "Lowest contractive state; maximum friction" },
-  { sys: "David Hawkins", level: "Anger (H=150)", H: 150, js: -0.25, omega: 0.5276, phase: 3, state: "Suffering", drain: "133%", notes: "Egoic drive, high emotional heat" },
+  { sys: "David Hawkins", level: "Guilt (H=30)", H: 30, js: -0.85, omega: 0.1393, phase: 1, state: "Despair", drain: "667%", notes: "Severe self-condemnation, high thermodynamic destruction" },
+  { sys: "David Hawkins", level: "Apathy (H=50)", H: 50, js: -0.75, omega: 0.2212, phase: 2, state: "Despair", drain: "400%", notes: "Total hopelessness, energetic stagnation" },
+  { sys: "David Hawkins", level: "Grief (H=75)", H: 75, js: -0.625, omega: 0.3127, phase: 2, state: "Despair", drain: "267%", notes: "Despondency, mourning, and deep energetic leakage" },
+  { sys: "David Hawkins", level: "Fear (H=100)", H: 100, js: -0.5, omega: 0.3935, phase: 2, state: "Suffering", drain: "200%", notes: "Vigilance, withdrawal, high entropic defensiveness" },
+  { sys: "David Hawkins", level: "Desire (H=125)", H: 125, js: -0.375, omega: 0.4647, phase: 2, state: "Suffering", drain: "160%", notes: "Incessant craving, dissatisfaction and accumulation dynamics" },
+  { sys: "David Hawkins", level: "Anger (H=150)", H: 150, js: -0.25, omega: 0.5276, phase: 3, state: "Suffering", drain: "133%", notes: "Egoic drive, frustration and high emotional heat" },
+  { sys: "David Hawkins", level: "Pride (H=175)", H: 175, js: -0.125, omega: 0.5831, phase: 3, state: "Suffering", drain: "114%", notes: "Egoic inflation, defensive scaffolding, scorn/demanding view" },
   { sys: "David Hawkins", level: "Courage (H=200)", H: 200, js: 0, omega: 0.6321, phase: 3, state: "Tipping Point", drain: "100%", notes: "Initial structural integrity; tipping point passed", hi: true },
+  { sys: "David Hawkins", level: "Neutrality (H=250)", H: 250, js: 0, omega: 0.7135, phase: 3, state: "Tipping Point", drain: "100%", notes: "Release of attachment, dynamic equilibrium, self-trust", hi: true },
+  { sys: "David Hawkins", level: "Willingness (H=310)", H: 310, js: 0.0012, omega: 0.7877, phase: 4, state: "Tipping Point", drain: "99.8%", notes: "Active intention, systemic optimism, constructive action" },
+  { sys: "David Hawkins", level: "Acceptance (H=350)", H: 350, js: 0.008, omega: 0.8262, phase: 4, state: "Tipping Point", drain: "99.23%", notes: "Harmonious forgiveness, dynamic alignment, transcendence" },
   { sys: "David Hawkins", level: "Reason (H=400)", H: 400, js: 0.058, omega: 0.8647, phase: 4, state: "Time Passing", drain: "94.52%", notes: "Intellectual clarity and logical formulation" },
   { sys: "David Hawkins", level: "Love (H=500)", H: 500, js: 0.99, omega: 0.9179, phase: 4, state: "Eudaimonia", drain: "50.26%", notes: "True compassion and eudaimonic balance", hi: true },
+  { sys: "David Hawkins", level: "Joy (H=540)", H: 540, js: 2.377, omega: 0.9328, phase: 4, state: "Eudaimonia", drain: "29.61%", notes: "State of transfiguration; inner completion and ecstasy", hi: true },
   { sys: "David Hawkins", level: "Peace (H=600)", H: 600, js: 7.414, omega: 0.9502, phase: 5, state: "Deep Flourishing", drain: "11.88%", notes: "Stillness, illumination, non-separation" },
   { sys: "David Hawkins", level: "Enlightenment (H=1000)", H: 1000, js: 949, omega: 0.9933, phase: 5, state: "REVELATION", drain: "0.11%", notes: "Pure divine awareness in union with C-Light", hi: true },
 
@@ -253,27 +263,6 @@ export default function SystemsPanel({ onClose, onSendPrompt }: { onClose: () =>
     return MASTER_SYSTEMS_DATA.filter((row) => row.sys === masterFilter);
   };
 
-  const handleExportJSON = () => {
-    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(
-      JSON.stringify({
-        source: "Metemphysics All Systems Database & Scored Analysis",
-        exported_at: new Date().toISOString(),
-        alignments: {
-          tipping_point_0: CONVERGENCE_0,
-          eudaimonia_1: CONVERGENCE_1,
-          revelation_949: CONVERGENCE_949
-        },
-        systems_matrix: MASTER_SYSTEMS_DATA
-      }, null, 2)
-    );
-    const downloadAnchor = document.createElement("a");
-    downloadAnchor.setAttribute("href", dataStr);
-    downloadAnchor.setAttribute("download", "metemphysics_systems_analysis.json");
-    document.body.appendChild(downloadAnchor);
-    downloadAnchor.click();
-    downloadAnchor.remove();
-  };
-
   return (
     <div className="absolute inset-0 bg-[#050505] text-[#eeeae4] overflow-y-auto z-[200] p-6 flex flex-col border-2 border-orange-500/20 rounded-2xl">
       {/* Scrollable topheader */}
@@ -285,12 +274,6 @@ export default function SystemsPanel({ onClose, onSendPrompt }: { onClose: () =>
           <p className="text-xs text-[#8898aa] font-mono mt-1">18 Integrated Developmental Frameworks · 200+ Computed Coordinates · No Manual Calibrations</p>
         </div>
         <div className="flex items-center gap-3">
-          <button 
-            onClick={handleExportJSON}
-            className="flex items-center gap-1.5 bg-[#c9a84c]/10 border border-[#c9a84c]/40 rounded px-3 py-2 text-xs font-mono text-[#c9a84c] hover:bg-[#c9a84c]/20 transition-all cursor-pointer"
-          >
-            <Download className="w-3.5 h-3.5" /> EXPORT JSON
-          </button>
           <button 
             onClick={onClose}
             className="flex items-center gap-1 bg-[#c9a84c]/10 border border-[#c9a84c]/30 rounded px-4 py-2 text-xs font-mono text-[#c9a84c] hover:bg-[#c9a84c]/20 transition-all cursor-pointer"
@@ -365,6 +348,7 @@ export default function SystemsPanel({ onClose, onSendPrompt }: { onClose: () =>
                             <th className="p-2">Phase</th>
                             <th className="p-2">Session State</th>
                             <th className="p-2">C Drain %</th>
+                            <th className="p-2 text-right">Oracle Action</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -384,6 +368,14 @@ export default function SystemsPanel({ onClose, onSendPrompt }: { onClose: () =>
                               <td className="p-2">Phase {r.phase}</td>
                               <td className="p-2 text-[#8898aa]">{r.state}</td>
                               <td className="p-2 font-bold text-amber-200">{r.drain}</td>
+                              <td className="p-2 text-right" onClick={(e) => e.stopPropagation()}>
+                                <button
+                                  onClick={() => onSendPrompt(`Detail the state of ${r.level} in ${r.sys} on the T x S = C model.`)}
+                                  className="bg-orange-500/15 hover:bg-orange-500 hover:text-black border border-orange-500/40 text-orange-400 px-2 py-0.5 rounded text-[9px] font-mono font-bold transition-all cursor-pointer"
+                                >
+                                  💬 Put in Chat
+                                </button>
+                              </td>
                             </tr>
                           ))}
                         </tbody>
@@ -429,6 +421,7 @@ export default function SystemsPanel({ onClose, onSendPrompt }: { onClose: () =>
                     <th className="p-3">Phase State</th>
                     <th className="p-3">Session Value</th>
                     <th className="p-3">C Drain %</th>
+                    <th className="p-3 text-right">Oracle Action</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -438,7 +431,7 @@ export default function SystemsPanel({ onClose, onSendPrompt }: { onClose: () =>
                       onClick={() => onSendPrompt(`Analyze the developmental coordinate '${row.level}' in ${row.sys} through the T x S = C model.`)}
                       className={`hover:bg-white/5 border-b border-white/5 cursor-pointer ${row.hi ? "bg-[#c9a84c]/5" : ""}`}
                     >
-                      <td className="p-3 text-white/50">{row.sys}</td>
+                      <td className="p-3 text-white/55">{row.sys}</td>
                       <td className="p-3 text-[#e4d9c0] font-semibold">{row.level}</td>
                       <td className="p-3 text-center text-[#c9a84c]">{row.H}</td>
                       <td className="p-3 text-teal-400 font-bold">{row.js}</td>
@@ -446,6 +439,14 @@ export default function SystemsPanel({ onClose, onSendPrompt }: { onClose: () =>
                       <td className="p-3 text-center">Phase {row.phase}</td>
                       <td className="p-3 text-[#8898aa]">{row.state}</td>
                       <td className="p-3 font-semibold text-amber-200">{row.drain}</td>
+                      <td className="p-3 text-right" onClick={(e) => e.stopPropagation()}>
+                        <button
+                          onClick={() => onSendPrompt(`Analyze the developmental coordinate '${row.level}' in ${row.sys} through the T x S = C model.`)}
+                          className="bg-orange-500/15 hover:bg-orange-500 hover:text-black border border-orange-500/40 text-orange-400 px-2 py-0.5 rounded text-[9px] font-mono font-bold transition-all cursor-pointer"
+                        >
+                          💬 Put in Chat
+                        </button>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -533,6 +534,7 @@ export default function SystemsPanel({ onClose, onSendPrompt }: { onClose: () =>
                       <th className="p-3">J/S value</th>
                       <th className="p-3">Ω Order</th>
                       <th className="p-3">C Drain %</th>
+                      <th className="p-3 text-right">Oracle Action</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -551,6 +553,14 @@ export default function SystemsPanel({ onClose, onSendPrompt }: { onClose: () =>
                         <td className="p-3 text-teal-400 font-bold">{row.js}</td>
                         <td className="p-3 text-[#e8d5a3]">{row.omega}</td>
                         <td className="p-3 text-amber-200">{row.drain}</td>
+                        <td className="p-3 text-right" onClick={(e) => e.stopPropagation()}>
+                          <button
+                            onClick={() => onSendPrompt(`Detail the state of ${row.level} in the ${row.sys}`)}
+                            className="bg-orange-500/15 hover:bg-orange-500 hover:text-black border border-orange-500/40 text-orange-400 px-2 py-0.5 rounded text-[9px] font-mono font-bold transition-all cursor-pointer"
+                          >
+                            💬 Put in Chat
+                          </button>
+                        </td>
                       </tr>
                     ))}
                   </tbody>

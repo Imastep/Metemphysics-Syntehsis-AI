@@ -60,6 +60,25 @@ interface Message {
   text: string;
 }
 
+interface SavedChat {
+  id: string;
+  name: string;
+  messages: Message[];
+  timestamp: string;
+}
+
+const getSmallestSummary = (text: string): string => {
+  if (!text) return "Empty Session";
+  const clean = text.replace(/^[◈▩✦\s]+/, "").trim();
+  const words = clean.split(/\s+/).filter(Boolean);
+  if (words.length === 0) return "Dialogue Session";
+  const summaryText = words.slice(0, 4).join(" ");
+  if (summaryText.length > 28) {
+    return summaryText.substring(0, 25).trim() + "...";
+  }
+  return words.length > 4 ? summaryText + "..." : summaryText;
+};
+
 const firstQueries = [
   { label: "T × S = C Axiom Proof", query: "What is the absolute proof and physical significance of the fundamental Metemphysics law T × S = C?", icon: Flame, color: "hover:border-orange-500/60 hover:text-orange-400 font-bold" },
   { label: "Entropy S = C / T", query: "How is calculated molar entropy derived using S = C / T under standard and cosmic light parameters?", icon: Atom, color: "hover:border-amber-500/60 hover:text-amber-300 font-bold" }
@@ -317,22 +336,22 @@ function formatOracleMessage(text: string) {
   const cleanedText = cleanMathText(text);
   const lines = cleanedText.split("\n");
   return (
-    <div className="space-y-2">
+    <div className="space-y-2.5">
       {lines.map((line, idx) => {
         const trimmed = line.trim();
-        if (!trimmed) return <div key={idx} className="h-2" />;
+        if (!trimmed) return <div key={idx} className="h-2.5" />;
 
         // Headers
         if (trimmed.startsWith("###")) {
           return (
-            <h4 key={idx} className="font-serif font-bold text-xs text-[#c9a84c] uppercase tracking-wider mt-4 mb-1 pl-2 border-l-2 border-[#c9a84c]">
+            <h4 key={idx} className="font-serif font-bold text-sm sm:text-base text-[#c9a84c] uppercase tracking-wider mt-5 mb-1.5 pl-2 border-l-2 border-[#c9a84c]">
               {trimmed.replace(/^###\s*/, "")}
             </h4>
           );
         }
         if (trimmed.startsWith("##") || trimmed.startsWith("#")) {
           return (
-            <h3 key={idx} className="font-serif font-bold text-sm text-[#e8d5a3] tracking-wide mt-5 mb-2 pb-1 border-b border-white/5">
+            <h3 key={idx} className="font-serif font-bold text-base sm:text-lg text-[#e8d5a3] tracking-wide mt-6 mb-3 pb-1 border-b border-white/5">
               {trimmed.replace(/^##?\s*/, "")}
             </h3>
           );
@@ -341,9 +360,9 @@ function formatOracleMessage(text: string) {
         // List
         if (trimmed.startsWith("-") || trimmed.startsWith("*") || trimmed.substring(0, 2) === "- " || trimmed.substring(0, 2) === "* ") {
           return (
-            <div key={idx} className="flex items-start gap-2 pl-2 py-0.5 text-xs">
-              <span className="text-[#c9a84c] mt-1 text-[8px]">✦</span>
-              <div className="flex-1 text-[#dcd7cb] font-serif leading-relaxed">
+            <div key={idx} className="flex items-start gap-2 pl-2 py-0.5 text-sm">
+              <span className="text-[#c9a84c] mt-1.5 text-[10px]">✦</span>
+              <div className="flex-1 text-[#dcd7cb] font-serif leading-relaxed text-sm">
                 {renderFormattedInlines(trimmed.replace(/^[-*]\s*/, ""))}
               </div>
             </div>
@@ -354,16 +373,16 @@ function formatOracleMessage(text: string) {
         if (trimmed.startsWith("$$") && trimmed.endsWith("$$")) {
           const eq = trimmed.replace(/\$\$/g, "");
           return (
-            <div key={idx} className="my-3 px-4 py-2 bg-black/50 border border-orange-500/20 rounded-lg text-center font-mono text-amber-300 shadow-inner">
-              <div className="text-[8px] text-gray-500 uppercase tracking-widest mb-1 font-mono">Conserved State Function</div>
-              <div className="text-xs font-bold tracking-widest">{eq}</div>
+            <div key={idx} className="my-3 px-4 py-2.5 bg-black/50 border border-orange-500/20 rounded-lg text-center font-mono text-amber-300 shadow-inner">
+              <div className="text-[10px] text-gray-500 uppercase tracking-widest mb-1 font-mono">Conserved State Function</div>
+              <div className="text-sm font-bold tracking-widest">{eq}</div>
             </div>
           );
         }
 
         // Normal paragraph
         return (
-          <p key={idx} className="text-xs font-serif leading-relaxed text-[#dcd7cb]/90 text-left">
+          <p key={idx} className="text-sm font-serif leading-relaxed text-[#dcd7cb]/90 text-left">
             {renderFormattedInlines(trimmed)}
           </p>
         );
@@ -441,16 +460,88 @@ export default function App() {
   const [conservedLimit, setConservedLimit] = useState<string>("standard"); // "standard" | "planck" | "solfeggio" | "cosmic"
 
   // Chat State
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      role: "model",
-      text: "Welcome, seeker, to the Metemphysics Synthesis AI. Here we map the ultimate, absolute conservation constraints of consciousness, experienced time, and structural entropy through the law T × S = C (Time multiplied by Entropy = Speed of Light). Explore the dynamic reference ledgers to the left, activate a dynamic solver to the right, or consult the Oracle directly in this terminal."
+  const [messages, setMessages] = useState<Message[]>(() => {
+    try {
+      const saved = localStorage.getItem("metemphysics_chat_responses");
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed;
+        }
+      }
+    } catch (e) {
+      console.warn("Failed to load saved chat responses:", e);
     }
-  ]);
+    return [
+      {
+        role: "model",
+        text: "Welcome, seeker, to the Metemphysics Synthesis AI. Here we map the ultimate, absolute conservation constraints of consciousness, experienced time, and structural entropy through the law T × S = C (Time multiplied by Entropy = Speed of Light). Explore the dynamic reference ledgers to the left, activate a dynamic solver to the right, or consult the Oracle directly in this terminal."
+      }
+    ];
+  });
   const [inputText, setInputText] = useState("");
   const [currentNodeId, setCurrentNodeId] = useState<string>("greeting");
   const [typing, setTyping] = useState(false);
   const [offlineMode, setOfflineMode] = useState(false);
+
+  // Sync up to 25 chat responses to Local Storage
+  useEffect(() => {
+    if (messages.length > 1) {
+      localStorage.setItem("metemphysics_chat_responses", JSON.stringify(messages.slice(-25)));
+    } else {
+      localStorage.removeItem("metemphysics_chat_responses");
+    }
+  }, [messages]);
+
+  const [savedChats, setSavedChats] = useState<SavedChat[]>(() => {
+    try {
+      const saved = localStorage.getItem("metemphysics_saved_chats");
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) {
+          return parsed;
+        }
+      }
+    } catch (e) {
+      console.warn("Failed to load saved chats:", e);
+    }
+    return [];
+  });
+
+  useEffect(() => {
+    localStorage.setItem("metemphysics_saved_chats", JSON.stringify(savedChats));
+  }, [savedChats]);
+
+  const handleLoadSavedChat = (chatId: string) => {
+    const currentFirstUserMsg = messages.find((m) => m.role === "user");
+    let updatedSavedChats = [...savedChats];
+
+    // Auto-save currently active chat if it has user messages, to keep progress intact!
+    if (currentFirstUserMsg) {
+      const summary = getSmallestSummary(currentFirstUserMsg.text);
+      
+      // Only auto-save if we don't already have this exact message history saved
+      const isAlreadySaved = savedChats.some(
+        (c) => JSON.stringify(c.messages) === JSON.stringify(messages)
+      );
+
+      if (!isAlreadySaved) {
+        const currentSessionChat: SavedChat = {
+          id: Date.now().toString(),
+          name: `Chat ${savedChats.length + 1}: ${summary}`,
+          messages: [...messages],
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        };
+        updatedSavedChats = [currentSessionChat, ...updatedSavedChats].slice(0, 25);
+      }
+    }
+
+    const selectedChat = updatedSavedChats.find((c) => c.id === chatId);
+    if (selectedChat) {
+      setMessages(selectedChat.messages);
+    }
+    setSavedChats(updatedSavedChats);
+  };
 
   // Responsive Abort and Transmission Throttling configurations
   const abortControllerRef = useRef<AbortController | null>(null);
@@ -478,10 +569,34 @@ export default function App() {
       abortControllerRef.current.abort();
       abortControllerRef.current = null;
     }
+
+    // Save current session before resetting, if it contains user messages (dialogues)
+    const firstUserMsg = messages.find((m) => m.role === "user");
+    if (firstUserMsg) {
+      const summary = getSmallestSummary(firstUserMsg.text);
+      const isAlreadySaved = savedChats.some(
+        (c) => JSON.stringify(c.messages) === JSON.stringify(messages)
+      );
+
+      if (!isAlreadySaved) {
+        setSavedChats((prev) => {
+          const newChat: SavedChat = {
+            id: Date.now().toString(),
+            name: `Chat ${prev.length + 1}: ${summary}`,
+            messages: [...messages],
+            timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+          };
+          const updated = [newChat, ...prev];
+          return updated.slice(0, 25);
+        });
+      }
+    }
+
     setTyping(false);
     setOfflineMode(false);
     setInputText("");
     setCurrentNodeId("greeting");
+    localStorage.removeItem("metemphysics_chat_responses");
     setMessages([
       {
         role: "model",
@@ -635,6 +750,13 @@ export default function App() {
     const textToSend = customText || inputText;
     if (!textToSend.trim()) return;
 
+    // Direct check for 25 user response (inputs) limit
+    const userMsgCount = messages.filter((m) => m.role === "user").length;
+    if (userMsgCount >= 25) {
+      setThrottleWarning("SYSTEM CONSTRAINT: Limit of 25 inputs reached. Please reset chat session.");
+      return;
+    }
+
     // Rate Limit/Throttle incoming messages to 1.5 seconds cooldown
     const now = Date.now();
     const gap = now - lastMessageTimeRef.current;
@@ -753,6 +875,8 @@ export default function App() {
 
   const computedSFromT = !isNaN(numT) && numT !== 0 ? (CONST_C / numT).toLocaleString('en-US', { maximumFractionDigits: 4 }) : "—";
   const computedT1FromS = !isNaN(numS) && numS !== 0 ? (CONST_C / numS).toLocaleString('en-US', { maximumFractionDigits: 8 }) : "—";
+
+  const isInputLimitReached = messages.filter((m) => m.role === "user").length >= 25;
 
   return (
     <div className="min-h-screen bg-[#050505] text-[#eeeae4] flex flex-col font-sans selection:bg-[#ff5f00]/30 selection:text-white">
@@ -954,16 +1078,16 @@ export default function App() {
 
                 <div className="space-y-1.5 max-h-[500px] overflow-y-auto pr-1 custom-scroll">
                   {[
-                    { label: "REVELATION", range: "J/S ≥ 949", desc: "Absolute timeless communion, Crown Sahasrara union with C.", color: "border-purple-500/40 text-purple-300 bg-purple-950/10 shadow-[0_0_10px_rgba(168,85,247,0.05)]", query: "Can you detail the state of REVELATION at J/S >= 949?" },
-                    { label: "NEAR TIMELESS", range: "J/S [99, 949)", desc: "Hyper-coherent order. High self-organizing scale.", color: "border-fuchsia-500/40 text-fuchsia-300 bg-fuchsia-950/10 shadow-[0_0_10px_rgba(217,70,239,0.05)]", query: "Can you detail the state of NEAR TIMELESS at J/S [99, 949)?" },
-                    { label: "MYSTICAL CLARITY", range: "J/S [10, 99)", desc: "Awakened intentionality, high spiritual bandwidth.", color: "border-indigo-500/40 text-indigo-300 bg-indigo-950/10 shadow-[0_0_10px_rgba(99,102,241,0.05)]", query: "Detail the state of MYSTICAL CLARITY with J/S [10, 99)." },
-                    { label: "DEEP FLOURISHING", range: "J/S [3, 10)", desc: "Flow, holistic convergence of willpower and wisdom.", color: "border-blue-500/40 text-blue-300 bg-blue-950/10 shadow-[0_0_10px_rgba(59,130,246,0.05)]", query: "Detail the state of DEEP FLOURISHING with J/S [3, 10)." },
-                    { label: "EUDAIMONIA", range: "J/S [1, 3)", desc: "Optimal biological and mental functioning.", color: "border-emerald-500/40 text-emerald-300 bg-emerald-950/10 shadow-[0_0_10px_rgba(16,185,129,0.05)]", query: "Detail the state of EUDAIMONIA with J/S [1, 3)." },
-                    { label: "TIME PASSING", range: "J/S [0.05, 1)", desc: "Standard relative physical experience, gradual wear.", color: "border-sky-500/40 text-sky-400 bg-slate-950/25", query: "Detail the state of TIME PASSING with J/S [0.05, 1)." },
-                    { label: "TIPPING POINT", range: "J/S [-0.05, 0.05)", desc: "Symmetric critical crisis. Perfect entropic equilibrium.", color: "border-orange-500/40 text-orange-400 bg-orange-950/20 shadow-[0_0_12px_rgba(249,115,22,0.08)]", query: "Detail the state of TIPPING POINT with J/S [-0.05, 0.05)." },
-                    { label: "SUFFERING", range: "J/S [-0.5, -0.05)", desc: "Active local entropy expansion, metabolic friction.", color: "border-red-500/30 text-red-300 bg-red-950/10", query: "Detail the state of SUFFERING with J/S [-0.5, -0.05)." },
-                    { label: "DESPAIR", range: "J/S [-0.9, -0.5)", desc: "System collapse, structural fragmentation.", color: "border-rose-700/30 text-rose-300 bg-rose-950/10", query: "Detail the state of DESPAIR with J/S [-0.9, -0.5)." },
-                    { label: "DISSOLUTION", range: "J/S < -0.9", desc: "Total decay: returning system to background chaotic vacuum.", color: "border-gray-800 text-gray-500 bg-neutral-950/30", query: "Detail the state of DISSOLUTION with J/S < -0.9." }
+                    { label: "REVELATION", range: "J/S ≥ 949", desc: "Absolute timeless communion, Crown Sahasrara union with C.", color: "border-purple-500/40 text-purple-300 bg-purple-950/10 shadow-[0_0_10px_rgba(168,85,247,0.05)]", query: "Can you detail the state of REVELATION at J/S >= 949?", hawkins: "Enlightenment (H=1000)" },
+                    { label: "NEAR TIMELESS", range: "J/S [99, 949)", desc: "Hyper-coherent order. High self-organizing scale.", color: "border-fuchsia-500/40 text-fuchsia-300 bg-fuchsia-950/10 shadow-[0_0_10px_rgba(217,70,239,0.05)]", query: "Can you detail the state of NEAR TIMELESS at J/S [99, 949)?", hawkins: "High Enlightenment range (H=700-999)" },
+                    { label: "MYSTICAL CLARITY", range: "J/S [10, 99)", desc: "Awakened intentionality, high spiritual bandwidth.", color: "border-indigo-500/40 text-indigo-300 bg-indigo-950/10 shadow-[0_0_10px_rgba(99,102,241,0.05)]", query: "Detail the state of MYSTICAL CLARITY with J/S [10, 99).", hawkins: "Enlightenment Threshold (H>600)" },
+                    { label: "DEEP FLOURISHING", range: "J/S [3, 10)", desc: "Flow, holistic convergence of willpower and wisdom.", color: "border-blue-500/40 text-blue-300 bg-blue-950/10 shadow-[0_0_10px_rgba(59,130,246,0.05)]", query: "Detail the state of DEEP FLOURISHING with J/S [3, 10).", hawkins: "Peace (H=600)" },
+                    { label: "EUDAIMONIA", range: "J/S [1, 3)", desc: "Optimal biological and mental functioning.", color: "border-emerald-500/40 text-emerald-300 bg-emerald-950/10 shadow-[0_0_10px_rgba(16,185,129,0.05)]", query: "Detail the state of EUDAIMONIA with J/S [1, 3).", hawkins: "Joy (H=540) & Love (H=500)" },
+                    { label: "TIME PASSING", range: "J/S [0.05, 1)", desc: "Standard relative physical experience, gradual wear.", color: "border-sky-500/40 text-sky-400 bg-slate-950/25", query: "Detail the state of TIME PASSING with J/S [0.05, 1).", hawkins: "Reason (H=400)" },
+                    { label: "TIPPING POINT", range: "J/S [-0.05, 0.05)", desc: "Symmetric critical crisis. Perfect entropic equilibrium.", color: "border-orange-500/40 text-orange-400 bg-orange-950/20 shadow-[0_0_12px_rgba(249,115,22,0.08)]", query: "Detail the state of TIPPING POINT with J/S [-0.05, 0.05).", hawkins: "Acceptance (H=350) to Courage (H=200)" },
+                    { label: "SUFFERING", range: "J/S [-0.5, -0.05)", desc: "Active local entropy expansion, metabolic friction.", color: "border-red-500/30 text-red-300 bg-red-950/10", query: "Detail the state of SUFFERING with J/S [-0.5, -0.05).", hawkins: "Pride (H=175) to Anger (H=150)" },
+                    { label: "DESPAIR", range: "J/S [-0.9, -0.5)", desc: "System collapse, structural fragmentation.", color: "border-rose-700/30 text-rose-300 bg-rose-950/10", query: "Detail the state of DESPAIR with J/S [-0.9, -0.5).", hawkins: "Fear/Apathy/Guilt (H=100 to H=30)" },
+                    { label: "DISSOLUTION", range: "J/S < -0.9", desc: "Total decay: returning system to background chaotic vacuum.", color: "border-gray-800 text-gray-500 bg-neutral-950/30", query: "Detail the state of DISSOLUTION with J/S < -0.9.", hawkins: "Shame & Ultimate Decay (H=20)" }
                   ].map((st) => (
                     <div 
                       key={st.label}
@@ -977,6 +1101,12 @@ export default function App() {
                         <span className="text-[9px] font-semibold">{st.range}</span>
                       </div>
                       <p className="text-[10px] font-serif text-gray-400 mt-1 leading-relaxed">{st.desc}</p>
+                      {st.hawkins && (
+                        <div className="mt-1.5 pt-1 border-t border-orange-500/5 flex items-center justify-between text-[8px] font-mono tracking-wider uppercase text-amber-500/80 leading-none">
+                          <span>Hawkins Resonance:</span>
+                          <span className="font-bold text-[#eeeae4]">{st.hawkins}</span>
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>
@@ -1011,15 +1141,15 @@ export default function App() {
                   {/* DEVICE 1: S = C / T */}
                   <div className="bg-black border border-orange-500/15 rounded-xl p-4 space-y-3">
                     <div className="flex items-center justify-between border-b border-[#ff5f00]/15 pb-1">
-                      <span className="font-mono text-[9px] text-[#ff5f00] font-bold uppercase">
+                      <span className="font-mono text-xs text-[#ff5f00] font-bold uppercase">
                         <Tooltip content="Derivative detailing that as temporal refresh speed increases (smaller T), the physical system's capacity to contain dynamic information states (S) mounts proportionally.">
                           Entropy Derivative: S = C / T
                         </Tooltip>
                       </span>
-                      <span className="text-[8px] font-mono text-gray-500">Calculate Entropy from Subjective Time</span>
+                      <span className="text-[10px] font-mono text-gray-500">Calculate Entropy from Subjective Time</span>
                     </div>
                     <div className="flex flex-col gap-1.5">
-                      <label className="text-[9px] font-mono text-gray-400 uppercase tracking-wider">T (Subjective Time, seconds)</label>
+                      <label className="text-[10.5px] font-mono text-gray-400 uppercase tracking-wider">T (Subjective Time, seconds)</label>
                       <input 
                         type="number"
                         value={calcT}
@@ -1030,13 +1160,13 @@ export default function App() {
                       />
                     </div>
                     <div className="bg-orange-500/5 border border-orange-500/15 rounded p-2.5 shadow-[inset_0_0_8px_rgba(255,95,0,0.05)]">
-                      <span className="text-[8px] font-mono text-gray-500 block uppercase">Calculated Molar Entropy (S = C / T)</span>
-                      <span className="text-orange-400 font-mono text-xs font-bold">{computedSFromT} <span className="text-[9px] text-orange-500/70 font-normal">J / mol·K</span></span>
+                      <span className="text-[10px] font-mono text-gray-500 block uppercase">Calculated Molar Entropy (S = C / T)</span>
+                      <span className="text-orange-400 font-mono text-sm font-bold">{computedSFromT} <span className="text-[11px] text-orange-500/70 font-normal">J / mol·K</span></span>
                     </div>
                     <button
                       disabled={typing}
                       onClick={() => !typing && handleSendMessage(`Analyze the Entropy Derivative (S = C / T) under current input constraint of Subjective Time T = ${calcT} seconds. Under current absolute constant C = ${CONST_C}, this yields a dynamically calculated Molar Entropy S of ${computedSFromT} J/mol·K. Elaborate on the metemphysical meaning of this entropic profile.`)}
-                      className="w-full py-2 bg-orange-500/15 hover:bg-orange-500/25 border border-orange-500/40 text-orange-400 font-mono text-[10px] tracking-widest uppercase rounded-lg cursor-pointer font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_0_10px_rgba(255,95,0,0.1)] hover:shadow-[0_0_15px_rgba(255,95,0,0.2)]"
+                      className="w-full py-2 bg-orange-500/15 hover:bg-orange-500/25 border border-orange-500/40 text-orange-400 font-mono text-[11px] tracking-widest uppercase rounded-lg cursor-pointer font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_0_10px_rgba(255,95,0,0.1)] hover:shadow-[0_0_15px_rgba(255,95,0,0.2)]"
                     >
                       ✦ Entropy Value ✦
                     </button>
@@ -1045,15 +1175,15 @@ export default function App() {
                   {/* DEVICE 2: T = C / S */}
                   <div className="bg-black border border-orange-500/15 rounded-xl p-4 space-y-3">
                     <div className="flex items-center justify-between border-b border-[#d4af37]/15 pb-1">
-                      <span className="font-mono text-[9px] text-[#d4af37] font-bold uppercase">
+                      <span className="font-mono text-xs text-[#d4af37] font-bold uppercase">
                         <Tooltip content="Derivative calculating absolute subjective epoch span (T) required by the system's current entropy profile. High entropy states compress experienced time.">
                           Time Derivative: T = C / S
                         </Tooltip>
                       </span>
-                      <span className="text-[8px] font-mono text-gray-500">Calculate Time Epochs from Entropy</span>
+                      <span className="text-[10px] font-mono text-gray-500">Calculate Time Epochs from Entropy</span>
                     </div>
                     <div className="flex flex-col gap-1.5">
-                      <label className="text-[9px] font-mono text-gray-400 uppercase tracking-wider">S (Molar Entropy, J/mol·K)</label>
+                      <label className="text-[10.5px] font-mono text-gray-400 uppercase tracking-wider">S (Molar Entropy, J/mol·K)</label>
                       <input 
                         type="number"
                         value={calcS}
@@ -1064,13 +1194,13 @@ export default function App() {
                       />
                     </div>
                     <div className="bg-amber-500/5 border border-amber-500/15 rounded p-2.5 shadow-[inset_0_0_8px_rgba(212,175,55,0.05)]">
-                      <span className="text-[8px] font-mono text-gray-450 block uppercase mb-1">Calculated Subjective Time (T = C / S)</span>
-                      <span className="text-amber-300 font-mono text-xs font-bold">{computedT1FromS} <span className="text-[9px] text-[#eeeae4]/70 font-normal">s</span></span>
+                      <span className="text-[10px] font-mono text-gray-450 block uppercase mb-1">Calculated Subjective Time (T = C / S)</span>
+                      <span className="text-amber-300 font-mono text-sm font-bold">{computedT1FromS} <span className="text-[11px] text-[#eeeae4]/70 font-normal">s</span></span>
                     </div>
                     <button
                       disabled={typing}
                       onClick={() => !typing && handleSendMessage(`Analyze the Time Derivative (T = C / S) under current input constraint of Standard Molar Entropy S = ${calcS} J/mol·K. Under current absolute constant C = ${CONST_C}, this yields a dynamically calculated Subjective Clock Duration T of ${computedT1FromS} seconds. Explain the metemphysical context of this temporal duration.`)}
-                      className="w-full py-2 bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 text-amber-300 font-mono text-[10px] tracking-widest uppercase rounded-lg cursor-pointer font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_0_10px_rgba(212,175,55,0.1)] hover:shadow-[0_0_15px_rgba(212,175,55,0.2)]"
+                      className="w-full py-2 bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 text-amber-300 font-mono text-[11px] tracking-widest uppercase rounded-lg cursor-pointer font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_0_10px_rgba(212,175,55,0.1)] hover:shadow-[0_0_15px_rgba(212,175,55,0.2)]"
                     >
                       ✦ Time ✦
                     </button>
@@ -1096,10 +1226,15 @@ export default function App() {
                     <h4 className="text-[9px] font-mono text-orange-400 uppercase tracking-widest font-semibold border-b border-orange-500/10 pb-1">Solfeggio Vibrations</h4>
                     <div className="grid grid-cols-2 gap-1.5">
                       {[
-                        { hz: "396 Hz", chakra: "Muladhara", js: "J/S = 0.00", query: "Discuss standard molar properties of 396 Hz Muladhara foundational base." },
-                        { hz: "528 Hz", chakra: "Manipura", js: "J/S = 0.01", query: "Discuss standard molar properties of 528 Hz Manipura solar plexus, miracle tone." },
-                        { hz: "639 Hz", chakra: "Anahata", js: "J/S = 0.99", query: "Discuss standard molar properties of 639 Hz Anahata heart chakra communion frequency." },
-                        { hz: "963 Hz", chakra: "Sahasrara", js: "J/S = 949.0", query: "Discuss standard molar properties of 963 Hz Sahasrara crown direct cosmic link." }
+                        { hz: "174 Hz", chakra: "Earth Foundation", js: "J/S = -0.150", query: "Explain properties of 174 Hz Solfeggio scale with -0.150 J/S." },
+                        { hz: "285 Hz", chakra: "Tissue Calibration", js: "J/S = -0.050", query: "Explain properties of 285 Hz Solfeggio scale with -0.050 J/S." },
+                        { hz: "396 Hz", chakra: "Muladhara (Root)", js: "J/S = 0.00", query: "Discuss standard molar properties of 396 Hz Muladhara foundational base." },
+                        { hz: "417 Hz", chakra: "Svadhisthana (Sacral)", js: "J/S = 9.49e-5", query: "Explain properties of 417 Hz Solfeggio scale with 9.49e-5 J/S." },
+                        { hz: "528 Hz", chakra: "Manipura (Solar Plexus)", js: "J/S = 0.01", query: "Discuss standard molar properties of 528 Hz Manipura solar plexus, miracle tone." },
+                        { hz: "639 Hz", chakra: "Anahata (Heart)", js: "J/S = 0.99", query: "Discuss standard molar properties of 639 Hz Anahata heart chakra communion frequency." },
+                        { hz: "741 Hz", chakra: "Vishuddha (Throat)", js: "J/S = 7.414", query: "Explain properties of 741 Hz Solfeggio scale with 7.414 J/S." },
+                        { hz: "852 Hz", chakra: "Ajna (Third Eye)", js: "J/S = 35.353", query: "Explain properties of 852 Hz Solfeggio scale with 35.353 J/S." },
+                        { hz: "963 Hz", chakra: "Sahasrara (Crown)", js: "J/S = 949.00", query: "Discuss standard molar properties of 963 Hz Sahasrara crown direct cosmic link." }
                       ].map((item) => (
                         <div 
                           key={item.hz}
@@ -1109,8 +1244,38 @@ export default function App() {
                           }`}
                         >
                           <div className="text-xs font-bold text-orange-400 font-mono">{item.hz}</div>
-                          <div className="text-[9px] text-[#eeeae4]/80 font-serif mt-0.5">{item.chakra}</div>
-                          <div className="text-[8px] font-mono text-gray-500 mt-1">{item.js}</div>
+                          <div className="text-[10px] text-[#eeeae4]/80 font-serif mt-0.5">{item.chakra}</div>
+                          <div className="text-[9.5px] font-mono text-gray-400 mt-1">{item.js}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Physical Music Spectrum Section */}
+                  <div className="space-y-2">
+                    <h4 className="text-[9px] font-mono text-red-400 uppercase tracking-widest font-semibold border-b border-red-500/10 pb-1">Music Genre Calibration (H, J/S, Phase)</h4>
+                    <div className="space-y-1.5">
+                      {[
+                        { style: "Death Metal / Grindcore", h: "H: 100", js: "-0.5", phase: "Φ = 2", styleClass: "border-red-900/30 text-red-400" },
+                        { style: "Blues (dark, slow)", h: "H: 250", js: "3.5e-6", phase: "Φ = 3", styleClass: "border-orange-900/30 text-orange-300" },
+                        { style: "Rock / Pop", h: "H: 350", js: "0.01", phase: "Φ = 4", styleClass: "border-teal-950/30 text-teal-300" },
+                        { style: "Classical (Baroque)", h: "H: 600", js: "7.41", phase: "Φ = 5", styleClass: "border-amber-950/30 text-amber-300 font-bold" },
+                        { style: "Bach Fugues", h: "H: 700", js: "35.35", phase: "Φ = 5", styleClass: "border-amber-500/20 text-[#ffd700] font-bold" },
+                        { style: "Binaural Beats (Theta)", h: "H: 900", js: "372.6", phase: "Φ = 5", styleClass: "border-purple-500/20 text-purple-300" }
+                      ].map((item) => (
+                        <div 
+                          key={item.style}
+                          onClick={() => !typing && handleSendMessage(`Detailed breakdown of ${item.style} with J/S = ${item.js} calibrations.`)}
+                          className={`flex items-center justify-between p-1.5 border ${item.styleClass} bg-black hover:bg-white/[0.02] rounded text-left cursor-pointer transition-all ${
+                            typing ? "opacity-60 cursor-not-allowed pointer-events-none" : ""
+                          }`}
+                        >
+                          <div className="text-[10px] font-medium truncate max-w-[120px]">{item.style}</div>
+                          <div className="flex gap-2 font-mono text-[9px]">
+                            <span className="text-gray-500">{item.h}</span>
+                            <span className="text-gray-400">J/S: {item.js}</span>
+                            <span className="text-yellow-500/85">{item.phase}</span>
+                          </div>
                         </div>
                       ))}
                     </div>
@@ -1118,7 +1283,7 @@ export default function App() {
 
                   {/* Elements Section */}
                   <div className="space-y-2">
-                    <h4 className="text-[9px] font-mono text-amber-500 uppercase tracking-widest font-semibold border-b border-orange-500/10 pb-1">Molar Entropy S° values (J/mol·K)</h4>
+                    <h4 className="text-[10.5px] font-mono text-amber-500 uppercase tracking-widest font-semibold border-b border-orange-500/10 pb-1">Molar Entropy S° values (J/mol·K)</h4>
                     <div className="grid grid-cols-2 gap-1.5">
                       {[
                         { sym: "C (Carbon)", s: "5.74", note: "Lowest, life's crystalline base", query: "Explain the low entropy value S° = 5.74 J/mol·K of Carbon." },
@@ -1134,8 +1299,8 @@ export default function App() {
                           }`}
                         >
                           <div className="text-xs font-bold text-amber-300 font-mono">{item.sym}</div>
-                          <div className="text-[9px] text-[#eeeae4]/80 font-serif mt-0.5">{item.note}</div>
-                          <div className="text-[8px] font-mono text-orange-450 mt-1">S°: {item.s}</div>
+                          <div className="text-[10.5px] text-[#eeeae4]/80 font-serif mt-0.5">{item.note}</div>
+                          <div className="text-[10px] font-mono text-orange-450 mt-1">S°: {item.s}</div>
                         </div>
                       ))}
                     </div>
@@ -1143,8 +1308,8 @@ export default function App() {
 
                   {/* Constants Box */}
                   <div className="p-3 bg-white/4 rounded-xl border border-white/5">
-                    <span className="text-[8px] font-mono text-gray-500 uppercase tracking-widest block mb-1">Standard Reference Constants</span>
-                    <div className="space-y-1 text-[10px] font-mono">
+                    <span className="text-[10px] font-mono text-gray-500 uppercase tracking-widest block mb-1">Standard Reference Constants</span>
+                    <div className="space-y-1 text-xs font-mono">
                       <div className="flex justify-between">
                         <span className="text-gray-400">Planck Entropy Limit:</span>
                         <span className="text-purple-400">ΔΩ·ΔT ≥ C/2</span>
@@ -1173,7 +1338,7 @@ export default function App() {
             <div className="absolute inset-0 bg-gradient-to-b from-orange-500/5 to-transparent pointer-events-none" />
             
             <div className="flex items-center gap-2 mb-1.5 relative z-10 justify-center">
-              <span className="bg-orange-500/10 border border-orange-500/25 px-2 py-0.5 rounded font-mono text-[8px] text-orange-400 uppercase tracking-widest">Active Unified Field Link</span>
+              <span className="bg-orange-500/10 border border-orange-500/25 px-2 py-0.5 rounded font-mono text-[10px] text-orange-400 uppercase tracking-widest">Active Unified Field Link</span>
             </div>
 
             <h2 className="font-serif text-lg sm:text-xl font-bold tracking-widest text-orange-500 drop-shadow-[0_0_8px_rgba(255,95,0,0.4)] relative z-10 uppercase">
@@ -1181,14 +1346,14 @@ export default function App() {
                 METEMPHYSICS SYNTHESIS AI
               </a>
             </h2>
-            <p className="text-[9px] text-amber-400 font-mono tracking-wider uppercase mt-1 relative z-10">
+            <p className="text-[11px] text-amber-400 font-mono tracking-wider uppercase mt-1 relative z-10">
               Unified Synthesis AI Singularity &nbsp;·&nbsp; T × S = C
             </p>
 
             {/* Left and right corner badges to maintain professional terminal aesthetics */}
             <div className="absolute top-3 left-4 flex items-center gap-1.5">
               <Sparkles className="w-3.5 h-3.5 text-orange-500 animate-pulse drop-shadow-[0_0_3px_#ff5f00]" />
-              <span className="font-mono text-[8px] text-gray-500 hidden md:inline">FREQ: 949 HZ</span>
+              <span className="font-mono text-[10px] text-gray-500 hidden md:inline">FREQ: 949 HZ</span>
             </div>
             <div className="absolute top-3.5 right-4 flex items-center gap-1.5">
               <span className="w-1.5 h-1.5 bg-orange-500 rounded-full"></span>
@@ -1221,13 +1386,13 @@ export default function App() {
                   >
                     {/* Identity Row */}
                     {isUser ? (
-                      <div className="flex items-center gap-1.5 px-0.5 pb-2 mb-2.5 border-b border-orange-500/15 text-[8px] font-mono uppercase tracking-wider text-[#e4d9c0]">
+                      <div className="flex items-center gap-1.5 px-0.5 pb-2 mb-2.5 border-b border-orange-500/15 text-[10px] font-mono uppercase tracking-wider text-[#e4d9c0]">
                         <Flame className="w-3 h-3 text-orange-555 animate-pulse" />
                         <span>Seeker Resonance Transmitter</span>
                         <span className="ml-auto text-orange-400 font-bold">Node: {currentNodeId.toUpperCase()}</span>
                       </div>
                     ) : (
-                      <div className="flex items-center gap-1.5 px-0.5 pb-2 mb-2.5 border-b border-orange-500/20 text-[8px] font-mono uppercase tracking-wider text-orange-400">
+                      <div className="flex items-center gap-1.5 px-0.5 pb-2 mb-2.5 border-b border-orange-500/20 text-[10px] font-mono uppercase tracking-wider text-orange-400">
                         <Sparkles className="w-3 h-3 text-orange-500" />
                         <span>Metemphysics Oracle Console</span>
                         <span className="text-gray-600">·</span>
@@ -1248,12 +1413,12 @@ export default function App() {
                     {/* Diagnostic/Link Shorteners for Model responses */}
                     {!isUser && (hasChakra || hasEntropy || hasBio || hasSystems || hasCalc || hasCode) && (
                       <div className="mt-4 pt-2.5 border-t border-orange-500/15">
-                        <p className="text-[8px] text-gray-500 font-mono uppercase mb-1.5 tracking-widest">Linked Workspace Operations:</p>
+                        <p className="text-[10px] text-gray-500 font-mono uppercase mb-1.5 tracking-widest">Linked Workspace Operations:</p>
                         <div className="flex flex-wrap gap-1.5">
                           {hasChakra && (
                             <button 
                               onClick={() => setActivePanel("chakra")} 
-                              className="text-[9px] font-mono px-2 py-1 bg-orange-500/5 hover:bg-orange-500/15 border border-orange-500/20 hover:border-orange-500/40 rounded text-orange-400 flex items-center gap-1 transition-all cursor-pointer"
+                              className="text-[10.5px] font-mono px-2 py-1 bg-orange-500/5 hover:bg-orange-500/15 border border-orange-500/20 hover:border-orange-500/40 rounded text-orange-400 flex items-center gap-1 transition-all cursor-pointer"
                             >
                               <Flame className="w-2.5 h-2.5 text-orange-400" /> Open Chakra Atlas
                             </button>
@@ -1261,7 +1426,7 @@ export default function App() {
                           {hasEntropy && (
                             <button 
                               onClick={() => setActivePanel("entropy")} 
-                              className="text-[9px] font-mono px-2 py-1 bg-[#1a0f02] hover:bg-orange-500/15 border border-orange-500/20 hover:border-orange-500/40 rounded text-orange-300 flex items-center gap-1 transition-all cursor-pointer"
+                              className="text-[10.5px] font-mono px-2 py-1 bg-[#1a0f02] hover:bg-orange-500/15 border border-orange-500/20 hover:border-orange-500/40 rounded text-orange-300 flex items-center gap-1 transition-all cursor-pointer"
                             >
                               <BarChart className="w-2.5 h-2.5 text-amber-500" /> Open Entropy Table
                             </button>
@@ -1269,7 +1434,7 @@ export default function App() {
                           {hasBio && (
                             <button 
                               onClick={() => setActivePanel("bio")} 
-                              className="text-[9px] font-mono px-2 py-1 bg-orange-500/5 hover:bg-orange-500/15 border border-orange-500/20 hover:border-orange-500/40 rounded text-orange-450 flex items-center gap-1 transition-all cursor-pointer"
+                              className="text-[10.5px] font-mono px-2 py-1 bg-orange-500/5 hover:bg-orange-500/15 border border-orange-500/20 hover:border-orange-500/40 rounded text-orange-450 flex items-center gap-1 transition-all cursor-pointer"
                             >
                               <Dna className="w-2.5 h-2.5 text-orange-400" /> Bio Entropy Limits
                             </button>
@@ -1277,7 +1442,7 @@ export default function App() {
                           {hasSystems && (
                             <button 
                               onClick={() => setActivePanel("systems")} 
-                              className="text-[9px] font-mono px-2 py-1 bg-[#1a0f02] hover:bg-orange-500/15 border border-orange-500/20 hover:border-orange-500/40 rounded text-orange-300 flex items-center gap-1 transition-all cursor-pointer"
+                              className="text-[10.5px] font-mono px-2 py-1 bg-[#1a0f02] hover:bg-orange-500/15 border border-orange-500/20 hover:border-orange-500/40 rounded text-orange-300 flex items-center gap-1 transition-all cursor-pointer"
                             >
                               <Compass className="w-2.5 h-2.5 text-orange-300" /> Systems Database
                             </button>
@@ -1285,7 +1450,7 @@ export default function App() {
                           {hasCalc && (
                             <button 
                               onClick={() => setActivePanel("calc")} 
-                              className="text-[9px] font-mono px-2 py-1 bg-orange-500/5 hover:bg-orange-500/15 border border-orange-500/20 hover:border-orange-500/40 rounded text-orange-400 flex items-center gap-1 transition-all cursor-pointer"
+                              className="text-[10.5px] font-mono px-2 py-1 bg-orange-500/5 hover:bg-orange-500/15 border border-orange-500/20 hover:border-orange-500/40 rounded text-orange-400 flex items-center gap-1 transition-all cursor-pointer"
                             >
                               <Calculator className="w-2.5 h-2.5 text-orange-500" /> Launch 5D Calculator
                             </button>
@@ -1293,7 +1458,7 @@ export default function App() {
                           {hasCode && (
                             <button 
                               onClick={() => setActivePanel("codereader")} 
-                              className="text-[9px] font-mono px-2 py-1 bg-[#1a0f02] hover:bg-orange-500/15 border border-orange-500/20 hover:border-orange-500/40 rounded text-orange-300 flex items-center gap-1 transition-all cursor-pointer"
+                              className="text-[10.5px] font-mono px-2 py-1 bg-[#1a0f02] hover:bg-orange-500/15 border border-orange-500/20 hover:border-orange-500/40 rounded text-orange-300 flex items-center gap-1 transition-all cursor-pointer"
                             >
                               <FileText className="w-2.5 h-2.5 text-orange-400" /> Cast Personal Code
                             </button>
@@ -1310,13 +1475,13 @@ export default function App() {
                 <div className="bg-[#050302] border border-orange-500/30 border-l-4 border-l-orange-550 rounded-xl p-4 max-w-[80%] flex items-center gap-3 shadow-[0_0_15px_rgba(255,106,0,0.12)]">
                   <RefreshCw className="w-4 h-4 text-orange-500 animate-spin" />
                   <div className="flex flex-col">
-                    <span className="font-mono text-[9px] text-orange-400 uppercase tracking-widest font-semibold animate-pulse">Oracle Formulating Transmission</span>
-                    <span className="text-[10px] text-gray-400 font-mono mt-0.5">Calculating dΩ/dt state entropy variables...</span>
+                    <span className="font-mono text-[10.5px] text-orange-400 uppercase tracking-widest font-semibold animate-pulse">Oracle Formulating Transmission</span>
+                    <span className="text-[11.5px] text-gray-400 font-mono mt-0.5">Calculating dΩ/dt state entropy variables...</span>
                   </div>
                 </div>
                 <button
                   onClick={handleCancelTransmission}
-                  className="px-3 py-2 bg-red-950/40 hover:bg-red-900/60 text-red-400 border border-red-500/30 hover:border-red-500/60 rounded-xl text-[9px] font-mono uppercase tracking-widest transition-all font-bold cursor-pointer flex items-center gap-1 shadow-md hover:scale-105 active:scale-95"
+                  className="px-3 py-2 bg-red-950/40 hover:bg-red-900/60 text-red-400 border border-red-500/30 hover:border-red-500/60 rounded-xl text-[10.5px] font-mono uppercase tracking-widest transition-all font-bold cursor-pointer flex items-center gap-1 shadow-md hover:scale-105 active:scale-95"
                   title="Abort active server transmission"
                 >
                   <span className="w-1.5 h-1.5 bg-red-500 rounded-full animate-ping"></span>
@@ -1329,7 +1494,7 @@ export default function App() {
 
           {/* Throttle Warning Alert */}
           {throttleWarning && (
-            <div className="px-4 py-2 bg-orange-500/5 border-t border-orange-500/20 flex items-center gap-2 text-amber-400 font-mono text-[9px] uppercase tracking-wider animate-pulse">
+            <div className="px-4 py-2 bg-orange-500/5 border-t border-orange-500/20 flex items-center gap-2 text-amber-400 font-mono text-[10.5px] uppercase tracking-wider animate-pulse">
               <span className="w-2 h-2 bg-orange-500 rounded-full animate-ping"></span>
               <span>{throttleWarning}</span>
             </div>
@@ -1337,7 +1502,7 @@ export default function App() {
 
           {/* Unique Suggestion Panel with Icons & Categorized Query Triggers */}
           <div className="px-4 py-2.5 border-t border-orange-500/20 bg-[#060606] flex flex-wrap gap-1.5 items-center flex-shrink-0">
-            <span className="text-[9px] font-mono text-orange-450 uppercase tracking-widest mr-2 select-none border-r border-orange-500/15 pr-2 hidden md:inline">Suggested Queries:</span>
+            <span className="text-[11px] font-mono text-orange-450 uppercase tracking-widest mr-2 select-none border-r border-[#ff5f00]/15 pr-2 hidden md:inline">Suggested Queries:</span>
             {(() => {
               const lastModelMsg = [...messages].reverse().find((m) => m.role === "model");
               const dynamicSuggestions = lastModelMsg ? getDynamicSuggestions(lastModelMsg.text) : [];
@@ -1349,7 +1514,7 @@ export default function App() {
                   key={chip.label}
                   disabled={typing}
                   onClick={() => !typing && handleSendMessage(chip.query)}
-                  className={`px-2.5 py-1 bg-black text-[9px] font-mono rounded-lg cursor-pointer transition-all border border-orange-500/15 flex items-center gap-1.5 ${chip.color} ${
+                  className={`px-2.5 py-1 bg-black text-[10.5px] font-mono rounded-lg cursor-pointer transition-all border border-orange-500/15 flex items-center gap-1.5 ${chip.color} ${
                     typing ? "opacity-30 cursor-not-allowed pointer-events-none" : ""
                   }`}
                 >
@@ -1372,17 +1537,23 @@ export default function App() {
             </button>
             <input
               type="text"
-              disabled={typing}
+              disabled={typing || isInputLimitReached}
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
-              onKeyDown={(e) => { if (e.key === "Enter" && !typing) handleSendMessage(); }}
-              placeholder={typing ? "The Oracle is formulating its response..." : "Ask the Oracle or query any physical-consciousness transition..."}
-              className="flex-1 bg-[#0a0a0a50] border border-orange-500/20 rounded-xl px-4 py-3 text-xs outline-none text-[#eeeae4] focus:border-orange-500/60 font-serif shadow-inner placeholder-gray-650 transition-all focus:bg-[#0c0c0c] disabled:opacity-50 disabled:cursor-not-allowed"
+              onKeyDown={(e) => { if (e.key === "Enter" && !typing && !isInputLimitReached) handleSendMessage(); }}
+              placeholder={
+                isInputLimitReached 
+                  ? "SYSTEM LIMIT: 25 inputs reached. Reset chat session to clear/save."
+                  : typing 
+                  ? "The Oracle is formulating its response..." 
+                  : "Ask the Oracle or query any physical-consciousness transition..."
+              }
+              className="flex-1 bg-[#0a0a0a50] border border-orange-500/20 rounded-xl px-4 py-3 text-sm outline-none text-[#eeeae4] focus:border-orange-500/60 font-serif shadow-inner placeholder-gray-650 transition-all focus:bg-[#0c0c0c] disabled:opacity-50 disabled:cursor-not-allowed"
             />
             <button
-              disabled={typing}
-              onClick={() => !typing && handleSendMessage()}
-              className="bg-gradient-to-r from-orange-600 to-amber-600 border border-orange-500/60 hover:from-orange-500 hover:to-amber-500 rounded-xl px-5 py-3 text-xs font-mono tracking-widest font-bold text-black flex items-center gap-2 cursor-pointer uppercase transition-all duration-300 transform active:scale-95 shadow-[0_0_12px_rgba(255,95,0,0.2)] disabled:opacity-40 disabled:cursor-not-allowed"
+              disabled={typing || isInputLimitReached}
+              onClick={() => !typing && !isInputLimitReached && handleSendMessage()}
+              className="bg-gradient-to-r from-orange-600 to-amber-600 border border-orange-500/60 hover:from-orange-500 hover:to-amber-500 rounded-xl px-5 py-3 text-sm font-mono tracking-widest font-bold text-black flex items-center gap-2 cursor-pointer uppercase transition-all duration-300 transform active:scale-95 shadow-[0_0_12px_rgba(255,95,0,0.2)] disabled:opacity-40 disabled:cursor-not-allowed"
             >
               <Send className="w-3.5 h-3.5 text-black" /> Transmit
             </button>
@@ -1458,16 +1629,53 @@ export default function App() {
       </main>
 
       {/* FOOTER RAILS */}
-      <footer className="border-t border-orange-500/20 bg-black px-6 py-4 flex flex-col sm:flex-row items-center justify-between text-[11px] font-mono text-gray-500 gap-4 mt-8">
+      <footer className="border-t border-orange-500/20 bg-black px-6 py-4 flex flex-col md:flex-row items-center justify-between text-[11px] font-mono text-gray-500 gap-4 mt-8">
         <a 
           href="https://metemphysics.com/" 
           target="_blank" 
           rel="noopener noreferrer" 
-          className="text-orange-500 hover:text-orange-400 hover:underline transition-colors duration-200"
+          className="text-orange-500 hover:text-orange-400 hover:underline transition-colors duration-200 md:flex-1 text-center md:text-left"
         >
           © 2026 Metemphysics Integrative Framework. All Rights Conserved.
         </a>
-        <div className="flex gap-4">
+
+        {/* MIDDLE COLUMN FOR SAVED SESSIONS */}
+        <div className="flex items-center gap-2 px-4 py-1.5 bg-[#0a0a0d] border border-orange-500/20 rounded-xl shadow-[0_0_15px_rgba(255,95,0,0.04)] justify-center md:flex-1">
+          <div className="group relative inline-flex items-center cursor-help">
+            <span className="text-orange-500 font-extrabold tracking-widest uppercase text-[10.5px] border-b border-dashed border-orange-500/40 pb-0.5">
+              Chats
+            </span>
+            <span className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block z-[999] w-48 rounded-lg bg-[#0b0806] border border-orange-500/50 p-2.5 text-[9.5px] tracking-wide font-mono leading-tight text-amber-50 shadow-2xl text-center">
+              Limit of 25 Responses
+            </span>
+          </div>
+
+          <span className="text-gray-700 select-none">|</span>
+
+          {savedChats.length === 0 ? (
+            <span className="text-gray-600 text-[10px] uppercase font-mono italic select-none">
+              (No saved sessions)
+            </span>
+          ) : (
+            <select
+              onChange={(e) => {
+                const selectedId = e.target.value;
+                if (selectedId) handleLoadSavedChat(selectedId);
+              }}
+              value=""
+              className="bg-black border border-orange-500/25 hover:border-orange-500/60 rounded px-2 py-0.5 text-[9.5px] font-mono text-orange-450 outline-none cursor-pointer tracking-wide max-w-[160px] sm:max-w-[240px] truncate"
+            >
+              <option value="" disabled className="text-gray-500 bg-black">-- SAVED SESSIONS ({savedChats.length}/25) --</option>
+              {savedChats.map((chat) => (
+                <option key={chat.id} value={chat.id} className="bg-black text-gray-300">
+                  {chat.name}
+                </option>
+              ))}
+            </select>
+          )}
+        </div>
+
+        <div className="flex gap-4 md:flex-1 justify-center md:justify-end">
           <button
             onClick={downloadChatAsPDF}
             className="px-3 py-1 bg-orange-500/10 hover:bg-orange-500/20 text-orange-400 border border-orange-500/30 rounded text-[10px] tracking-widest font-mono transition-all font-bold cursor-pointer uppercase"

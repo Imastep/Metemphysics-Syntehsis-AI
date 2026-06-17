@@ -30,6 +30,25 @@ async function startServer() {
       })
     : null;
 
+  // Simple In-memory response cache structure
+  interface CacheEntry {
+    text: string;
+    offline: boolean;
+    expiresAt: number;
+  }
+  const apiCache = new Map<string, CacheEntry>();
+  const CACHE_TTL_MS = 10 * 60 * 1000; // 10 minutes duration
+  const MAX_CACHE_SIZE = 100;
+
+  // Simple In-memory rate limiting structure
+  interface RateLimitTracker {
+    count: number;
+    resetTime: number;
+  }
+  const rateLimitMap = new Map<string, RateLimitTracker>();
+  const RATE_LIMIT_WINDOW_MS = 60 * 1000; // 1 minute window
+  const MAX_REQUESTS_PER_WINDOW = 25; // max 25 queries per minute
+
   // endpoint to handle chat requests
   app.post("/api/chat", async (req, res) => {
     const { message, history, currentKnodeId, studioMode, conservedLimit } = req.body || {};
@@ -38,11 +57,66 @@ async function startServer() {
         return res.status(400).json({ error: "Message is required." });
       }
 
+      const now = Date.now();
+      const clientIp = (req.headers["x-forwarded-for"] as string || req.ip || "unknown-ip").split(",")[0].trim();
+
+      // 1. IP-Based Rate Limiter Check
+      let tracker = rateLimitMap.get(clientIp);
+      if (!tracker || now > tracker.resetTime) {
+        tracker = { count: 0, resetTime: now + RATE_LIMIT_WINDOW_MS };
+      }
+      tracker.count++;
+      rateLimitMap.set(clientIp, tracker);
+
+      if (tracker.count > MAX_REQUESTS_PER_WINDOW) {
+        const localResponse = generateLocalResponse(message, studioMode, conservedLimit, currentKnodeId);
+        return res.json({
+          text: `[SYSTEM: IP limit of ${MAX_REQUESTS_PER_WINDOW} queries/min exceeded - local backup activated]\n\n${localResponse}`,
+          offline: true,
+          rateLimited: true
+        });
+      }
+
+      // 2. Cache Match Check
+      const cacheKey = JSON.stringify({
+        message,
+        studioMode,
+        conservedLimit,
+        currentKnodeId,
+        historyLength: history?.length || 0
+      });
+
+      if (apiCache.has(cacheKey)) {
+        const cached = apiCache.get(cacheKey)!;
+        if (now < cached.expiresAt) {
+          return res.json({
+            text: cached.text,
+            offline: cached.offline,
+            cached: true
+          });
+        } else {
+          apiCache.delete(cacheKey);
+        }
+      }
+
       const hasKey = !!apiKey;
       if (!hasKey || !ai) {
         const localResponse = generateLocalResponse(message, studioMode, conservedLimit, currentKnodeId);
+        const responseText = `[SYSTEM: offline routing mode active]\n\n${localResponse}`;
+        
+        // Cache the offline response too
+        if (apiCache.size >= MAX_CACHE_SIZE) {
+          const oldestKey = apiCache.keys().next().value;
+          if (oldestKey !== undefined) apiCache.delete(oldestKey);
+        }
+        apiCache.set(cacheKey, {
+          text: responseText,
+          offline: true,
+          expiresAt: now + CACHE_TTL_MS
+        });
+
         return res.json({
-          text: `[SYSTEM: offline routing mode active]\n\n${localResponse}`,
+          text: responseText,
           offline: true
         });
       }
@@ -127,19 +201,49 @@ CRITICAL FORMULA DIRECTIVE: Never output raw LaTeX mathematical formatting (e.g.
         }
       }
 
-      if (!response) {
+      if (!response || !response.text) {
         throw lastError || new Error("All model endpoints returned empty or failed.");
       }
 
-      res.json({ text: response.text });
+      // Populate Cache for future duplicate requests
+      if (apiCache.size >= MAX_CACHE_SIZE) {
+        const oldestKey = apiCache.keys().next().value;
+        if (oldestKey !== undefined) apiCache.delete(oldestKey);
+      }
+      apiCache.set(cacheKey, {
+        text: response.text,
+        offline: false,
+        expiresAt: Date.now() + CACHE_TTL_MS
+      });
+
+      return res.json({ text: response.text });
     } catch (e: any) {
       const errorMessage = e.message || String(e);
       // Clean and soft log so it is not caught as a severe app crash by platform monitors
       console.log(`[Gemini API Offline Path] Graceful local Metemphysics fallback activated. (Status: ${errorMessage.slice(0, 100)})`);
       const localResponse = generateLocalResponse(message, studioMode, conservedLimit, currentKnodeId);
+      const offlineText = `[SYSTEM: offline mode - automatic field backup recovery active]\n\n${localResponse}\n\n*(Telemetry Sync Code: ${errorMessage.slice(0, 80)})*`;
+
+      // Cache the fallback response too under cacheKey
+      const cacheKey = JSON.stringify({
+        message,
+        studioMode,
+        conservedLimit,
+        currentKnodeId,
+        historyLength: history?.length || 0
+      });
+      if (apiCache.size >= MAX_CACHE_SIZE) {
+        const oldestKey = apiCache.keys().next().value;
+        if (oldestKey !== undefined) apiCache.delete(oldestKey);
+      }
+      apiCache.set(cacheKey, {
+        text: offlineText,
+        offline: true,
+        expiresAt: Date.now() + CACHE_TTL_MS
+      });
       
       res.status(200).json({ 
-        text: `[SYSTEM: offline mode - automatic field backup recovery active]\n\n${localResponse}\n\n*(Telemetry Sync Code: ${errorMessage.slice(0, 80)})*`, 
+        text: offlineText, 
         offline: true 
       });
     }
@@ -259,6 +363,35 @@ In the traditions of Kashmir Shaivism, the cosmos is not a static construct but 
 - **J/S State:** J/S >= 949 (REVELATION Mode)
 - **Thermodynamic Equivalence:** The Spanda vibration corresponds to the high-frequency temporal oscillation (T ➔ 0, S ➔ Maximum Coherence) where the subjective observer merged directly with the field of light.
 - **Universal Alignment:** Under the constant C = ${cVal}, this state represents the absolute integration of all relative pathways back into the singular point of origin.`;
+  }
+
+  if (query.includes("newton") || query.includes("isaac") || query.includes("principia")) {
+    return `### ◈ ISAAC NEWTON: PRINCIPIA MATHEMATICA & THE ALCHEMICAL SOURCE ◈
+
+#### I. THE LIGHT SPECTRUM AND GRAVITATIONAL VECTOR
+Sir Isaac Newton unified planetary mechanics with alchemical theology. In the Metemphysical framework, Newton’s light refraction experiments decomposed white light into cohesive wave frequencies, establishing the baseline for dynamic frequency calibrations:
+  C = ${cVal} (Velocity of divine light propagation)
+Newton's gravitational attraction vector F = G · (m1 · m2) / r² mirrors the mutual inter-attractor drawing forces in high-frequent spiritual systems (e.g., Omega Resonance where Ω_combined utilizes similar distance-decay mechanics).
+
+#### II. THE ALCHEMICAL THERMODYNAMIC TRANSLATION
+- **J/S Calibration:** 35.353 to 126.68 (**Mystical Clarity** to **Near Timeless**) represented by his alchemical synthesis (Magnum Opus).
+- **Core Insights:** Newton recognized that geometry and gravity are but outward expressions of an underlying spiritual breath (the "Aether"), proving that gravity is a manifestation of active divine will holding cosmic orbits constant. Under T × S = C, the planetary periods represent stable temporal coordinates (T) balanced against angular entropy (S).`;
+  }
+
+  if (query.includes("astrology") || query.includes("zodiac") || query.includes("planetary") || query.includes("transit") || query.includes("cosmological")) {
+    return `### ◈ COSMOLOGICAL CORRESPONDENCE: THE METEMPHYSICAL ASTROLOGICAL ENGINE ◈
+
+#### I. THE MACROCOSMIC RESIDUAL WAVE
+Astrology functions as a celestial correlation engine mapping macrocosmic orbital rhythms and resonance geometries (conjunctions, trines, oppositions) to the microcosmic human nervous system and somatic vortexes (Chakras).
+- **Angular Harmonics:** Relative angular aspect relationships (e.g., 120° Trine vs 90° Square) translate into high or low resonance constants (β) within the unified feedback equations.
+- **The Equation Alignment:** Under the supreme conservation law **T × S = C**, the slow orbital movements of transiting planets represent massive temporal waves (high T) that systematically dictate local entropy budgets (S) in the human biosphere.
+
+#### II. SYSTEM MATRIX CALIBRATION
+- **Integrated Calibration Index:** Ω = 639 (with state of **Time Passing** to **Eudaimonic** alignment)
+- **Primary Correspondences:**
+  - **Solar Core (Suns/Sol):** Direct link to the primary C-constant wave.
+  - **Lunar Cycle (Luna):** Direct somatic water-fluid entrainment coordinate.
+  - **Cosmic Houses:** Spatial coordinates defining local density bounds for the expression of individual consciousness.`;
   }
 
   // 3. Fallback math / formulas query

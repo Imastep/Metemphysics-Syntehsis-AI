@@ -348,6 +348,28 @@ export default function NumerologyPanel({ onClose, onSendPrompt }: { onClose: ()
             {/* TABS 1: NUMBERS (Calculator & Step Ledger) */}
             {activeTab === "numbers" && (
               <div className="space-y-6">
+
+                {/* Active Digit Profile Card */}
+                <div className="border border-orange-500/35 bg-orange-950/10 rounded-xl p-4 flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-2xl font-serif font-black text-orange-400">{selectedDigit.digit}</span>
+                      <span className="text-md font-serif font-bold text-white">— {selectedDigit.name} ({selectedDigit.symbol})</span>
+                    </div>
+                    <p className="text-xs text-gray-400 leading-relaxed font-serif italic mt-1">"{selectedDigit.description}"</p>
+                    <div className="flex flex-wrap gap-x-4 gap-y-1 font-mono text-[10px] text-gray-400 mt-2">
+                      <span>Consciousness: <strong className="text-[#5cdb95]">{selectedDigit.consciousness}</strong></span>
+                      <span>Entropy: <strong className="text-amber-500">{selectedDigit.entropy}</strong></span>
+                      <span>Cosmic Influence: <strong className="text-purple-400">{selectedDigit.cosmic}</strong></span>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => onSendPrompt(`Conduct a supreme numerical-harmonic review of Digit ${selectedDigit.digit} (${selectedDigit.name}). Symbolized by '${selectedDigit.symbol}', tell me about its consciousness (${selectedDigit.consciousness}), entropy coefficient (${selectedDigit.entropy}), and metemphysical properties.`)}
+                    className="flex-shrink-0 w-full sm:w-auto bg-orange-500/20 hover:bg-orange-500 hover:text-black border border-orange-500 text-orange-400 px-3.5 py-2 rounded-lg font-mono text-[9px] font-bold transition-all cursor-pointer shadow-[0_0_8px_rgba(255,95,0,0.1)] flex items-center justify-center gap-1.5"
+                  >
+                    💬 Put in Chat
+                  </button>
+                </div>
                 
                 {/* Calculator Area */}
                 <div className="border border-orange-500/20 bg-orange-950/5 rounded-xl p-4">
@@ -455,13 +477,23 @@ export default function NumerologyPanel({ onClose, onSendPrompt }: { onClose: ()
                     </svg>
                   </div>
 
-                  <div className="flex-1 space-y-2 text-center md:text-left">
-                    <span className="text-[8px] font-mono text-orange-400 border border-orange-500/30 px-2 py-0.5 rounded bg-orange-500/5 uppercase">
-                      SHAPE GEOMETRY ARCHETYPE {selectedDigit.digit}
-                    </span>
-                    <h3 className="font-serif text-xl font-bold text-[#e4d9c0]">{selectedDigit.shapeName}</h3>
-                    <p className="text-xs text-gray-450 leading-relaxed font-serif italic">"{selectedDigit.shapeSummary}"</p>
-                    <p className="text-[11px] text-gray-500 font-mono leading-normal pt-1">{selectedDigit.description}</p>
+                  <div className="flex-1 space-y-2 text-center md:text-left flex flex-col justify-between h-full">
+                    <div>
+                      <span className="text-[8px] font-mono text-orange-400 border border-orange-500/30 px-2 py-0.5 rounded bg-orange-500/5 uppercase">
+                        SHAPE GEOMETRY ARCHETYPE {selectedDigit.digit}
+                      </span>
+                      <h3 className="font-serif text-xl font-bold text-[#e4d9c0] mt-1">{selectedDigit.shapeName}</h3>
+                      <p className="text-xs text-gray-400 leading-relaxed font-serif italic">"{selectedDigit.shapeSummary}"</p>
+                      <p className="text-[11px] text-gray-500 font-mono leading-normal pt-1">{selectedDigit.description}</p>
+                    </div>
+                    <div className="pt-2">
+                      <button
+                        onClick={() => onSendPrompt(`Detail the Sacred Geometric significance of Shape: '${selectedDigit.shapeName}' representing Digit ${selectedDigit.digit} (${selectedDigit.name}). How does its geometry define its local entropy footprint?`)}
+                        className="bg-orange-500/20 hover:bg-orange-500 hover:text-black border border-orange-500/40 text-orange-400 px-3 py-1.5 rounded text-[9.5px] font-mono font-bold transition-all cursor-pointer flex items-center justify-center sm:justify-start gap-1.5 w-full sm:w-auto"
+                      >
+                        💬 Put Shape in Chat
+                      </button>
+                    </div>
                   </div>
                 </div>
 

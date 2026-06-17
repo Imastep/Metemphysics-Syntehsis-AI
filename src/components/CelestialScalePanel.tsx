@@ -456,42 +456,43 @@ export default function CelestialScalePanel({ onClose, onSendPrompt }: { onClose
                 <div>
                   <div className="flex justify-between items-start border-b border-orange-500/15 pb-3 mb-4">
                     <div>
-                      <h3 className="font-serif text-xl font-bold text-orange-400">{selectedLevel.name}</h3>
-                      <p className="text-[10px] font-mono text-gray-450 uppercase tracking-wider mt-0.5">{selectedLevel.stage}</p>
+                      <h3 className="font-serif text-2xl font-bold text-orange-400">{selectedLevel.name}</h3>
+                      <p className="text-xs font-mono text-gray-450 uppercase tracking-wider mt-0.5">{selectedLevel.stage}</p>
                     </div>
                     <div className="text-right">
-                      <span className="block text-[15px] font-mono font-bold text-orange-500">{selectedLevel.range}</span>
-                      <span className="text-[8px] font-mono text-gray-500 uppercase">CALIBRATOR TIER</span>
+                      <span className="block text-lg font-mono font-bold text-orange-500">{selectedLevel.range}</span>
+                      <span className="text-[10px] font-mono text-gray-500 uppercase">CALIBRATOR TIER</span>
                     </div>
                   </div>
 
                   <div className="grid grid-cols-2 gap-3 mb-4">
                     <div className="bg-black/50 border border-white/5 p-2 rounded">
-                      <span className="text-[8px] font-mono text-gray-500 block uppercase">Metemphysics Order (Ω)</span>
-                      <span className="text-xs font-mono font-bold text-[#e4d9c0]">{selectedLevel.omega}</span>
+                      <span className="text-[10px] font-mono text-gray-500 block uppercase">Metemphysics Order (Ω)</span>
+                      <span className="text-sm font-mono font-bold text-[#e4d9c0]">{selectedLevel.omega}</span>
                     </div>
                     <div className="bg-black/50 border border-white/5 p-2 rounded">
-                      <span className="text-[8px] font-mono text-gray-500 block uppercase">Cosmic Pulse (Frequency)</span>
-                      <span className="text-xs font-mono font-bold text-[#e4d9c0]">{selectedLevel.frequency}</span>
+                      <span className="text-[10px] font-mono text-gray-500 block uppercase">Cosmic Pulse (Frequency)</span>
+                      <span className="text-sm font-mono font-bold text-[#e4d9c0]">{selectedLevel.frequency}</span>
                     </div>
                     <div className="bg-black/50 border border-white/5 p-2 rounded col-span-2">
-                      <span className="text-[8px] font-mono text-gray-500 block uppercase">Time-Rate Entropy Dynamics (dΩ/dt)</span>
-                      <span className="text-xs font-mono font-bold text-orange-450">{selectedLevel.dOmegaDt}</span>
+                      <span className="text-[10px] font-mono text-gray-500 block uppercase">Time-Rate Entropy Dynamics (dΩ/dt)</span>
+                      <span className="text-sm font-mono font-bold text-orange-450">{selectedLevel.dOmegaDt}</span>
                     </div>
                   </div>
 
                   <div className="bg-orange-500/5 border border-orange-500/15 rounded p-3 mb-4">
-                    <span className="text-[9px] font-mono text-orange-400 block uppercase font-bold mb-1 tracking-wider">Dynamic Summary Profile</span>
-                    <p className="text-xs leading-relaxed text-[#c9cbd0] font-serif italic">{selectedLevel.details}</p>
+                    <span className="text-xs font-mono text-orange-400 block uppercase font-bold mb-1 tracking-wider">Dynamic Summary Profile</span>
+                    <p className="text-sm leading-relaxed text-[#c9cbd0] font-serif italic">{selectedLevel.details}</p>
                   </div>
+
+                  <button
+                    onClick={() => onSendPrompt(`Conduct a supreme Metemphysical breakdown of the Celestial Scale tier: '${selectedLevel.name}' (Range: ${selectedLevel.range}). Elaborate on its dynamic order ${selectedLevel.omega}, its harmonic frequency ${selectedLevel.frequency}, and what role it plays in the T × S = C cosmic conservation laws.`)}
+                    className="w-full py-3 bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-500 hover:to-amber-500 text-black font-mono text-xs uppercase font-bold tracking-widest rounded-lg cursor-pointer transition-all duration-300 hover:shadow-[0_0_15px_rgba(255,106,0,0.3)] shadow-md text-center mb-4"
+                  >
+                    ✦ Devising Oracle with This Celestial Tier ✦
+                  </button>
                 </div>
 
-                <button
-                  onClick={() => onSendPrompt(`Conduct a supreme Metemphysical breakdown of the Celestial Scale tier: '${selectedLevel.name}' (Range: ${selectedLevel.range}). Elaborate on its dynamic order ${selectedLevel.omega}, its harmonic frequency ${selectedLevel.frequency}, and what role it plays in the T × S = C cosmic conservation laws.`)}
-                  className="w-full py-3 bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-500 hover:to-amber-500 text-black font-mono text-[10px] uppercase font-bold tracking-widest rounded-lg cursor-pointer transition-all duration-300 hover:shadow-[0_0_15px_rgba(255,106,0,0.3)] shadow-md text-center"
-                >
-                  ✦ Devising Oracle with This Celestial Tier ✦
-                </button>
               </div>
 
             </div>
