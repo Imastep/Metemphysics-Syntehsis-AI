@@ -8,12 +8,25 @@ import path from "path";
 import { createServer as createViteServer } from "vite";
 import { GoogleGenAI } from "@google/genai";
 import dotenv from "dotenv";
+import helmet from "helmet";
+import Redis from "ioredis";
 
 dotenv.config();
 
 async function startServer() {
   const app = express();
   const PORT = 3000;
+
+  // Configure helmet security headers, allowing embedding within the AI Studio preview iframe
+  app.use(
+    helmet({
+      contentSecurityPolicy: false, // Let Vite client handle script/asset loading
+      crossOriginEmbedderPolicy: false,
+      crossOriginOpenerPolicy: false,
+      crossOriginResourcePolicy: false,
+      frameguard: false, // REQUIRED: Allow embedding inside AI Studio's preview iframe
+    })
+  );
 
   app.use(express.json());
 
@@ -30,7 +43,42 @@ async function startServer() {
       })
     : null;
 
-  // Simple In-memory response cache structure
+  // Initialize Redis if configured
+  let redis: Redis | null = null;
+  let isRedisReady = false;
+  const redisUrl = process.env.REDIS_URL;
+  if (redisUrl) {
+    try {
+      redis = new Redis(redisUrl, {
+        maxRetriesPerRequest: 1,
+        connectTimeout: 5000,
+        enableOfflineQueue: false, // Do not queue commands when Redis is offline or disconnected
+        reconnectOnError: (err) => {
+          console.log("[Redis Cache Status] Offline mode (running in-memory fallbacks)");
+          return false; // do not retry immediately to avoid clogging
+        }
+      });
+      redis.on("ready", () => {
+        isRedisReady = true;
+        console.log("Redis client is fully ready and connected.");
+      });
+      redis.on("error", (err) => {
+        isRedisReady = false;
+        // Suppressed diagnostic logs for peaceful local fallback operations
+      });
+      redis.on("close", () => {
+        isRedisReady = false;
+      });
+      redis.on("end", () => {
+        isRedisReady = false;
+      });
+      console.log("Redis cache client created for multi-server scaling.");
+    } catch (err: any) {
+      console.log("[Redis Cache Status] Initialized offline. In-memory mode active.");
+    }
+  }
+
+  // Simple In-memory response cache structure (as fallback backup)
   interface CacheEntry {
     text: string;
     offline: boolean;
@@ -40,7 +88,7 @@ async function startServer() {
   const CACHE_TTL_MS = 10 * 60 * 1000; // 10 minutes duration
   const MAX_CACHE_SIZE = 100;
 
-  // Simple In-memory rate limiting structure
+  // Simple In-memory rate limiting structure (as fallback backup)
   interface RateLimitTracker {
     count: number;
     resetTime: number;
@@ -48,6 +96,72 @@ async function startServer() {
   const rateLimitMap = new Map<string, RateLimitTracker>();
   const RATE_LIMIT_WINDOW_MS = 60 * 1000; // 1 minute window
   const MAX_REQUESTS_PER_WINDOW = 25; // max 25 queries per minute
+
+  // --- REDIS/IN-MEMORY CACHE HELPERS ---
+  const getCacheValue = async (key: string): Promise<CacheEntry | null> => {
+    if (redis && isRedisReady) {
+      try {
+        const cached = await redis.get(`cache:${key}`);
+        if (cached) {
+          return JSON.parse(cached) as CacheEntry;
+        }
+      } catch (err: any) {
+        console.log("[Redis Fallback] Fetching from local memory cache.");
+      }
+    }
+    const cached = apiCache.get(key);
+    if (cached) {
+      if (Date.now() < cached.expiresAt) {
+        return cached;
+      } else {
+        apiCache.delete(key);
+      }
+    }
+    return null;
+  };
+
+  const setCacheValue = async (key: string, entry: CacheEntry) => {
+    if (redis && isRedisReady) {
+      try {
+        const ttlSeconds = Math.max(1, Math.ceil((entry.expiresAt - Date.now()) / 1000));
+        await redis.setex(`cache:${key}`, ttlSeconds, JSON.stringify(entry));
+      } catch (err: any) {
+        console.log("[Redis Fallback] Saved to local memory cache.");
+      }
+    }
+    // Update local map as a backup
+    if (apiCache.size >= MAX_CACHE_SIZE) {
+      const oldestKey = apiCache.keys().next().value;
+      if (oldestKey !== undefined) apiCache.delete(oldestKey);
+    }
+    apiCache.set(key, entry);
+  };
+
+  // --- REDIS/IN-MEMORY RATE LIMIT HELPER ---
+  const checkRateLimit = async (clientIp: string): Promise<{ count: number; allowed: boolean }> => {
+    if (redis && isRedisReady) {
+      try {
+        const key = `ratelimit:${clientIp}`;
+        const count = await redis.incr(key);
+        if (count === 1) {
+          await redis.expire(key, Math.ceil(RATE_LIMIT_WINDOW_MS / 1000));
+        }
+        return { count, allowed: count <= MAX_REQUESTS_PER_WINDOW };
+      } catch (err: any) {
+        console.log("[Redis Fallback] Rate-limiting via local tracker.");
+      }
+    }
+    
+    // In-Memory Fallback rate limiter
+    const now = Date.now();
+    let tracker = rateLimitMap.get(clientIp);
+    if (!tracker || now > tracker.resetTime) {
+      tracker = { count: 0, resetTime: now + RATE_LIMIT_WINDOW_MS };
+    }
+    tracker.count++;
+    rateLimitMap.set(clientIp, tracker);
+    return { count: tracker.count, allowed: tracker.count <= MAX_REQUESTS_PER_WINDOW };
+  };
 
   // Endpoint to save procedurally generated launcher icon to .aistudio folder
   app.post("/api/save-icon", express.json({ limit: "15mb" }), async (req, res) => {
@@ -95,15 +209,10 @@ async function startServer() {
       const now = Date.now();
       const clientIp = (req.headers["x-forwarded-for"] as string || req.ip || "unknown-ip").split(",")[0].trim();
 
-      // 1. IP-Based Rate Limiter Check
-      let tracker = rateLimitMap.get(clientIp);
-      if (!tracker || now > tracker.resetTime) {
-        tracker = { count: 0, resetTime: now + RATE_LIMIT_WINDOW_MS };
-      }
-      tracker.count++;
-      rateLimitMap.set(clientIp, tracker);
+      // 1. IP-Based Rate Limiter Check (using shared multi-server or in-memory)
+      const rateLimitResult = await checkRateLimit(clientIp);
 
-      if (tracker.count > MAX_REQUESTS_PER_WINDOW) {
+      if (!rateLimitResult.allowed) {
         const localResponse = generateLocalResponse(message, studioMode, conservedLimit, currentKnodeId);
         return res.json({
           text: `[SYSTEM: IP limit of ${MAX_REQUESTS_PER_WINDOW} queries/min exceeded - local backup activated]\n\n${localResponse}`,
@@ -112,7 +221,7 @@ async function startServer() {
         });
       }
 
-      // 2. Cache Match Check
+      // 2. Cache Match Check (using shared multi-server or in-memory)
       const cacheKey = JSON.stringify({
         message,
         studioMode,
@@ -121,17 +230,13 @@ async function startServer() {
         historyLength: history?.length || 0
       });
 
-      if (apiCache.has(cacheKey)) {
-        const cached = apiCache.get(cacheKey)!;
-        if (now < cached.expiresAt) {
-          return res.json({
-            text: cached.text,
-            offline: cached.offline,
-            cached: true
-          });
-        } else {
-          apiCache.delete(cacheKey);
-        }
+      const cachedEntry = await getCacheValue(cacheKey);
+      if (cachedEntry) {
+        return res.json({
+          text: cachedEntry.text,
+          offline: cachedEntry.offline,
+          cached: true
+        });
       }
 
       const hasKey = !!apiKey;
@@ -140,11 +245,7 @@ async function startServer() {
         const responseText = `[SYSTEM: offline routing mode active]\n\n${localResponse}`;
         
         // Cache the offline response too
-        if (apiCache.size >= MAX_CACHE_SIZE) {
-          const oldestKey = apiCache.keys().next().value;
-          if (oldestKey !== undefined) apiCache.delete(oldestKey);
-        }
-        apiCache.set(cacheKey, {
+        await setCacheValue(cacheKey, {
           text: responseText,
           offline: true,
           expiresAt: now + CACHE_TTL_MS
@@ -236,37 +337,53 @@ CRITICAL FORMULA DIRECTIVE: Never output raw LaTeX mathematical formatting (e.g.
         return raw.replace(/[{}"[\]:]/g, "").slice(0, 100);
       };
 
-      for (const currentModel of modelsToTry) {
-        const maxRetries = 3;
-        for (let attempt = 1; attempt <= maxRetries; attempt++) {
-          try {
-            response = await ai.models.generateContent({
-              model: currentModel,
-              contents,
-              config: {
-                systemInstruction,
-                temperature: 0.7
+      const REQUEST_TIMEOUT_MS = 12000; // 12 seconds optimal threshold for snappy chat replies
+      let timeoutId: NodeJS.Timeout | undefined;
+
+      const generateResponseWithTimeout = async (): Promise<any> => {
+        for (const currentModel of modelsToTry) {
+          const maxRetries = 2; // Reduced to 2 retries under timeout pressure to fail-over faster
+          for (let attempt = 1; attempt <= maxRetries; attempt++) {
+            try {
+              const res = await ai.models.generateContent({
+                model: currentModel,
+                contents,
+                config: {
+                  systemInstruction,
+                  temperature: 0.7
+                }
+              });
+              if (res && res.text) {
+                lastError = null;
+                return res;
               }
-            });
-            if (response && response.text) {
-              lastError = null;
-              break;
-            }
-          } catch (err: any) {
-            lastError = err;
-            const briefErrMsg = sanitizeErrorMsg(err);
-            console.log(`[Gemini API Status] Attempt ${attempt}/${maxRetries} on ${currentModel}: ${briefErrMsg}`);
-            
-            if (attempt < maxRetries) {
-              // Exponential backoff: 500ms, 1000ms, etc.
-              const sleepMs = 500 * Math.pow(2, attempt - 1);
-              await delay(sleepMs);
+            } catch (err: any) {
+              lastError = err;
+              const briefErrMsg = sanitizeErrorMsg(err);
+              console.log(`[Gemini API Status] Attempt ${attempt}/${maxRetries} on ${currentModel}: ${briefErrMsg}`);
+              
+              if (attempt < maxRetries) {
+                const sleepMs = 400 * Math.pow(2, attempt - 1);
+                await delay(sleepMs);
+              }
             }
           }
         }
-        
-        if (response && response.text) {
-          break;
+        return null;
+      };
+
+      try {
+        const responsePromise = generateResponseWithTimeout();
+        const timeoutPromise = new Promise<never>((_, reject) => {
+          timeoutId = setTimeout(() => {
+            reject(new Error("Uplink response timeout. Transitioning to local deterministic core."));
+          }, REQUEST_TIMEOUT_MS);
+        });
+
+        response = await Promise.race([responsePromise, timeoutPromise]);
+      } finally {
+        if (timeoutId) {
+          clearTimeout(timeoutId);
         }
       }
 
@@ -276,11 +393,7 @@ CRITICAL FORMULA DIRECTIVE: Never output raw LaTeX mathematical formatting (e.g.
       }
 
       // Populate Cache for future duplicate requests
-      if (apiCache.size >= MAX_CACHE_SIZE) {
-        const oldestKey = apiCache.keys().next().value;
-        if (oldestKey !== undefined) apiCache.delete(oldestKey);
-      }
-      apiCache.set(cacheKey, {
+      await setCacheValue(cacheKey, {
         text: response.text,
         offline: false,
         expiresAt: Date.now() + CACHE_TTL_MS
@@ -301,11 +414,7 @@ CRITICAL FORMULA DIRECTIVE: Never output raw LaTeX mathematical formatting (e.g.
         currentKnodeId,
         historyLength: history?.length || 0
       });
-      if (apiCache.size >= MAX_CACHE_SIZE) {
-        const oldestKey = apiCache.keys().next().value;
-        if (oldestKey !== undefined) apiCache.delete(oldestKey);
-      }
-      apiCache.set(cacheKey, {
+      await setCacheValue(cacheKey, {
         text: offlineText,
         offline: true,
         expiresAt: Date.now() + CACHE_TTL_MS
