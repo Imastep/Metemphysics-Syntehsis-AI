@@ -21,6 +21,7 @@ import {
   FileText, 
   Send, 
   ChevronRight, 
+  ChevronDown,
   RefreshCw,
   Info,
   Database,
@@ -487,13 +488,28 @@ const REFERENCE_PAPERS: {
   }
 ];
 
-function getRelevantReferences(text: string): ReferenceItem[] {
+function getRelevantReferences(text: string, userQuestionText?: string): ReferenceItem[] {
   const textLower = text.toLowerCase();
+  const qLower = userQuestionText ? userQuestionText.toLowerCase() : "";
   
   // 1. Calculate static matched papers
   const matched = REFERENCE_PAPERS.map(paper => {
     let score = 0;
     
+    // Check keywords in the user's question first (higher score boost!)
+    if (qLower) {
+      paper.keywords.forEach(kw => {
+        const regex = new RegExp(kw.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&"), "g");
+        const occurrences = (qLower.match(regex) || []).length;
+        score += occurrences * 15;
+      });
+      const mainAuthor = paper.authors.toLowerCase().split(/[ ,&]/)[0];
+      if (mainAuthor && qLower.includes(mainAuthor)) {
+        score += 50;
+      }
+    }
+    
+    // Check keywords in the model's text (secondary relevance)
     paper.keywords.forEach(kw => {
       const regex = new RegExp(kw.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&"), "g");
       const occurrences = (textLower.match(regex) || []).length;
@@ -518,6 +534,9 @@ function getRelevantReferences(text: string): ReferenceItem[] {
 
   // Keep papers with explicit matches
   const filteredStatic = matched.filter(p => p.score > 0);
+  
+  // Sort static matches descending by their matching score!
+  filteredStatic.sort((a, b) => b.score - a.score);
 
   // 2. Extract dynamic concepts and phrases from THIS INDIVIDUAL response
   const EXCLUDE_WORDS = new Set([
@@ -584,15 +603,15 @@ function getRelevantReferences(text: string): ReferenceItem[] {
       year,
       link: searchUrl,
       description,
-      resonance: 85 + (concept.length % 15)
+      resonance: 80 + (concept.length % 12)
     });
   });
 
-  // Combine both: static matches get converted to ReferenceItem structures, sorted along with dynamic entries 
+  // Convert static matches to ReferenceItem structures.
   const staticItems: ReferenceItem[] = filteredStatic.map((r, i) => {
-    let resonance = 95 - i * 8 + Math.min(5, r.score);
+    let resonance = 95 - i * 5 + Math.min(4, Math.floor(r.score / 5));
     if (resonance > 99) resonance = 99;
-    if (resonance < 70) resonance = 70;
+    if (resonance < 72) resonance = 72;
     return {
       title: r.title,
       authors: r.authors,
@@ -1054,6 +1073,8 @@ export default function App() {
   
   // Real-time Sidebar and Formula states
   const [sidebarTab, setSidebarTab] = useState<"ontology" | "states" | "formulas" | "harmonics">("ontology");
+  const [isMobileSynthesisExpanded, setIsMobileSynthesisExpanded] = useState(false);
+  const [isMobileSystemsExpanded, setIsMobileSystemsExpanded] = useState(false);
   const [calcT, setCalcT] = useState<string>("1.0");
   const [calcS, setCalcS] = useState<string>("1.0");
 
@@ -1075,8 +1096,8 @@ export default function App() {
 
   const downloadChatAsPDF = () => {
     try {
-      const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "letter" });
-      const PW = 215.9, PH = 279.4, ML = 18, MR = 18, MT = 20, MB = 20, CW = PW - ML - MR;
+      const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+      const PW = 210, PH = 297, ML = 15, MR = 15, MT = 20, MB = 20, CW = PW - ML - MR;
       let y = MT;
       let pageNum = 1;
 
@@ -1205,7 +1226,7 @@ export default function App() {
         doc.rect(ML, sY, 1.8, h, "F");
       };
 
-      messages.forEach((msg) => {
+      messages.forEach((msg, idx) => {
         const isUser = msg.role === "user";
         const cleanText = sanitizeForPdf(
           msg.text
@@ -1218,8 +1239,8 @@ export default function App() {
             .replace(/#/g, "")
         );
 
-        // Determine references inside AI response
-        const refs = isUser ? [] : getRelevantReferences(msg.text);
+        // Determine references inside AI response relative to the actual questions asked
+        const refs = isUser ? [] : getRelevantReferences(msg.text, idx > 0 ? messages[idx - 1].text : undefined);
         const hasRefs = refs.length > 0;
         
         // Inner text splitting with precise style setups
@@ -1664,10 +1685,33 @@ export default function App() {
       <main className="flex-1 w-full max-w-full overflow-x-hidden p-4 lg:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 min-h-0">
         
         {/* LEFT COLUMN: PRIMARY DYNAMIC DIRECTORY (GRID 3) */}
-        <div className="lg:col-span-3 flex flex-col lg:h-[calc(100vh-195px)] lg:min-h-[750px] h-auto bg-black border border-orange-500/25 rounded-xl shadow-[0_0_20px_rgba(212,175,55,0.06)] relative">
+        <div 
+          className={`lg:col-span-3 flex flex-col bg-black border lg:h-[calc(100vh-195px)] lg:min-h-[750px] lg:overflow-visible rounded-xl transition-all duration-300 relative ${
+            isMobileSynthesisExpanded 
+              ? "h-auto shadow-[0_0_25px_rgba(255,95,0,0.12)] border-orange-500/50" 
+              : "h-[54px] overflow-hidden border-orange-500/25 shadow-[0_0_20px_rgba(212,175,55,0.06)]"
+          }`}
+        >
           
+          {/* ALWAYS VISIBLE MOBILE/TABLET HEADER BAR (TOC STYLE) */}
+          <div 
+            onClick={() => setIsMobileSynthesisExpanded(!isMobileSynthesisExpanded)}
+            className="lg:hidden flex items-center justify-between p-4 bg-[#080808] border-b border-orange-500/20 cursor-pointer hover:bg-orange-950/15 active:bg-orange-950/25 transition-all rounded-t-xl select-none"
+          >
+            <div className="flex items-center gap-2">
+              <BookOpen className="w-4 h-4 text-orange-500 drop-shadow-[0_0_4px_rgba(255,95,0,0.5)]" />
+              <span className="font-serif font-bold text-white text-xs tracking-widest uppercase">SYNTHESIS</span>
+            </div>
+            <div className="flex items-center gap-1.5 font-mono text-[9px] text-orange-400 font-bold uppercase tracking-wider">
+              <span>{isMobileSynthesisExpanded ? "Collapse Directory" : "Expand Directory Menu"}</span>
+              <ChevronDown className={`w-3.5 h-3.5 text-orange-500 transition-transform duration-300 ${
+                isMobileSynthesisExpanded ? "rotate-180" : ""
+              }`} />
+            </div>
+          </div>
+
           {/* Tab Selection Row */}
-          <div className="flex border-b border-orange-500/25 bg-[#080808] rounded-t-xl overflow-hidden">
+          <div className="flex border-b border-orange-500/25 bg-[#080808] rounded-t-xl lg:rounded-t-xl overflow-hidden">
             {[
               { id: "ontology", label: "Ontology", icon: BookOpen },
               { id: "states", label: "J/S Matrix", icon: Layers },
@@ -2234,7 +2278,7 @@ export default function App() {
                             <BookOpen className="w-3 h-3 text-orange-500" /> REFERENCES
                           </p>
                           <div className="space-y-1.5">
-                            {getRelevantReferences(m.text).map((ref, refIdx) => {
+                            {getRelevantReferences(m.text, idx > 0 ? messages[idx - 1].text : undefined).map((ref, refIdx) => {
                               const isPeak = refIdx === 0;
                               return (
                                 <div 
@@ -2381,9 +2425,32 @@ export default function App() {
         </div>
 
         {/* RIGHT COLUMN: SYSTEMS LAB MENU SLIDER (GRID 3) */}
-        <div className="lg:col-span-3 flex flex-col lg:h-[calc(100vh-195px)] lg:min-h-[750px] h-auto bg-black border border-orange-500/25 rounded-xl p-4 shadow-[0_0_20px_rgba(212,175,55,0.06)] relative select-none">
+        <div 
+          className={`lg:col-span-3 flex flex-col bg-black border lg:h-[calc(100vh-195px)] lg:min-h-[750px] lg:overflow-visible lg:p-4 rounded-xl transition-all duration-300 relative select-none ${
+            isMobileSystemsExpanded 
+              ? "h-auto p-4 shadow-[0_0_25px_rgba(255,95,0,0.12)] border-orange-500/50" 
+              : "h-[54px] p-0 overflow-hidden border-orange-500/25 shadow-[0_0_20px_rgba(212,175,55,0.06)]"
+          }`}
+        >
           
-          <div className="pb-3 border-b border-orange-500/20 mb-3 flex items-center justify-between flex-shrink-0">
+          {/* ALWAYS VISIBLE MOBILE/TABLET HEADER BAR (TOC STYLE) FOR SYSTEMS LAB */}
+          <div 
+            onClick={() => setIsMobileSystemsExpanded(!isMobileSystemsExpanded)}
+            className="lg:hidden flex items-center justify-between p-4 bg-[#080808] border-b border-orange-500/20 cursor-pointer hover:bg-orange-950/15 active:bg-orange-950/25 transition-all rounded-t-xl select-none"
+          >
+            <div className="flex items-center gap-2">
+              <Cpu className="w-4 h-4 text-orange-500 drop-shadow-[0_0_4px_rgba(255,95,0,0.5)] animate-pulse" />
+              <span className="font-serif font-bold text-white text-xs tracking-widest uppercase">SYSTEMS LAB</span>
+            </div>
+            <div className="flex items-center gap-1.5 font-mono text-[9px] text-orange-400 font-bold uppercase tracking-wider">
+              <span>{isMobileSystemsExpanded ? "Collapse Lab" : "Expand Systems Lab"}</span>
+              <ChevronDown className={`w-3.5 h-3.5 text-orange-500 transition-transform duration-300 ${
+                isMobileSystemsExpanded ? "rotate-180" : ""
+              }`} />
+            </div>
+          </div>
+          
+          <div className="hidden lg:flex pb-3 border-b border-orange-500/20 mb-3 items-center justify-between flex-shrink-0">
             <div className="flex flex-col">
               <h3 className="font-serif font-bold text-white text-[11px] tracking-wider flex items-center gap-1.5">
                 <Cpu className="w-3.5 h-3.5 text-orange-500 animate-pulse" /> SYSTEMS LAB
@@ -2394,7 +2461,9 @@ export default function App() {
           </div>
 
           {/* Scrolling launcher list with slightly smaller buttons */}
-          <div className="flex-1 overflow-y-auto space-y-2.5 lg:space-y-0 lg:flex lg:flex-col lg:justify-between lg:h-full pr-1 custom-scroll">
+          <div className={`flex-1 overflow-y-auto space-y-2.5 lg:space-y-0 lg:flex lg:flex-col lg:justify-between lg:h-full pr-1 custom-scroll ${
+            isMobileSystemsExpanded ? "block pt-4 lg:pt-0" : "hidden lg:flex"
+          }`}>
             {[
               { id: "chakra", name: "Music & Chakra Atlas", desc: "Solfeggio and H calibrations", icon: Flame, color: "hover:border-orange-500/60 hover:bg-orange-500/5 hover:shadow-[0_0_12px_rgba(255,95,0,0.1)]", tip: "Acoustic calibration grid coupling natural vibration intervals (Hz), human chakra energy levels, or cognitive EEG brainwave ranges." },
               { id: "entropy", name: "Entropy Periodic Table", desc: "Molar & thermodynamic values", icon: BarChart, color: "hover:border-orange-500/60 hover:bg-orange-500/5 hover:shadow-[0_0_12px_rgba(255,95,0,0.1)]", tip: "Thermodynamic reference database listing accurate molar weights, phase states, and entropy indexes (S°) across elements." },
