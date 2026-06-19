@@ -12,7 +12,7 @@ interface SoulLife {
 }
 
 export default function CalcPanel({ onClose, onSendPrompt }: { onClose: () => void; onSendPrompt: (p: string) => void }) {
-  const [activeTab, setActiveTab] = useState<"god" | "omega" | "vector" | "js" | "soul" | "award">("god");
+  const [activeTab, setActiveTab] = useState<"god" | "omega" | "vector" | "js" | "soul">("god");
 
   // Solver: God Equation
   const [godT, setGodT] = useState("");
@@ -445,20 +445,20 @@ export default function CalcPanel({ onClose, onSendPrompt }: { onClose: () => vo
   };
 
   return (
-    <div className="fixed lg:absolute inset-0 bg-[#050505] text-[#eeeae4] overflow-y-auto z-[200] p-6 flex flex-col font-serif border-2 border-orange-500/20 rounded-2xl">
+    <div className="fixed lg:absolute inset-0 bg-[#050505] text-[#eeeae4] overflow-y-auto z-[200] p-6 flex flex-col border-2 border-orange-500/20 rounded-2xl">
       <div className="max-w-4xl mx-auto w-full">
         {/* Header bar */}
         <div className="flex items-center justify-between pb-6 border-b border-orange-500/20 mb-6">
           <div className="flex items-center gap-3">
-            <Calculator className="w-8 h-8 text-[#c9a84c] animate-pulse" />
+            <Calculator className="w-8 h-8 text-orange-500 animate-pulse" />
             <div>
-              <h2 className="font-serif text-2xl font-bold text-[#c9a84c] tracking-wider">∫ — METEMPHYSICS CALCULATOR</h2>
+              <h2 className="font-sans text-xl font-bold text-orange-400 tracking-wider">∫ — METEMPHYSICS CALCULATOR</h2>
               <p className="text-xs text-[#8898aa] font-mono mt-1">Multi-Field Solvers · Live Waveform Models · T × S = C Constraints</p>
             </div>
           </div>
           <button 
             onClick={onClose}
-            className="flex items-center gap-1 bg-[#c9a84c]/10 border border-[#c9a84c]/30 rounded px-4 py-2 text-xs font-mono text-[#c9a84c] hover:bg-[#c9a84c]/20 transition-all cursor-pointer"
+            className="flex items-center gap-1 bg-orange-500/10 border border-orange-500/30 rounded px-4 py-2 text-xs font-mono text-orange-400 hover:bg-orange-500/20 transition-all cursor-pointer"
           >
             <X className="w-4 h-4" /> CLOSE
           </button>
@@ -471,16 +471,15 @@ export default function CalcPanel({ onClose, onSendPrompt }: { onClose: () => vo
             { id: "omega", label: "II. Ω Variable" },
             { id: "vector", label: "III. 5D ΩVector" },
             { id: "js", label: "IV. J/S Index" },
-            { id: "soul", label: "V. Metempsychosis" },
-            { id: "award", label: "VI. Award Analysis" }
+            { id: "soul", label: "V. Metempsychosis" }
           ].map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id as any)}
               className={`font-mono text-[10px] tracking-wider uppercase px-4 py-2 border rounded transition-all cursor-pointer ${
                 activeTab === tab.id
-                  ? "bg-[#c9a84c]/10 border-[#c9a84c] text-[#c9a84c]"
-                  : "bg-transparent border-[#c9a84c]/15 text-[#8898aa] hover:border-[#c9a84c]/40 hover:text-[#e8d5a3]"
+                  ? "bg-orange-500/10 border-orange-500 text-orange-400"
+                  : "bg-transparent border-orange-500/20 text-[#8898aa] hover:border-orange-500/40 hover:text-orange-300"
               }`}
             >
               {tab.label}
@@ -492,9 +491,12 @@ export default function CalcPanel({ onClose, onSendPrompt }: { onClose: () => vo
         {activeTab === "god" && (
           <div className="space-y-6">
             <div className="bg-[#0c0c0c]/90 border border-orange-500/15 rounded-lg p-5">
-              <h3 className="text-lg text-[#e8d5a3] font-serif mb-2">I. Foundational Equation Solver</h3>
-              <div className="bg-orange-500/5 border border-orange-500/20 rounded p-3 text-center font-mono text-sm text-amber-500 tracking-widest my-3">
-                $T \times S = C$ (Constant is 299,792,458)
+              <h3 className="text-lg text-orange-400 font-serif mb-2">I. Foundational Equation Solver</h3>
+              <div className="bg-orange-500/5 border border-orange-500/20 rounded px-4 py-3.5 text-center font-serif text-base text-amber-500 tracking-wide my-3 flex items-center justify-center gap-2">
+                <span className="font-bold font-serif italic text-lg">T × S = C</span>
+                <span className="text-xs text-amber-500/60 font-mono tracking-normal leading-none border-l border-amber-500/20 pl-2">
+                  (Constant C = 299,792,458 m/s)
+                </span>
               </div>
               <p className="text-xs text-[#8898aa] italic mb-4">Input any two fields. Leave the remaining field blank to compute its exact value.</p>
 
@@ -506,7 +508,7 @@ export default function CalcPanel({ onClose, onSendPrompt }: { onClose: () => vo
                     value={godT} 
                     onChange={(e) => setGodT(e.target.value)} 
                     placeholder="Compute value" 
-                    className="bg-black/40 border border-[#c9a84c]/20 p-2 text-xs font-mono text-white rounded outline-none" 
+                    className="bg-black/40 border border-orange-500/25 p-2 text-xs font-mono text-white rounded outline-none" 
                   />
                 </div>
                 <div className="flex flex-col gap-1.5">
@@ -516,7 +518,7 @@ export default function CalcPanel({ onClose, onSendPrompt }: { onClose: () => vo
                     value={godS} 
                     onChange={(e) => setGodS(e.target.value)} 
                     placeholder="Compute value" 
-                    className="bg-black/40 border border-[#c9a84c]/20 p-2 text-xs font-mono text-white rounded outline-none" 
+                    className="bg-black/40 border border-orange-500/25 p-2 text-xs font-mono text-white rounded outline-none" 
                   />
                 </div>
                 <div className="flex flex-col gap-1.5">
@@ -525,7 +527,7 @@ export default function CalcPanel({ onClose, onSendPrompt }: { onClose: () => vo
                     type="number" 
                     value={godC} 
                     onChange={(e) => setGodC(e.target.value)} 
-                    className="bg-black/40 border border-[#c9a84c]/20 p-2 text-xs font-mono text-white rounded outline-none" 
+                    className="bg-black/40 border border-orange-500/25 p-2 text-xs font-mono text-white rounded outline-none" 
                   />
                 </div>
               </div>
@@ -536,7 +538,7 @@ export default function CalcPanel({ onClose, onSendPrompt }: { onClose: () => vo
                 </button>
                 <button 
                   onClick={() => { setGodT(""); setGodS(""); setGodC("299792458"); setGodResult(null); }}
-                  className="border border-[#c9a84c]/20 text-[#8898aa] font-mono text-[10px] py-2 px-4 rounded hover:bg-white/5 cursor-pointer"
+                  className="border border-orange-500/25 text-[#8898aa] hover:text-orange-300 font-mono text-[10px] py-2 px-4 rounded hover:bg-white/5 cursor-pointer"
                 >
                   Reset
                 </button>
@@ -546,15 +548,15 @@ export default function CalcPanel({ onClose, onSendPrompt }: { onClose: () => vo
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-4 pt-4 border-t border-white/5">
                   <div className="bg-[#050810] border border-white/5 p-3 rounded">
                     <span className="text-[9px] text-gray-500 font-mono uppercase tracking-wider block">Computed Time T</span>
-                    <span className="text-sm font-bold text-[#c9a84c] font-mono">{godResult.T}</span>
+                    <span className="text-sm font-bold text-orange-400 font-mono">{godResult.T}</span>
                   </div>
                   <div className="bg-[#050810] border border-white/5 p-3 rounded">
                     <span className="text-[9px] text-gray-500 font-mono uppercase tracking-wider block">Computed Entropy S</span>
-                    <span className="text-sm font-bold text-[#c9a84c] font-mono">{godResult.S}</span>
+                    <span className="text-sm font-bold text-orange-400 font-mono">{godResult.S}</span>
                   </div>
                   <div className="bg-[#050810] border border-white/5 p-3 rounded">
                     <span className="text-[9px] text-gray-500 font-mono uppercase tracking-wider block">Constant C</span>
-                    <span className="text-sm font-bold text-[#c9a84c] font-mono">{godResult.C}</span>
+                    <span className="text-sm font-bold text-orange-400 font-mono">{godResult.C}</span>
                   </div>
                   <div className="col-span-full bg-amber-500/5 p-3 border border-amber-400/20 rounded font-serif italic text-xs leading-relaxed">
                     {godResult.interp}
@@ -565,19 +567,19 @@ export default function CalcPanel({ onClose, onSendPrompt }: { onClose: () => vo
 
             {/* Negentropy Solver */}
             <div className="bg-[#0c0c0c]/90 border border-orange-500/15 rounded-lg p-5">
-              <h3 className="text-sm font-bold font-mono tracking-widest text-[#c9a84c] uppercase mb-3">J = −S Negentropy Inversion</h3>
+              <h3 className="text-sm font-bold font-mono tracking-widest text-orange-400 uppercase mb-3">J = −S Negentropy Inversion</h3>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
                 <div className="flex flex-col gap-1.5">
                   <label className="text-[10px] font-mono text-gray-500 uppercase">S — Entropy</label>
-                  <input type="number" value={negS} onChange={(e) => setNegS(e.target.value)} placeholder="e.g. 5.6" className="bg-black/40 border border-[#c9a84c]/20 p-2 text-xs font-mono text-[#eeeae4] rounded outline-none" />
+                  <input type="number" value={negS} onChange={(e) => setNegS(e.target.value)} placeholder="e.g. 5.6" className="bg-black/40 border border-orange-500/25 p-2 text-xs font-mono text-[#eeeae4] rounded outline-none" />
                 </div>
                 <div className="flex flex-col gap-1.5">
                   <label className="text-[10px] font-mono text-gray-500 uppercase">T — Time position</label>
-                  <input type="number" value={negT} onChange={(e) => setNegT(e.target.value)} placeholder="e.g. 100" className="bg-black/40 border border-[#c9a84c]/20 p-2 text-xs font-mono text-[#eeeae4] rounded outline-none" />
+                  <input type="number" value={negT} onChange={(e) => setNegT(e.target.value)} placeholder="e.g. 100" className="bg-black/40 border border-orange-500/25 p-2 text-xs font-mono text-[#eeeae4] rounded outline-none" />
                 </div>
                 <div className="flex flex-col gap-1.5">
                   <label className="text-[10px] font-mono text-gray-500 uppercase">k — Boltzmann constant</label>
-                  <input type="number" value={negK} onChange={(e) => setNegk(e.target.value)} className="bg-black/40 border border-[#c9a84c]/20 p-2 text-xs font-mono text-[#eeeae4] rounded outline-none" />
+                  <input type="number" value={negK} onChange={(e) => setNegk(e.target.value)} className="bg-black/40 border border-orange-500/25 p-2 text-xs font-mono text-[#eeeae4] rounded outline-none" />
                 </div>
               </div>
               <button onClick={solveNegentropy} className="bg-gradient-to-r from-orange-600 to-amber-700 border border-orange-400/30 text-white font-mono text-[10px] py-2 px-4 rounded hover:from-orange-500 hover:to-amber-600 cursor-pointer">
@@ -587,15 +589,15 @@ export default function CalcPanel({ onClose, onSendPrompt }: { onClose: () => vo
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-4 pt-4 border-t border-white/5">
                   <div className="bg-[#050810] border border-white/5 p-3 rounded">
                     <span className="text-[9px] text-gray-500 font-mono block">J — Negentropy</span>
-                    <span className="text-sm font-bold text-[#c9a84c] font-mono">{negResult.J}</span>
+                    <span className="text-sm font-bold text-orange-400 font-mono">{negResult.J}</span>
                   </div>
                   <div className="bg-[#050810] border border-white/5 p-3 rounded">
                     <span className="text-[9px] text-gray-500 font-mono block">W — Microstates</span>
-                    <span className="text-sm font-bold text-[#c9a84c] font-mono">{negResult.W}</span>
+                    <span className="text-sm font-bold text-orange-400 font-mono">{negResult.W}</span>
                   </div>
                   <div className="bg-[#050810] border border-white/5 p-3 rounded">
                     <span className="text-[9px] text-gray-500 font-mono block">ln(1/W)</span>
-                    <span className="text-sm font-bold text-[#c9a84c] font-mono">{negResult.lnW}</span>
+                    <span className="text-sm font-bold text-orange-400 font-mono">{negResult.lnW}</span>
                   </div>
                 </div>
               )}
@@ -607,22 +609,22 @@ export default function CalcPanel({ onClose, onSendPrompt }: { onClose: () => vo
         {activeTab === "omega" && (
           <div className="space-y-6">
             <div className="bg-[#0c0c0c]/90 border border-orange-500/15 rounded-lg p-5">
-              <h3 className="text-lg text-[#e8d5a3] font-serif mb-2">II. Universal Order Quantity (Ω)</h3>
-              <div className="bg-orange-500/5 border border-orange-500/20 rounded p-3 text-center font-mono text-sm text-amber-500 tracking-widest my-3">
-                {"$\\Omega = 1 - e^{-C / (T \\cdot k)}$"}
+              <h3 className="text-lg text-orange-400 font-serif mb-2">II. Universal Order Quantity (Ω)</h3>
+              <div className="bg-orange-500/5 border border-orange-500/20 rounded px-4 py-3.5 text-center font-serif text-base text-amber-500 tracking-wide my-3 flex items-center justify-center gap-2">
+                <span className="font-bold font-serif italic text-lg">Ω = 1 − e<sup>−C / (T · k)</sup></span>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
                 <div className="flex flex-col gap-1.5">
                   <label className="text-[10px] font-mono text-gray-500 uppercase">T — System Time (s)</label>
-                  <input type="number" value={omT} onChange={(e) => setOmT(e.target.value)} placeholder="e.g. 2.5e9" className="bg-black/40 border border-[#c9a84c]/20 p-2 text-xs font-mono text-white rounded outline-none" />
+                  <input type="number" value={omT} onChange={(e) => setOmT(e.target.value)} placeholder="e.g. 2.5e9" className="bg-black/40 border border-orange-500/25 p-2 text-xs font-mono text-white rounded outline-none" />
                 </div>
                 <div className="flex flex-col gap-1.5">
                   <label className="text-[10px] font-mono text-gray-500 uppercase">C — Constant</label>
-                  <input type="number" value={omC} onChange={(e) => setOmC(e.target.value)} className="bg-black/40 border border-[#c9a84c]/20 p-2 text-xs font-mono text-white rounded outline-none" />
+                  <input type="number" value={omC} onChange={(e) => setOmC(e.target.value)} className="bg-black/40 border border-orange-500/25 p-2 text-xs font-mono text-white rounded outline-none" />
                 </div>
                 <div className="flex flex-col gap-1.5">
                   <label className="text-[10px] font-mono text-gray-500 uppercase">k — Noise Coefficient</label>
-                  <input type="number" value={omK} onChange={(e) => setOmK(e.target.value)} className="bg-black/40 border border-[#c9a84c]/20 p-2 text-xs font-mono text-white rounded outline-none" />
+                  <input type="number" value={omK} onChange={(e) => setOmK(e.target.value)} className="bg-black/40 border border-orange-500/25 p-2 text-xs font-mono text-white rounded outline-none" />
                 </div>
               </div>
 
@@ -630,7 +632,7 @@ export default function CalcPanel({ onClose, onSendPrompt }: { onClose: () => vo
                 <button onClick={solveOmega} className="bg-gradient-to-r from-orange-600 to-amber-700 border border-orange-400/30 text-white font-mono text-[10px] py-2 px-4 rounded hover:from-orange-500 hover:to-amber-600 cursor-pointer">
                   Compute Ω
                 </button>
-                <button onClick={() => { setOmT(""); setOmResult(null); }} className="border border-[#c9a84c]/20 text-[#8898aa] font-mono text-[10px] py-2 px-4 rounded hover:bg-white/5 cursor-pointer">
+                <button onClick={() => { setOmT(""); setOmResult(null); }} className="border border-orange-500/25 text-[#8898aa] hover:text-orange-300 font-mono text-[10px] py-2 px-4 rounded hover:bg-white/5 cursor-pointer">
                   Reset
                 </button>
               </div>
@@ -639,8 +641,8 @@ export default function CalcPanel({ onClose, onSendPrompt }: { onClose: () => vo
                 <div className="mt-4 pt-4 border-t border-white/5 space-y-4">
                   <div className="text-center">
                     <span className="text-xs text-gray-500 font-mono uppercase tracking-widest block">Core Order Quantity (Ω)</span>
-                    <div className="text-4xl font-serif font-black text-[#c9a84c] my-1">{omResult.val}</div>
-                    <span className="text-xs font-mono text-[#e8d5a3]">{omResult.phase}</span>
+                    <div className="text-4xl font-serif font-black text-orange-400 my-1">{omResult.val}</div>
+                    <span className="text-xs font-mono text-orange-300">{omResult.phase}</span>
                   </div>
 
                   <div className="h-2 bg-white/5 rounded-full overflow-hidden w-full">
@@ -650,19 +652,19 @@ export default function CalcPanel({ onClose, onSendPrompt }: { onClose: () => vo
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                     <div className="bg-[#050810] border border-white/5 p-3 rounded">
                       <span className="text-[9px] text-[#8898aa] font-mono block">dΩ/dt</span>
-                      <span className="text-xs font-mono text-[#c9a84c]">{omResult.dO}</span>
+                      <span className="text-xs font-mono text-orange-400">{omResult.dO}</span>
                     </div>
                     <div className="bg-[#050810] border border-white/5 p-3 rounded">
                       <span className="text-[9px] text-[#8898aa] font-mono block">d²Ω/dt²</span>
-                      <span className="text-xs font-mono text-[#c9a84c]">{omResult.d2O}</span>
+                      <span className="text-xs font-mono text-orange-400">{omResult.d2O}</span>
                     </div>
                     <div className="bg-[#050810] border border-white/5 p-3 rounded">
                       <span className="text-[9px] text-[#8898aa] font-mono block">∫Ω dt</span>
-                      <span className="text-xs font-mono text-[#c9a84c]">{omResult.intO}</span>
+                      <span className="text-xs font-mono text-orange-400">{omResult.intO}</span>
                     </div>
                     <div className="bg-[#050810] border border-white/5 p-3 rounded">
                       <span className="text-[9px] text-[#8898aa] font-mono block">W configuration</span>
-                      <span className="text-xs font-mono text-[#c9a84c]">{omResult.W}</span>
+                      <span className="text-xs font-mono text-orange-400">{omResult.W}</span>
                     </div>
                   </div>
 
@@ -672,20 +674,20 @@ export default function CalcPanel({ onClose, onSendPrompt }: { onClose: () => vo
             </div>
 
             {/* C Budget Tracker */}
-            <div className="bg-[#0c1220]/80 border border-[#c9a84c]/12 rounded-lg p-5">
-              <h3 className="text-sm font-bold font-mono tracking-widest text-[#c9a84c] uppercase mb-3">C Budget Remaining</h3>
+            <div className="bg-[#0c0c0c]/95 border border-orange-500/15 rounded-lg p-5">
+              <h3 className="text-sm font-bold font-mono tracking-widest text-orange-400 uppercase mb-3">C Budget Remaining</h3>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
                 <div className="flex flex-col gap-1.5">
                   <label className="text-[10px] font-mono text-gray-500 uppercase">C Total Potential</label>
-                  <input type="number" value={budC} onChange={(e) => setBudC(e.target.value)} placeholder="e.g. 10" className="bg-black/40 border border-[#c9a84c]/20 p-2 text-xs font-mono text-white rounded outline-none" />
+                  <input type="number" value={budC} onChange={(e) => setBudC(e.target.value)} placeholder="e.g. 10" className="bg-black/40 border border-orange-500/25 p-2 text-xs font-mono text-white rounded outline-none" />
                 </div>
                 <div className="flex flex-col gap-1.5">
                   <label className="text-[10px] font-mono text-gray-500 uppercase">S × T spent so far</label>
-                  <input type="number" value={budST} onChange={(e) => setBudST(e.target.value)} placeholder="e.g. 4.5" className="bg-black/40 border border-[#c9a84c]/20 p-2 text-xs font-mono text-white rounded outline-none" />
+                  <input type="number" value={budST} onChange={(e) => setBudST(e.target.value)} placeholder="e.g. 4.5" className="bg-black/40 border border-orange-500/25 p-2 text-xs font-mono text-white rounded outline-none" />
                 </div>
                 <div className="flex flex-col gap-1.5">
                   <label className="text-[10px] font-mono text-gray-500 uppercase">Mean Ω achieved (0–1)</label>
-                  <input type="number" value={budOm} onChange={(e) => setBudOm(e.target.value)} placeholder="e.g. 0.8" className="bg-black/40 border border-[#c9a84c]/20 p-2 text-xs font-mono text-white rounded outline-none" />
+                  <input type="number" value={budOm} onChange={(e) => setBudOm(e.target.value)} placeholder="e.g. 0.8" className="bg-black/40 border border-orange-500/25 p-2 text-xs font-mono text-white rounded outline-none" />
                 </div>
               </div>
               <button onClick={solveBudget} className="bg-gradient-to-r from-blue-900 to-indigo-800 border border-blue-400/30 text-white font-mono text-[10px] py-2 px-4 rounded hover:from-blue-800 hover:to-indigo-700 cursor-pointer">
@@ -694,20 +696,20 @@ export default function CalcPanel({ onClose, onSendPrompt }: { onClose: () => vo
               {budResult && (
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-4 pt-4 border-t border-white/5">
                   <div className="bg-[#050810] border border-white/5 p-3 rounded">
-                    <span className="text-[9px] text-[#8898aa] block font-mono">C Remaining</span>
-                    <span className="text-sm font-bold text-[#c9a84c] font-mono">{budResult.rem}</span>
+                    <span className="text-[9px] text-[#8898aa] block font-mono font-medium">C Remaining</span>
+                    <span className="text-sm font-bold text-orange-400 font-mono">{budResult.rem}</span>
                   </div>
                   <div className="bg-[#050810] border border-white/5 p-3 rounded">
-                    <span className="text-[9px] text-[#8898aa] block font-mono">% Remaining</span>
-                    <span className="text-sm font-bold text-[#c9a84c] font-mono">{budResult.pct}</span>
+                    <span className="text-[9px] text-[#8898aa] block font-mono font-medium">% Remaining</span>
+                    <span className="text-sm font-bold text-orange-400 font-mono">{budResult.pct}</span>
                   </div>
                   <div className="bg-[#050810] border border-white/5 p-3 rounded">
-                    <span className="text-[9px] text-[#8898aa] block font-mono">η Efficiency</span>
-                    <span className="text-sm font-bold text-[#c9a84c] font-mono">{budResult.eta}</span>
+                    <span className="text-[9px] text-[#8898aa] block font-mono font-medium">η Efficiency</span>
+                    <span className="text-sm font-bold text-orange-400 font-mono">{budResult.eta}</span>
                   </div>
                   <div className="bg-[#050810] border border-white/5 p-3 rounded">
-                    <span className="text-[9px] text-[#8898aa] block font-mono">Temporal lifespan</span>
-                    <span className="text-sm font-bold text-[#c9a84c] font-mono">{budResult.life}</span>
+                    <span className="text-[9px] text-[#8898aa] block font-mono font-medium">Temporal lifespan</span>
+                    <span className="text-sm font-bold text-orange-400 font-mono">{budResult.life}</span>
                   </div>
                 </div>
               )}
@@ -718,8 +720,8 @@ export default function CalcPanel({ onClose, onSendPrompt }: { onClose: () => vo
         {/* SOLVER PANEL: OMEGA VECTOR */}
         {activeTab === "vector" && (
           <div className="space-y-6">
-            <div className="bg-[#0c1220]/80 border border-[#c9a84c]/12 rounded-lg p-5">
-              <h3 className="text-lg text-[#e8d5a3] font-serif mb-2">III. 5D Omega Vector Model</h3>
+            <div className="bg-[#0c0c0c]/90 border border-orange-500/15 rounded-lg p-5">
+              <h3 className="text-lg text-orange-400 font-serif mb-2">III. 5D Omega Vector Model</h3>
               <p className="text-xs text-[#8898aa] font-mono mb-4">Input dimensional order scores to see the integrated signature. Or select a model preset.</p>
 
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 mb-4">
@@ -727,7 +729,7 @@ export default function CalcPanel({ onClose, onSendPrompt }: { onClose: () => vo
                   <button 
                     key={preset}
                     onClick={() => handleVecPreset(preset as any)}
-                    className="px-2 py-1 px-3 border border-[#c9a84c]/20 hover:border-amber-400 hover:text-amber-400 rounded text-[10px] font-mono uppercase bg-transparent text-[#8898aa] transition-all cursor-pointer"
+                    className="px-2 py-1 px-3 border border-orange-500/25 hover:border-orange-500 hover:text-orange-400 rounded text-[10px] font-mono uppercase bg-transparent text-[#8898aa] transition-all cursor-pointer"
                   >
                     {preset}
                   </button>
@@ -737,27 +739,27 @@ export default function CalcPanel({ onClose, onSendPrompt }: { onClose: () => vo
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
                 <div className="flex flex-col gap-1.5">
                   <label className="text-[10px] font-mono text-gray-500 uppercase">Ω_s — Structural</label>
-                  <input type="number" value={vS} onChange={(e) => setVs(e.target.value)} placeholder="0.0 - 1.0" min="0" max="1" step="0.01" className="bg-black/40 border border-[#c9a84c]/20 p-2 text-xs font-mono text-white rounded outline-none" />
+                  <input type="number" value={vS} onChange={(e) => setVs(e.target.value)} placeholder="0.0 - 1.0" min="0" max="1" step="0.01" className="bg-black/40 border border-orange-500/25 p-2 text-xs font-mono text-white rounded outline-none" />
                 </div>
                 <div className="flex flex-col gap-1.5">
                   <label className="text-[10px] font-mono text-gray-500 uppercase">Ω_i — Informational</label>
-                  <input type="number" value={vI} onChange={(e) => setVi(e.target.value)} placeholder="0.0 - 1.0" min="0" max="1" step="0.01" className="bg-black/40 border border-[#c9a84c]/20 p-2 text-xs font-mono text-white rounded outline-none" />
+                  <input type="number" value={vI} onChange={(e) => setVi(e.target.value)} placeholder="0.0 - 1.0" min="0" max="1" step="0.01" className="bg-black/40 border border-orange-500/25 p-2 text-xs font-mono text-white rounded outline-none" />
                 </div>
                 <div className="flex flex-col gap-1.5">
                   <label className="text-[10px] font-mono text-gray-500 uppercase">Ω_t — Temporal</label>
-                  <input type="number" value={vT} onChange={(e) => setVt(e.target.value)} placeholder="0.0 - 1.0" min="0" max="1" step="0.01" className="bg-black/40 border border-[#c9a84c]/20 p-2 text-xs font-mono text-white rounded outline-none" />
+                  <input type="number" value={vT} onChange={(e) => setVt(e.target.value)} placeholder="0.0 - 1.0" min="0" max="1" step="0.01" className="bg-black/40 border border-orange-500/25 p-2 text-xs font-mono text-white rounded outline-none" />
                 </div>
                 <div className="flex flex-col gap-1.5">
                   <label className="text-[10px] font-mono text-gray-500 uppercase">Ω_r — Relational</label>
-                  <input type="number" value={vR_col} onChange={(e) => setVr_col(e.target.value)} placeholder="0.0 - 1.0" min="0" max="1" step="0.01" className="bg-black/40 border border-[#c9a84c]/20 p-2 text-xs font-mono text-white rounded outline-none" />
+                  <input type="number" value={vR_col} onChange={(e) => setVr_col(e.target.value)} placeholder="0.0 - 1.0" min="0" max="1" step="0.01" className="bg-black/40 border border-orange-500/25 p-2 text-xs font-mono text-white rounded outline-none" />
                 </div>
                 <div className="flex flex-col gap-1.5">
                   <label className="text-[10px] font-mono text-gray-500 uppercase">Ω_c — Conscious (estimate)</label>
-                  <input type="number" value={vC_col} onChange={(e) => setVc_col(e.target.value)} placeholder="0.0 - 1.0" min="0" max="1" step="0.01" className="bg-black/40 border border-[#c9a84c]/20 p-2 text-xs font-mono text-white rounded outline-none" />
+                  <input type="number" value={vC_col} onChange={(e) => setVc_col(e.target.value)} placeholder="0.0 - 1.0" min="0" max="1" step="0.01" className="bg-black/40 border border-orange-500/25 p-2 text-xs font-mono text-white rounded outline-none" />
                 </div>
                 <div className="flex flex-col gap-1.5">
                   <label className="text-[10px] font-mono text-gray-500 uppercase">R — Recursion Factor</label>
-                  <input type="number" value={vRecursion} onChange={(e) => setVRecursion(e.target.value)} className="bg-black/40 border border-[#c9a84c]/20 p-2 text-xs font-mono text-white rounded outline-none" />
+                  <input type="number" value={vRecursion} onChange={(e) => setVRecursion(e.target.value)} className="bg-black/40 border border-orange-500/25 p-2 text-xs font-mono text-white rounded outline-none" />
                 </div>
               </div>
 
@@ -765,7 +767,7 @@ export default function CalcPanel({ onClose, onSendPrompt }: { onClose: () => vo
                 <button onClick={solveVector} className="bg-gradient-to-r from-blue-900 to-indigo-800 border border-blue-400/30 text-white font-mono text-[10px] py-2 px-4 rounded hover:from-blue-800 hover:to-indigo-700 cursor-pointer">
                   ✦ Map Vector ✦
                 </button>
-                <button onClick={cpClearVec} className="border border-[#c9a84c]/20 text-[#8898aa] font-mono text-[10px] py-2 px-4 rounded hover:bg-white/5 cursor-pointer">
+                <button onClick={cpClearVec} className="border border-orange-500/25 text-[#8898aa] hover:text-orange-300 font-mono text-[10px] py-2 px-4 rounded hover:bg-white/5 cursor-pointer">
                   Reset
                 </button>
               </div>
@@ -773,7 +775,7 @@ export default function CalcPanel({ onClose, onSendPrompt }: { onClose: () => vo
               {vecResult && (
                 <div className="mt-4 pt-4 border-t border-white/5 space-y-4">
                   <div className="space-y-2">
-                    <span className="text-[10px] font-mono text-gray-500 block uppercase tracking-widest text-center">Five-Dimensional Omega Vector Profile</span>
+                    <span className="text-[10px] font-mono text-gray-500 block uppercase tracking-widest text-center font-medium">Five-Dimensional Omega Vector Profile</span>
                     <div className="space-y-1">
                       {vecResult.dims.map((d, i) => (
                         <div key={i} className="flex items-center gap-3 text-xs font-mono">
@@ -781,7 +783,7 @@ export default function CalcPanel({ onClose, onSendPrompt }: { onClose: () => vo
                           <div className="flex-1 h-2 bg-white/5 rounded overflow-hidden">
                             <div className={`h-full rounded ${d.cls}`} style={{ width: `${d.v * 100}%` }}></div>
                           </div>
-                          <span className="text-[#c9a84c] min-w-[36px] text-right font-bold">{d.v}</span>
+                          <span className="text-orange-400 min-w-[36px] text-right font-bold">{d.v}</span>
                         </div>
                       ))}
                     </div>
@@ -792,15 +794,15 @@ export default function CalcPanel({ onClose, onSendPrompt }: { onClose: () => vo
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     <div className="bg-[#050810] border border-white/5 p-3 rounded">
                       <span className="text-[9px] text-[#8898aa] block font-mono">Mean Ω̅</span>
-                      <span className="text-sm font-bold text-[#c9a84c] font-mono">{vecResult.mean}</span>
+                      <span className="text-sm font-bold text-orange-400 font-mono">{vecResult.mean}</span>
                     </div>
                     <div className="bg-[#050810] border border-white/5 p-3 rounded">
                       <span className="text-[9px] text-[#8898aa] block font-mono">Ω_c (computed)</span>
-                      <span className="text-sm font-bold text-[#c9a84c] font-mono">{vecResult.oc}</span>
+                      <span className="text-sm font-bold text-orange-400 font-mono">{vecResult.oc}</span>
                     </div>
                     <div className="bg-[#050810] border border-white/5 p-3 rounded">
                       <span className="text-[9px] text-[#8898aa] block font-mono">C Resonance Bonus</span>
-                      <span className="text-sm font-bold text-[#c9a84c] font-mono">{vecResult.res}</span>
+                      <span className="text-sm font-bold text-orange-400 font-mono">{vecResult.res}</span>
                     </div>
                     <div className="bg-[#050810] border border-white/5 p-3 rounded">
                       <span className="text-[9px] text-[#8898aa] block font-mono">Phase State</span>
@@ -817,16 +819,16 @@ export default function CalcPanel({ onClose, onSendPrompt }: { onClose: () => vo
             </div>
 
             {/* Solver: Uncertainty */}
-            <div className="bg-[#0c1220]/80 border border-[#c9a84c]/12 rounded-lg p-5">
-              <h3 className="text-sm font-bold font-mono tracking-widest text-[#c9a84c] uppercase mb-3">ΔΩ · ΔT ≥ C/2 Bound</h3>
+            <div className="bg-[#0c0c0c]/90 border border-orange-500/15 rounded-lg p-5">
+              <h3 className="text-sm font-bold font-mono tracking-widest text-orange-400 uppercase mb-3">ΔΩ · ΔT ≥ C/2 Bound</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
                 <div className="flex flex-col gap-1.5 align-group">
                   <label className="text-[10px] font-mono text-gray-500">ΔΩ — State uncertainty</label>
-                  <input type="number" value={uncDo} onChange={(e) => setUncDo(e.target.value)} placeholder="e.g. 0.01" className="bg-black/40 border border-[#c9a84c]/20 p-2 text-xs font-mono text-white rounded outline-none" />
+                  <input type="number" value={uncDo} onChange={(e) => setUncDo(e.target.value)} placeholder="e.g. 0.01" className="bg-black/40 border border-orange-500/25 p-2 text-xs font-mono text-white rounded outline-none" />
                 </div>
                 <div className="flex flex-col gap-1.5 align-group">
                   <label className="text-[10px] font-mono text-gray-500">ΔT — Time uncertainty (s)</label>
-                  <input type="number" value={uncDt} onChange={(e) => setUncDt(e.target.value)} placeholder="e.g. 1.2e12" className="bg-black/40 border border-[#c9a84c]/20 p-2 text-xs font-mono text-white rounded outline-none" />
+                  <input type="number" value={uncDt} onChange={(e) => setUncDt(e.target.value)} placeholder="e.g. 1.2e12" className="bg-black/40 border border-orange-500/25 p-2 text-xs font-mono text-white rounded outline-none" />
                 </div>
               </div>
               <button onClick={solveUncertainty} className="bg-gradient-to-r from-blue-900 to-indigo-800 border border-blue-400/30 text-white font-mono text-[10px] py-2 px-4 rounded hover:from-blue-800 hover:to-indigo-700 cursor-pointer">
@@ -836,7 +838,7 @@ export default function CalcPanel({ onClose, onSendPrompt }: { onClose: () => vo
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-4 pt-4 border-t border-white/5 text-xs font-mono">
                   <div className="bg-[#050810] border border-white/5 p-3 rounded">
                     <span className="text-[9px] text-[#8898aa] block font-mono">ΔΩ × ΔT Product</span>
-                    <span className="text-sm font-bold text-[#c9a84c]">{uncResult.prod}</span>
+                    <span className="text-sm font-bold text-orange-400">{uncResult.prod}</span>
                   </div>
                   <div className="bg-[#050810] border border-white/5 p-3 rounded">
                     <span className="text-[9px] text-[#8898aa] block font-mono">Uncertainty Floor</span>
@@ -855,23 +857,23 @@ export default function CalcPanel({ onClose, onSendPrompt }: { onClose: () => vo
         {/* SOLVER PANEL: J/S TIMELINESS */}
         {activeTab === "js" && (
           <div className="space-y-6">
-            <div className="bg-[#0c1220]/80 border border-[#c9a84c]/12 rounded-lg p-5">
-              <h3 className="text-lg text-[#e8d5a3] font-serif mb-2">IV. J/S Timeliness Experience</h3>
-              <div className="bg-sky-950/20 border border-sky-400/20 rounded p-3 text-center font-mono text-sm text-sky-300 tracking-widest my-3">
-                $J/S = C / (S \cdot T) - 1$
+            <div className="bg-[#0c0c0c]/90 border border-orange-500/15 rounded-lg p-5">
+              <h3 className="text-lg text-orange-400 font-serif mb-2">IV. J/S Timeliness Experience</h3>
+              <div className="bg-sky-950/20 border border-sky-400/20 rounded px-4 py-3.5 text-center font-serif text-base text-sky-300 tracking-wide my-3 flex items-center justify-center gap-2">
+                <span className="font-bold font-serif italic text-lg">J/S = C / (S · T) − 1</span>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
                 <div className="flex flex-col gap-1.5">
                   <label className="text-[10px] font-mono text-gray-500 uppercase">C — Total Budget Potential</label>
-                  <input type="number" value={jsC} onChange={(e) => setJsC(e.target.value)} placeholder="e.g. 10" className="bg-black/40 border border-[#c9a84c]/20 p-2 text-xs font-mono text-white rounded outline-none" />
+                  <input type="number" value={jsC} onChange={(e) => setJsC(e.target.value)} placeholder="e.g. 10" className="bg-black/40 border border-orange-500/25 p-2 text-xs font-mono text-white rounded outline-none" />
                 </div>
                 <div className="flex flex-col gap-1.5">
                   <label className="text-[10px] font-mono text-gray-500 uppercase">S — Entropy (disorder)</label>
-                  <input type="number" value={jsS} onChange={(e) => setJsS(e.target.value)} placeholder="e.g. 0.35" className="bg-black/40 border border-[#c9a84c]/20 p-2 text-xs font-mono text-white rounded outline-none" />
+                  <input type="number" value={jsS} onChange={(e) => setJsS(e.target.value)} placeholder="e.g. 0.35" className="bg-black/40 border border-orange-500/25 p-2 text-xs font-mono text-white rounded outline-none" />
                 </div>
                 <div className="flex flex-col gap-1.5">
                   <label className="text-[10px] font-mono text-gray-500 uppercase">T — Normalized Lifespan Position (0–1)</label>
-                  <input type="number" value={jsT} onChange={(e) => setJsT(e.target.value)} placeholder="e.g. 0.45" className="bg-black/40 border border-[#c9a84c]/20 p-2 text-xs font-mono text-white rounded outline-none" />
+                  <input type="number" value={jsT} onChange={(e) => setJsT(e.target.value)} placeholder="e.g. 0.45" className="bg-black/40 border border-orange-500/25 p-2 text-xs font-mono text-white rounded outline-none" />
                 </div>
               </div>
 
@@ -879,7 +881,7 @@ export default function CalcPanel({ onClose, onSendPrompt }: { onClose: () => vo
                 <button onClick={solveJsIndex} className="bg-gradient-to-r from-blue-900 to-indigo-800 border border-blue-400/30 text-white font-mono text-[10px] py-2 px-4 rounded hover:from-blue-800 hover:to-indigo-700 cursor-pointer">
                   ✦ Solve J/S ratio ✦
                 </button>
-                <button onClick={() => { setJsC(""); setJsS(""); setJsT(""); setJsResult(null); }} className="border border-[#c9a84c]/20 text-[#8898aa] font-mono text-[10px] py-2 px-4 rounded hover:bg-white/5 cursor-pointer">
+                <button onClick={() => { setJsC(""); setJsS(""); setJsT(""); setJsResult(null); }} className="border border-orange-500/25 text-[#8898aa] font-mono text-[10px] py-2 px-4 rounded hover:bg-white/5 cursor-pointer">
                   Reset
                 </button>
               </div>
@@ -887,9 +889,9 @@ export default function CalcPanel({ onClose, onSendPrompt }: { onClose: () => vo
               {jsResult && (
                 <div className="mt-4 pt-4 border-t border-white/5 space-y-4">
                   <div className="text-center">
-                    <span className="text-[10px] text-gray-500 font-mono uppercase tracking-widest block">Computed J/S State</span>
-                    <div className="text-4xl font-serif font-black text-[#c9a84c] my-1">{jsResult.val}</div>
-                    <span className="text-xs font-mono text-[#e8d5a3] tracking-widest uppercase">{jsResult.state}</span>
+                    <span className="text-[10px] text-gray-500 font-mono uppercase tracking-widest block font-medium">Computed J/S State</span>
+                    <div className="text-4xl font-serif font-black text-orange-400 my-1">{jsResult.val}</div>
+                    <span className="text-xs font-mono text-orange-300 tracking-widest uppercase">{jsResult.state}</span>
                   </div>
 
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -899,15 +901,15 @@ export default function CalcPanel({ onClose, onSendPrompt }: { onClose: () => vo
                     </div>
                     <div className="bg-[#050810] border border-white/5 p-3 rounded">
                       <span className="text-[9px] text-[#8898aa] block font-mono">C / (S•T) Product</span>
-                      <span className="text-sm font-bold text-[#c9a84c] font-mono">{jsResult.ratio}</span>
+                      <span className="text-sm font-bold text-orange-400 font-mono">{jsResult.ratio}</span>
                     </div>
                     <div className="bg-[#050810] border border-white/5 p-3 rounded">
                       <span className="text-[9px] text-[#8898aa] block font-mono">Derived Ω</span>
-                      <span className="text-sm font-bold text-[#c9a84c] font-mono">{jsResult.omega}</span>
+                      <span className="text-sm font-bold text-orange-400 font-mono">{jsResult.omega}</span>
                     </div>
                     <div className="bg-[#050810] border border-white/5 p-3 rounded">
                       <span className="text-[9px] text-[#8898aa] block font-mono">Distance to Revelation</span>
-                      <span className="text-sm font-bold text-[#c9a84c] font-mono">{jsResult.dist}</span>
+                      <span className="text-sm font-bold text-orange-400 font-mono">{jsResult.dist}</span>
                     </div>
                   </div>
 
@@ -921,8 +923,8 @@ export default function CalcPanel({ onClose, onSendPrompt }: { onClose: () => vo
         {/* SOLVER PANEL: METEMPSYCHOSIS */}
         {activeTab === "soul" && (
           <div className="space-y-6">
-            <div className="bg-[#0c1220]/80 border border-[#c9a84c]/12 rounded-lg p-5">
-              <h3 className="text-lg text-[#e8d5a3] font-serif mb-2">V. Soul Conservation Tracker</h3>
+            <div className="bg-[#0c0c0c]/90 border border-orange-500/15 rounded-lg p-5">
+              <h3 className="text-lg text-orange-400 font-serif mb-2">V. Soul Conservation Tracker</h3>
               <p className="text-xs text-[#8898aa] font-mono mb-4">Input parameters for multiple conjectured lifetimes to check compliance with the conservation constant.</p>
 
               <div className="space-y-3 relative mb-4">
@@ -935,7 +937,7 @@ export default function CalcPanel({ onClose, onSendPrompt }: { onClose: () => vo
                         value={life.T} 
                         onChange={(e) => updateSoulLife(index, "T", e.target.value)} 
                         placeholder="e.g. 2.52e9" 
-                        className="bg-black/40 border border-[#c9a84c]/20 p-2 text-xs font-mono text-white rounded outline-none" 
+                        className="bg-black/40 border border-orange-500/25 p-2 text-xs font-mono text-white rounded outline-none" 
                       />
                     </div>
                     <div className="flex flex-col gap-1.5">
@@ -945,7 +947,7 @@ export default function CalcPanel({ onClose, onSendPrompt }: { onClose: () => vo
                         value={life.S} 
                         onChange={(e) => updateSoulLife(index, "S", e.target.value)} 
                         placeholder="e.g. 0.45" 
-                        className="bg-black/40 border border-[#c9a84c]/20 p-2 text-xs font-mono text-white rounded outline-none" 
+                        className="bg-black/40 border border-orange-500/25 p-2 text-xs font-mono text-white rounded outline-none" 
                       />
                     </div>
                     <button 
@@ -967,7 +969,7 @@ export default function CalcPanel({ onClose, onSendPrompt }: { onClose: () => vo
                 </button>
                 <button 
                   onClick={() => { setSoulLives([{ T: "", S: "" }, { T: "", S: "" }]); setSoulResult(null); }}
-                  className="border border-[#c9a84c]/20 text-[#8898aa] font-mono text-[10px] py-2 px-4 rounded hover:bg-white/5 cursor-pointer"
+                  className="border border-orange-500/25 text-[#8898aa] hover:text-orange-300 font-mono text-[10px] py-2 px-4 rounded hover:bg-white/5 cursor-pointer"
                 >
                   Reset
                 </button>
@@ -979,7 +981,7 @@ export default function CalcPanel({ onClose, onSendPrompt }: { onClose: () => vo
                     {soulResult.list.map((l, i) => (
                       <div key={i} className="bg-black/30 border border-white/5 p-3 rounded">
                         <span className="text-[9px] text-[#6b7a8d] font-mono uppercase tracking-wider block">Life {i+1} Constant</span>
-                        <span className="text-sm font-bold text-[#c9a84c] font-mono">{l.C}</span>
+                        <span className="text-sm font-bold text-orange-400 font-mono">{l.C}</span>
                         <div className="text-[9px] text-[#8898aa] mt-0.5">Ω={l.om} · J/S={l.js}</div>
                       </div>
                     ))}
@@ -992,7 +994,7 @@ export default function CalcPanel({ onClose, onSendPrompt }: { onClose: () => vo
 
                   {soulResult.eList.length > 0 && (
                     <div className="bg-black/20 rounded border border-white/5 p-3 space-y-2">
-                      <span className="text-[9px] font-mono text-[#8c98ad] uppercase tracking-widest block">Karmic Evolution Delta</span>
+                       <span className="text-[9px] font-mono text-[#8c98ad] uppercase tracking-widest block font-medium">Karmic Evolution Delta</span>
                       <div className="space-y-1">
                         {soulResult.eList.map((e, idx) => (
                           <div key={idx} className="flex justify-between items-center text-xs font-mono p-1 border-b border-white/5 last:border-b-0">
@@ -1011,81 +1013,7 @@ export default function CalcPanel({ onClose, onSendPrompt }: { onClose: () => vo
           </div>
         )}
 
-        {/* SOLVER PANEL: AWARD PROBABILITY */}
-        {activeTab === "award" && (
-          <div className="space-y-6">
-            <div className="bg-[#0c1220]/80 border border-[#c9a84c]/12 rounded-lg p-5">
-              <h3 className="text-lg text-[#e8d5a3] font-serif mb-2">VI. Award Probability Modeling</h3>
-              <p className="text-xs text-[#8898aa] font-mono mb-4">Model the probability of obtaining academic awards (Nobel, Templeton, etc.) based on structural variables.</p>
 
-              <div className="grid grid-cols-3 gap-2 mb-4">
-                {["now", "paper", "full"].map((preset) => (
-                  <button 
-                    key={preset}
-                    onClick={() => handleAwardPreset(preset as any)}
-                    className="px-2 py-1 px-3 border border-[#c9a84c]/20 hover:border-amber-400 rounded text-[10px] font-mono uppercase bg-transparent text-[#8898aa] transition-all cursor-pointer"
-                  >
-                    {preset === "now" ? "Current State" : preset === "paper" ? "Paper Published" : "Full Development"}
-                  </button>
-                ))}
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-[10px] font-mono text-gray-500">Ω_framework — Core conceptual quality</label>
-                  <input type="number" value={awFw} onChange={(e) => setAwFw(e.target.value)} min="0" max="1" step="0.01" className="bg-black/40 border border-[#c9a84c]/20 p-2 text-xs font-mono text-white rounded outline-none" />
-                </div>
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-[10px] font-mono text-gray-500">Ω_presentation — Academic visibility</label>
-                  <input type="number" value={awPr} onChange={(e) => setAwPr(e.target.value)} min="0" max="1" step="0.01" className="bg-black/40 border border-[#c9a84c]/20 p-2 text-xs font-mono text-white rounded outline-none" />
-                </div>
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-[10px] font-mono text-gray-500">Ω_timing — Community receptivity</label>
-                  <input type="number" value={awTi} onChange={(e) => setAwTi(e.target.value)} min="0" max="1" step="0.01" className="bg-black/40 border border-[#c9a84c]/20 p-2 text-xs font-mono text-white rounded outline-none" />
-                </div>
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-[10px] font-mono text-gray-500">Ω_alignment — Requirement alignment</label>
-                  <input type="number" value={awAl} onChange={(e) => setAwAl(e.target.value)} min="0" max="1" step="0.01" className="bg-black/40 border border-[#c9a84c]/20 p-2 text-xs font-mono text-white rounded outline-none" />
-                </div>
-              </div>
-
-              <button onClick={solveAwardProb} className="bg-gradient-to-r from-blue-900 to-indigo-800 border border-blue-400/30 text-white font-mono text-[10px] py-2 px-4 rounded hover:from-blue-800 hover:to-indigo-700 cursor-pointer">
-                Calculate Odds
-              </button>
-
-              {awResult && (
-                <div className="mt-4 pt-4 border-t border-white/5 space-y-4">
-                  <div className="text-center">
-                    <span className="text-[10px] text-gray-500 font-mono uppercase tracking-widest block font-medium">Computed Award Probability</span>
-                    <div className="text-5xl font-serif font-black text-[#c9a84c] my-1">{awResult.pct}</div>
-                    <span className="text-xs font-mono text-[#e8d5a3] tracking-wider uppercase font-semibold">{awResult.state}</span>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                    <div className="bg-[#050810] border border-white/5 p-3 rounded">
-                      <span className="text-[9px] text-[#8898aa] block font-mono">Raw Product Factor</span>
-                      <span className="text-sm font-bold text-[#c9a84c] font-mono">{awResult.raw}</span>
-                    </div>
-                    <div className="bg-[#050810] border border-white/5 p-3 rounded">
-                      <span className="text-[9px] text-[#8898aa] block font-mono">Limiting Factor</span>
-                      <span className="text-[11px] font-bold text-white font-mono line-clamp-1">{awResult.weak}</span>
-                    </div>
-                    <div className="bg-[#050810] border border-white/5 p-3 rounded">
-                      <span className="text-[9px] text-[#8898aa] block font-mono">Modeled Probability</span>
-                      <span className="text-sm font-bold text-[#c9a84c] font-mono">{awResult.adj}</span>
-                    </div>
-                  </div>
-
-                  <div className="bg-[#121c2d]/50 p-4 border border-teal-500/20 rounded text-xs space-y-1">
-                    <span className="text-[9px] font-mono text-gray-500 block uppercase tracking-widest">Recommended Strategic Optimization Target</span>
-                    <p className="text-white font-serif leading-relaxed italic">{awResult.target}</p>
-                    <p className="text-[#8898aa] font-mono text-[10px] mt-2">{awResult.desc}</p>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );

@@ -414,10 +414,12 @@ function cleanMathText(text: string): string {
   if (!text) return "";
   let s = text;
   
-  // Normalize LaTeX math delimiters to standard unescaped $ delimiters
-  s = s.replace(/\\\(|\\\)/g, "$");
-  s = s.replace(/\\\[|\\\]/g, "$$");
-  s = s.replace(/\\\$|\\\$/g, "$");
+  // Strip LaTeX other delimiters instead of replacing with raw $
+  s = s.replace(/\\\(|\\\)/g, "");
+  s = s.replace(/\\\[|\\\]/g, "");
+  s = s.replace(/\\\$|\\\$/g, "");
+  s = s.replace(/\$([^\$]+)\$/g, "$1"); // convert "$T × S = C$" into "T × S = C"
+  s = s.replace(/\$/g, ""); // clean up any remaining stray single dollar sign math triggers
 
   // Convert standard Latex math syntax and typos (like /times) to true unicode mathematical notation
   s = s.replace(/\\times|\\times|\/times/g, "×");
@@ -852,17 +854,17 @@ function getSystemsLabItemStyle(id: string) {
     case "entropy": // Physics
       return {
         systemId: "physics",
-        borderClass: "border-white/10 hover:border-white/50 hover:bg-white/5 hover:shadow-[0_0_12px_rgba(255,255,255,0.1)]",
-        textColorClass: "text-white/95", 
-        accentColorClass: "text-white", 
-        iconBgClass: "bg-white/5",
-        iconBorderClass: "border-white/10",
-        iconColorClass: "text-white/90",
+        borderClass: "border-orange-500/15 hover:border-orange-500/50 hover:bg-orange-500/5 hover:shadow-[0_0_12px_rgba(251,146,60,0.15)]",
+        textColorClass: "text-orange-400/95", 
+        accentColorClass: "text-orange-400", 
+        iconBgClass: "bg-orange-500/[0.04]",
+        iconBorderClass: "border-orange-500/20",
+        iconColorClass: "text-orange-400",
         fontClass: "font-sans font-bold",
-        tooltipBorder: "border-white/40",
-        tooltipShadow: "shadow-[0_0_15px_rgba(255,255,255,0.25)]",
-        arrowBorder: "border-t-white/40",
-        chevronColor: "text-white/40"
+        tooltipBorder: "border-orange-500/40",
+        tooltipShadow: "shadow-[0_0_15px_rgba(245,158,11,0.3)]",
+        arrowBorder: "border-t-orange-500/40",
+        chevronColor: "text-orange-500/40"
       };
     case "celestialscale": // Mathematics (or astrophysics, mapped to mathematics)
       return {
@@ -972,17 +974,17 @@ function getSystemsLabItemStyle(id: string) {
     case "numerology": // Sacred Geometry Lex
       return {
         systemId: "sacred_geometry_lex",
-        borderClass: "border-orange-400/15 hover:border-orange-400/50 hover:bg-orange-500/5 hover:shadow-[0_0_12px_rgba(251,146,60,0.15)]",
-        textColorClass: "text-orange-350/95",
-        accentColorClass: "text-orange-400",
+        borderClass: "border-orange-500/15 hover:border-orange-500/50 hover:bg-orange-500/5 hover:shadow-[0_0_12px_rgba(255,106,0,0.15)]",
+        textColorClass: "text-orange-400/95",
+        accentColorClass: "text-orange-500",
         iconBgClass: "bg-orange-500/[0.04]",
         iconBorderClass: "border-orange-500/20",
         iconColorClass: "text-orange-400",
         fontClass: "font-sans tracking-widest font-semibold uppercase text-xs",
-        tooltipBorder: "border-orange-400/40",
-        tooltipShadow: "shadow-[0_0_15px_rgba(251,146,60,0.35)]",
-        arrowBorder: "border-t-orange-400/40",
-        chevronColor: "text-orange-400/45"
+        tooltipBorder: "border-orange-500/40",
+        tooltipShadow: "shadow-[0_0_15px_rgba(255,106,0,0.35)]",
+        arrowBorder: "border-t-orange-500/40",
+        chevronColor: "text-orange-500/45"
       };
     case "codereader": // Western Esotericism
       return {

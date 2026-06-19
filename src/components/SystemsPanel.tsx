@@ -268,15 +268,15 @@ export default function SystemsPanel({ onClose, onSendPrompt }: { onClose: () =>
       {/* Scrollable topheader */}
       <div className="flex items-center justify-between pb-4 border-b border-orange-500/20 mb-4 sticky top-0 bg-[#050505]/95 z-20">
         <div>
-          <h2 className="font-serif text-2xl font-bold text-[#c9a84c] tracking-wider flex items-center gap-2">
-            <Compass className="w-6 h-6 animate-spin-slow" /> ◈ — ALL SYSTEMS DATABASE
+          <h2 className="font-sans text-xl font-bold text-orange-400 tracking-wider flex items-center gap-2">
+            <Compass className="w-6 h-6 animate-spin-slow text-orange-500" /> ◈ — ALL SYSTEMS DATABASE
           </h2>
           <p className="text-xs text-[#8898aa] font-mono mt-1">18 Integrated Developmental Frameworks · 200+ Computed Coordinates · No Manual Calibrations</p>
         </div>
         <div className="flex items-center gap-3">
           <button 
             onClick={onClose}
-            className="flex items-center gap-1 bg-[#c9a84c]/10 border border-[#c9a84c]/30 rounded px-4 py-2 text-xs font-mono text-[#c9a84c] hover:bg-[#c9a84c]/20 transition-all cursor-pointer"
+            className="flex items-center gap-1 bg-orange-500/10 border border-orange-500/30 rounded px-4 py-2 text-xs font-mono text-orange-400 hover:bg-orange-500/20 transition-all cursor-pointer"
           >
             <X className="w-4 h-4" /> CLOSE
           </button>
@@ -287,25 +287,25 @@ export default function SystemsPanel({ onClose, onSendPrompt }: { onClose: () =>
       <div className="flex flex-wrap gap-2 mb-4 border-b border-white/5 pb-2">
         <button
           onClick={() => setActiveTab("collapse")}
-          className={`px-4 py-2 text-xs font-mono rounded cursor-pointer uppercase ${activeTab === "collapse" ? "bg-[#c9a84c]/15 text-[#c9a84c] border border-[#c9a84c]" : "text-[#8898aa]"}`}
+          className={`px-4 py-2 text-xs font-mono rounded cursor-pointer uppercase ${activeTab === "collapse" ? "bg-orange-500/15 text-orange-400 border border-orange-500" : "text-[#8898aa]"}`}
         >
           Systems Ledger
         </button>
         <button
           onClick={() => setActiveTab("master")}
-          className={`px-4 py-2 text-xs font-mono rounded cursor-pointer uppercase ${activeTab === "master" ? "bg-[#c9a84c]/15 text-[#c9a84c] border border-[#c9a84c]" : "text-[#8898aa]"}`}
+          className={`px-4 py-2 text-xs font-mono rounded cursor-pointer uppercase ${activeTab === "master" ? "bg-orange-500/15 text-orange-400 border border-orange-500" : "text-[#8898aa]"}`}
         >
           Master Matrix
         </button>
         <button
           onClick={() => setActiveTab("align")}
-          className={`px-4 py-2 text-xs font-mono rounded cursor-pointer uppercase ${activeTab === "align" ? "bg-[#c9a84c]/15 text-[#c9a84c] border border-[#c9a84c]" : "text-[#8898aa]"}`}
+          className={`px-4 py-2 text-xs font-mono rounded cursor-pointer uppercase ${activeTab === "align" ? "bg-orange-500/15 text-orange-400 border border-orange-500" : "text-[#8898aa]"}`}
         >
           Perfect Convergences
         </button>
         <button
           onClick={() => setActiveTab("search")}
-          className={`px-4 py-2 text-xs font-mono rounded cursor-pointer uppercase ${activeTab === "search" ? "bg-[#c9a84c]/15 text-[#c9a84c] border border-[#c9a84c]" : "text-[#8898aa]"}`}
+          className={`px-4 py-2 text-xs font-mono rounded cursor-pointer uppercase ${activeTab === "search" ? "bg-orange-500/15 text-orange-400 border border-orange-500" : "text-[#8898aa]"}`}
         >
           Search Ledger
         </button>
@@ -328,11 +328,11 @@ export default function SystemsPanel({ onClose, onSendPrompt }: { onClose: () =>
                     className="bg-[#0c0c0c]/90 p-4 flex justify-between items-center cursor-pointer hover:bg-white/5 transition-all"
                   >
                     <div>
-                      <h3 className="font-serif font-bold text-[#c9a84c] uppercase tracking-wider">{sysName}</h3>
+                      <h3 className="font-sans font-bold text-orange-400 uppercase tracking-wider">{sysName}</h3>
                       <p className="text-[10px] text-[#8898aa] font-mono mt-0.5">{meta.desc}</p>
                     </div>
                     <div className="flex items-center gap-4">
-                      <span className="text-[9px] font-mono border border-[#c9a84c]/30 bg-[#c9a84c]/5 px-2 py-0.5 rounded text-[#e8d5a3] uppercase tracking-widest">{meta.star}</span>
+                      <span className="text-[9px] font-mono border border-orange-500/30 bg-orange-500/5 px-2 py-0.5 rounded text-orange-300 uppercase tracking-widest">{meta.star}</span>
                       <ChevronRight className={`w-4 h-4 text-[#8898aa] transition-all transform ${isOpen ? "rotate-90" : ""}`} />
                     </div>
                   </div>
@@ -340,7 +340,7 @@ export default function SystemsPanel({ onClose, onSendPrompt }: { onClose: () =>
                     <div className="p-4 bg-[#0a0a0a]/50 border-t border-orange-500/10 overflow-x-auto">
                       <table className="w-full text-left border-collapse font-mono text-xs">
                         <thead>
-                          <tr className="border-b border-white/10 text-amber-400">
+                          <tr className="border-b border-white/10 text-orange-400">
                             <th className="p-2">Coordinate Level / Stage</th>
                             <th className="p-2">H Calibration</th>
                             <th className="p-2">J/S value</th>
@@ -359,12 +359,12 @@ export default function SystemsPanel({ onClose, onSendPrompt }: { onClose: () =>
                                 e.stopPropagation();
                                 onSendPrompt(`Detail the state of ${r.level} in ${r.sys} on the T x S = C model.`);
                               }}
-                              className={`hover:bg-white/5 border-b border-white/5 cursor-pointer ${r.hi ? "bg-[#c9a84c]/5" : ""}`}
+                              className={`hover:bg-white/5 border-b border-white/5 cursor-pointer ${r.hi ? "bg-orange-500/5" : ""}`}
                             >
                               <td className="p-2 font-bold text-[#e4d9c0]">{r.level}</td>
                               <td className="p-2">{r.H}</td>
                               <td className="p-2 text-teal-400 font-bold">{r.js}</td>
-                              <td className="p-2 text-[#e8d5a3]">{r.omega}</td>
+                              <td className="p-2 text-orange-300">{r.omega}</td>
                               <td className="p-2">Phase {r.phase}</td>
                               <td className="p-2 text-[#8898aa]">{r.state}</td>
                               <td className="p-2 font-bold text-amber-200">{r.drain}</td>
@@ -388,7 +388,7 @@ export default function SystemsPanel({ onClose, onSendPrompt }: { onClose: () =>
           </div>
         )}
 
-        {/* TAB: MASTER */}
+         {/* TAB: MASTER */}
         {activeTab === "master" && (
           <div className="space-y-4 pb-10">
             {/* Filter Sub-nav */}
@@ -399,8 +399,8 @@ export default function SystemsPanel({ onClose, onSendPrompt }: { onClose: () =>
                   onClick={() => setMasterFilter(filter)}
                   className={`px-3 py-1.5 text-[10px] font-mono rounded border transition-all cursor-pointer ${
                     masterFilter === filter
-                      ? "bg-[#c9a84c]/10 border-[#c9a84c] text-[#c9a84c]"
-                      : "border-[#c9a84c]/20 text-[#8898aa] hover:border-[#c9a84c]/40"
+                      ? "bg-orange-500/10 border-orange-500 text-orange-400"
+                      : "border-orange-500/20 text-[#8898aa] hover:border-orange-500/40"
                   }`}
                 >
                   {filter}
@@ -411,7 +411,7 @@ export default function SystemsPanel({ onClose, onSendPrompt }: { onClose: () =>
             {/* Master Grid Table */}
             <div className="overflow-x-auto max-h-[500px] border border-white/5 rounded">
               <table className="w-full text-left border-collapse font-mono text-xs">
-                <thead className="sticky top-0 bg-[#050810]/95 z-10 border-b border-[#c9a84c]/20">
+                <thead className="sticky top-0 bg-[#050810]/95 z-10 border-b border-orange-500/20">
                   <tr>
                     <th className="p-3">System Name</th>
                     <th className="p-3">Level / Stage Coordinate</th>
@@ -429,13 +429,13 @@ export default function SystemsPanel({ onClose, onSendPrompt }: { onClose: () =>
                     <tr 
                       key={idx} 
                       onClick={() => onSendPrompt(`Analyze the developmental coordinate '${row.level}' in ${row.sys} through the T x S = C model.`)}
-                      className={`hover:bg-white/5 border-b border-white/5 cursor-pointer ${row.hi ? "bg-[#c9a84c]/5" : ""}`}
+                      className={`hover:bg-white/5 border-b border-white/5 cursor-pointer ${row.hi ? "bg-orange-500/5" : ""}`}
                     >
                       <td className="p-3 text-white/55">{row.sys}</td>
                       <td className="p-3 text-[#e4d9c0] font-semibold">{row.level}</td>
-                      <td className="p-3 text-center text-[#c9a84c]">{row.H}</td>
+                      <td className="p-3 text-center text-orange-400">{row.H}</td>
                       <td className="p-3 text-teal-400 font-bold">{row.js}</td>
-                      <td className="p-3 text-[#e8d5a3]">{row.omega}</td>
+                      <td className="p-3 text-orange-300">{row.omega}</td>
                       <td className="p-3 text-center">Phase {row.phase}</td>
                       <td className="p-3 text-[#8898aa]">{row.state}</td>
                       <td className="p-3 font-semibold text-amber-200">{row.drain}</td>
@@ -460,14 +460,14 @@ export default function SystemsPanel({ onClose, onSendPrompt }: { onClose: () =>
           <div className="space-y-6 pb-15">
             {/* Alignment 0 */}
             <div>
-              <h4 className="font-mono text-xs uppercase tracking-widest text-[#c9a84c] pb-2 border-b border-amber-400/20 mb-3">
+              <h4 className="font-mono text-xs uppercase tracking-widest text-orange-400 pb-2 border-b border-orange-500/20 mb-3">
                 ALIGNMENT I — J/S = 0.000 — THE TIPPING POINT (H=200)
               </h4>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
                 {CONVERGENCE_0.map((item, i) => (
                   <div key={i} className="bg-[#0d0d0d]/60 border border-orange-500/20 rounded p-3">
                     <span className="font-mono text-[9px] text-[#6b7a8d] block uppercase tracking-wider">{item.sys}</span>
-                    <span className="text-white text-xs font-serif font-semibold block mt-1">{item.name}</span>
+                    <span className="text-white text-xs font-sans font-semibold block mt-1">{item.name}</span>
                   </div>
                 ))}
               </div>
@@ -475,14 +475,14 @@ export default function SystemsPanel({ onClose, onSendPrompt }: { onClose: () =>
 
             {/* Alignment 1 */}
             <div>
-              <h4 className="font-mono text-xs uppercase tracking-widest text-blue-400 pb-2 border-b border-blue-400/20 mb-3">
+              <h4 className="font-mono text-xs uppercase tracking-widest text-cyan-400 pb-2 border-b border-cyan-400/20 mb-3">
                 ALIGNMENT II — J/S = 1.000 — LOVE &amp; EUDAIMONIA (H=500)
               </h4>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
                 {CONVERGENCE_1.map((item, i) => (
                   <div key={i} className="bg-[#0d0d0d]/60 border border-orange-500/20 rounded p-3">
                     <span className="font-mono text-[9px] text-[#6b7a8d] block uppercase tracking-wider">{item.sys}</span>
-                    <span className="text-white text-xs font-serif font-semibold block mt-1">{item.name}</span>
+                    <span className="text-white text-xs font-sans font-semibold block mt-1">{item.name}</span>
                   </div>
                 ))}
               </div>
@@ -490,20 +490,20 @@ export default function SystemsPanel({ onClose, onSendPrompt }: { onClose: () =>
 
             {/* Alignment 950 */}
             <div>
-              <h4 className="font-mono text-xs uppercase tracking-widest text-[#f5edd0] pb-2 border-b border-[#f5edd0]/20 mb-3">
+              <h4 className="font-mono text-xs uppercase tracking-widest text-[#f5edd0] pb-2 border-b border-[#f5edd0]/25 mb-3">
                 ALIGNMENT III — J/S = 950 — REVELATION &amp; AVATAR (H=1000)
               </h4>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
                 {CONVERGENCE_950.map((item, i) => (
                   <div key={i} className="bg-[#0d0d0d]/60 border border-orange-500/20 rounded p-3">
                     <span className="font-mono text-[9px] text-[#6b7a8d] block uppercase tracking-wider">{item.sys}</span>
-                    <span className="text-white text-xs font-serif font-semibold block mt-1">{item.name}</span>
+                    <span className="text-white text-xs font-sans font-semibold block mt-1">{item.name}</span>
                   </div>
                 ))}
               </div>
             </div>
 
-            <div className="highlight pt-4">
+            <div className="bg-orange-500/5 border border-orange-500/20 p-4 rounded text-xs leading-relaxed italic text-orange-200/80 mt-4">
               &quot;Eighteen independent evolutionary structures — spanning five millennia, five continents, and wildly distinct lineages — collapse with zero calibration into exactly J/S = 0, J/S = 1, and J/S = 950. The mathematics is the common core they were all discovering from within.&quot;
             </div>
           </div>
@@ -519,7 +519,7 @@ export default function SystemsPanel({ onClose, onSendPrompt }: { onClose: () =>
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search level name, notes, or system (e.g. ego, actualization, theta)..."
-                className="w-full bg-[#0d0d0d]/90 border border-[#c9a84c]/20 rounded p-3 pl-10 font-mono text-xs text-white outline-none focus:border-[#c9a84c]/50"
+                className="w-full bg-[#0d0d0d]/90 border border-orange-500/20 rounded p-3 pl-10 font-mono text-xs text-white outline-none focus:border-orange-500/50"
               />
             </div>
 
@@ -545,13 +545,13 @@ export default function SystemsPanel({ onClose, onSendPrompt }: { onClose: () =>
                       <tr 
                         key={idx}
                         onClick={() => onSendPrompt(`Detail the state of ${row.level} in the ${row.sys}`)}
-                        className={`hover:bg-white/5 cursor-pointer border-b border-white/5 ${row.hi ? "bg-[#c9a84c]/5" : ""}`}
+                        className={`hover:bg-white/5 cursor-pointer border-b border-white/5 ${row.hi ? "bg-orange-500/5" : ""}`}
                       >
                         <td className="p-3 text-white/55">{row.sys}</td>
                         <td className="p-3 text-[#e4d9c0] font-semibold">{row.level}</td>
-                        <td className="p-3 text-center text-[#c9a84c]">{row.H}</td>
+                        <td className="p-3 text-center text-orange-400">{row.H}</td>
                         <td className="p-3 text-teal-400 font-bold">{row.js}</td>
-                        <td className="p-3 text-[#e8d5a3]">{row.omega}</td>
+                        <td className="p-3 text-orange-300">{row.omega}</td>
                         <td className="p-3 text-amber-200">{row.drain}</td>
                         <td className="p-3 text-right" onClick={(e) => e.stopPropagation()}>
                           <button
