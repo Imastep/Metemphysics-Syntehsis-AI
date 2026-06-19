@@ -413,6 +413,12 @@ const getDynamicSuggestions = (lastUserText: string, lastModelText: string) => {
 function cleanMathText(text: string): string {
   if (!text) return "";
   let s = text;
+  
+  // Normalize LaTeX math delimiters to standard unescaped $ delimiters
+  s = s.replace(/\\\(|\\\)/g, "$");
+  s = s.replace(/\\\[|\\\]/g, "$$");
+  s = s.replace(/\\\$|\\\$/g, "$");
+
   // Convert standard Latex math syntax and typos (like /times) to true unicode mathematical notation
   s = s.replace(/\\times|\\times|\/times/g, "×");
   s = s.replace(/\\cdot|\\cdot/g, "·");
@@ -1367,7 +1373,7 @@ function renderFormattedInlines(inlineText: string) {
     idxCounter++;
     
     // We search for math, bold, brackets, code
-    const mathMatch = currentText.match(/\$([^$]+)\$/);
+    const mathMatch = currentText.match(/\$([^$]+?)\$/);
     const boldMatch = currentText.match(/\*\*([^*]+)\*\*/);
     const bracketMatch = currentText.match(/\[([^\]]+)\]/);
     const codeMatch = currentText.match(/`([^`]+)`/);
@@ -1400,7 +1406,7 @@ function renderFormattedInlines(inlineText: string) {
     if (earliest.type === "math") {
       parts.push(
         <span key={`math-${idxCounter}`} className="mx-1 font-mono text-[11px] font-bold text-[#c9a84c] bg-orange-500/5 px-1.5 py-0.5 rounded border border-orange-500/20 inline-block shadow-sm">
-          {matchedValue}
+          {renderKeywordsWithTooltips(matchedValue)}
         </span>
       );
     } else if (earliest.type === "bold") {
