@@ -233,7 +233,7 @@ export default function NumerologyPanel({ onClose, onSendPrompt }: { onClose: ()
 
   const handleCalculate = () => {
     const n = parseFloat(calcInput);
-    if (isNaN(n) || n < 0 || n > 9.98) return;
+    if (isNaN(n) || n < 0 || n > 9.0) return;
     setCalculating(true);
     setCalcResult(null);
 
@@ -249,7 +249,7 @@ export default function NumerologyPanel({ onClose, onSendPrompt }: { onClose: ()
 
   // Generate step list
   const stepsList = [];
-  for (let i = 0; i <= 3; i += 0.5) {
+  for (let i = 0; i <= 9.0; i += 0.5) {
     const orderVal = i;
     const calc = getDynamicValue(orderVal);
     stepsList.push({
@@ -376,7 +376,7 @@ export default function NumerologyPanel({ onClose, onSendPrompt }: { onClose: ()
                   <span className="text-[9px] font-mono text-orange-400 uppercase font-bold tracking-wider block mb-2">
                     ORDER ~ SCALE CALCULATOR
                   </span>
-                  <p className="text-[10px] text-gray-450 font-mono mb-3 uppercase">Enter Order (0 - 9.98)</p>
+                  <p className="text-[10px] text-gray-450 font-mono mb-3 uppercase">Enter Order (0 - 9.0)</p>
                   
                   <div className="flex gap-2">
                     <input
@@ -432,11 +432,11 @@ export default function NumerologyPanel({ onClose, onSendPrompt }: { onClose: ()
                 {/* Ledger Step Section */}
                 <div>
                   <span className="text-[9px] font-mono text-orange-400 uppercase tracking-widest block mb-3">
-                    FULL SCALE - 0 - 9.98 - STEP 0.5
+                    FULL SCALE - 0 - 9.0 - STEP 0.5
                   </span>
 
-                  <div className="border border-white/5 rounded-xl overflow-hidden bg-black/40">
-                    <div className="grid grid-cols-6 gap-2 bg-black/80 px-4 py-2 border-b border-orange-500/20 text-[9px] font-mono text-gray-500 uppercase tracking-wider text-center">
+                  <div className="border border-white/5 rounded-xl overflow-hidden bg-black/40 max-h-[380px] overflow-y-auto custom-scroll">
+                    <div className="grid grid-cols-6 gap-2 bg-black/80 px-4 py-2 border-b border-orange-500/20 text-[9px] font-mono text-gray-500 uppercase tracking-wider text-center sticky top-0 z-10">
                       <div>Order</div>
                       <div className="text-left">Names</div>
                       <div>Symbols</div>

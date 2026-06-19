@@ -26,10 +26,10 @@ export const UNIFIED_LEXICON_SYSTEMS: LexiconSystem[] = [
     id: "physics",
     name: "Physics",
     fontClass: "font-sans font-bold",
-    textClass: "text-orange-450 border-[#ff5f00]/40",
-    tooltipBorder: "border-orange-500/40",
-    tooltipShadow: "shadow-[0_0_15px_rgba(255,95,0,0.3)]",
-    arrowBorder: "border-t-orange-500/40",
+    textClass: "text-white border-white/20 hover:bg-white/10 hover:border-white/50 text-white",
+    tooltipBorder: "border-white/40",
+    tooltipShadow: "shadow-[0_0_15px_rgba(255,255,255,0.25)]",
+    arrowBorder: "border-t-white/40",
     description: "Unified science mapping space-time, energy, matter, and entropy thresholds under T × S = C limits.",
     words: [
       { word: "Physics", tip: "Ultimate physical laws of thermodynamics, gravity, and spacetime boundaries under physical constant bounds." },
@@ -59,10 +59,10 @@ export const UNIFIED_LEXICON_SYSTEMS: LexiconSystem[] = [
     id: "mathematics",
     name: "Mathematics",
     fontClass: "font-mono font-bold tracking-wider",
-    textClass: "text-amber-400 border-amber-500/40",
-    tooltipBorder: "border-amber-500/40",
-    tooltipShadow: "shadow-[0_0_15px_rgba(217,175,55,0.35)]",
-    arrowBorder: "border-t-amber-500/40",
+    textClass: "text-orange-400 border-orange-500/30 hover:bg-orange-500/10 hover:border-orange-500/50",
+    tooltipBorder: "border-orange-500/40",
+    tooltipShadow: "shadow-[0_0_15px_rgba(249,115,22,0.3)]",
+    arrowBorder: "border-t-orange-500/40",
     description: "Pure structural science of numerical patterns, self-consistent axioms, ratios, and spatial invariants.",
     words: [
       { word: "Mathematics", tip: "Formal system of self-contained logic, numerical equations, and complex structures." },
@@ -89,7 +89,7 @@ export const UNIFIED_LEXICON_SYSTEMS: LexiconSystem[] = [
     id: "consciousness_studies",
     name: "Consciousness Studies",
     fontClass: "font-sans font-medium italic",
-    textClass: "text-emerald-400 border-emerald-550/40",
+    textClass: "text-emerald-400 border-emerald-500/30 hover:bg-emerald-500/10 hover:border-emerald-500/50",
     tooltipBorder: "border-emerald-500/40",
     tooltipShadow: "shadow-[0_0_15px_rgba(16,185,129,0.3)]",
     arrowBorder: "border-t-emerald-500/40",
@@ -119,7 +119,7 @@ export const UNIFIED_LEXICON_SYSTEMS: LexiconSystem[] = [
     id: "neuroscience",
     name: "Neuroscience",
     fontClass: "font-sans font-extrabold tracking-tight uppercase text-[10px]",
-    textClass: "text-cyan-400 border-cyan-500/30",
+    textClass: "text-cyan-400 border-cyan-500/25 hover:bg-cyan-500/10 hover:border-cyan-500/50",
     tooltipBorder: "border-cyan-500/40",
     tooltipShadow: "shadow-[0_0_15px_rgba(6,182,212,0.3)]",
     arrowBorder: "border-t-cyan-500/40",
@@ -144,7 +144,7 @@ export const UNIFIED_LEXICON_SYSTEMS: LexiconSystem[] = [
     id: "artificial_intelligence",
     name: "Artificial Intelligence",
     fontClass: "font-mono font-bold text-[10px] bg-blue-950/20 px-1 py-0.5 rounded border border-blue-500/20",
-    textClass: "text-blue-400 border-blue-500/30",
+    textClass: "text-blue-400 border-blue-500/20 hover:bg-blue-500/10 hover:border-blue-500/50",
     tooltipBorder: "border-blue-500/40",
     tooltipShadow: "shadow-[0_0_15px_rgba(59,130,246,0.35)]",
     arrowBorder: "border-t-blue-500/40",
@@ -172,7 +172,7 @@ export const UNIFIED_LEXICON_SYSTEMS: LexiconSystem[] = [
     id: "philosophy",
     name: "Philosophy",
     fontClass: "font-serif font-bold tracking-normal",
-    textClass: "text-indigo-400 border-indigo-500/40",
+    textClass: "text-indigo-400 border-indigo-500/30 hover:bg-indigo-500/10 hover:border-indigo-500/50",
     tooltipBorder: "border-indigo-500/40",
     tooltipShadow: "shadow-[0_0_15px_rgba(99,102,241,0.35)]",
     arrowBorder: "border-t-indigo-500/40",
@@ -201,7 +201,7 @@ export const UNIFIED_LEXICON_SYSTEMS: LexiconSystem[] = [
     id: "comparative_religion",
     name: "Comparative Religion",
     fontClass: "font-serif tracking-wider font-semibold uppercase text-[9px]",
-    textClass: "text-[#d97706] border-[#d97706]/40",
+    textClass: "text-amber-500 border-amber-550/30 hover:bg-amber-550/10 hover:border-amber-550/50",
     tooltipBorder: "border-amber-500/40",
     tooltipShadow: "shadow-[0_0_15px_rgba(245,158,11,0.3)]",
     arrowBorder: "border-t-amber-500/40",
@@ -229,7 +229,7 @@ export const UNIFIED_LEXICON_SYSTEMS: LexiconSystem[] = [
     id: "western_esotericism",
     name: "Western Esotericism",
     fontClass: "font-serif font-semibold italic capitalize",
-    textClass: "text-purple-400 border-purple-500/40",
+    textClass: "text-purple-400 border-purple-500/30 hover:bg-purple-500/10 hover:border-purple-500/50",
     tooltipBorder: "border-purple-500/40",
     tooltipShadow: "shadow-[0_0_15px_rgba(168,85,247,0.35)]",
     arrowBorder: "border-t-purple-500/40",
@@ -255,7 +255,7 @@ export const UNIFIED_LEXICON_SYSTEMS: LexiconSystem[] = [
     id: "psychology",
     name: "Psychology",
     fontClass: "font-sans tracking-wide font-normal italic",
-    textClass: "text-rose-400 border-rose-500/40",
+    textClass: "text-rose-400 border-rose-500/25 hover:bg-rose-500/10 hover:border-rose-500/50",
     tooltipBorder: "border-rose-500/40",
     tooltipShadow: "shadow-[0_0_15px_rgba(244,63,94,0.3)]",
     arrowBorder: "border-t-rose-500/40",
@@ -278,7 +278,7 @@ export const UNIFIED_LEXICON_SYSTEMS: LexiconSystem[] = [
     id: "systems_theory",
     name: "Systems Theory",
     fontClass: "font-mono font-bold tracking-tight text-[11px]",
-    textClass: "text-teal-400 border-teal-500/40",
+    textClass: "text-teal-400 border-teal-500/25 hover:bg-teal-500/10 hover:border-teal-500/50",
     tooltipBorder: "border-teal-500/40",
     tooltipShadow: "shadow-[0_0_15px_rgba(20,184,166,0.35)]",
     arrowBorder: "border-t-teal-500/40",
@@ -302,7 +302,7 @@ export const UNIFIED_LEXICON_SYSTEMS: LexiconSystem[] = [
     id: "information_science",
     name: "Information Science",
     fontClass: "font-mono font-semibold text-[10.5px] uppercase",
-    textClass: "text-lime-400 border-lime-500/30",
+    textClass: "text-lime-400 border-lime-500/25 hover:bg-lime-500/10 hover:border-lime-500/50",
     tooltipBorder: "border-lime-500/40",
     tooltipShadow: "shadow-[0_0_15px_rgba(132,204,22,0.3)]",
     arrowBorder: "border-t-lime-500/40",
@@ -324,11 +324,11 @@ export const UNIFIED_LEXICON_SYSTEMS: LexiconSystem[] = [
   {
     id: "mysticism",
     name: "Mysticism",
-    fontClass: "font-serif tracking-widest font-extrabold text-amber-350 bg-amber-500/10 shadow-[0_0_8px_rgba(245,158,11,0.2)] scroll-py-1",
-    textClass: "text-amber-300 border-amber-500/40",
-    tooltipBorder: "border-amber-500/60",
+    fontClass: "font-serif tracking-widest font-extrabold text-amber-300 bg-amber-500/10 shadow-[0_0_8px_rgba(245,158,11,0.2)] scroll-py-1",
+    textClass: "text-yellow-400 border-yellow-500/25 hover:bg-yellow-500/10 hover:border-yellow-500/50",
+    tooltipBorder: "border-yellow-500/60",
     tooltipShadow: "shadow-[0_0_18px_rgba(245,158,11,0.4)]",
-    arrowBorder: "border-t-amber-500/60",
+    arrowBorder: "border-t-yellow-500/60",
     description: "Direct transcendental realization of cosmic nonduality, unitive stillness, and spiritual awakening.",
     words: [
       { word: "Mysticism", tip: "Complete systematic focus on achieving direct, unmediated unitive experience of absolute Source." },
@@ -350,7 +350,7 @@ export const UNIFIED_LEXICON_SYSTEMS: LexiconSystem[] = [
     id: "sacred_geometry_lex",
     name: "Sacred Geometry",
     fontClass: "font-sans tracking-widest font-semibold uppercase text-xs",
-    textClass: "text-orange-355 border-orange-400/40",
+    textClass: "text-orange-350 border-orange-400/25 hover:bg-orange-500/10 hover:border-orange-500/50",
     tooltipBorder: "border-orange-500/40",
     tooltipShadow: "shadow-[0_0_15px_rgba(251,146,60,0.35)]",
     arrowBorder: "border-t-orange-500/40",
@@ -369,7 +369,7 @@ export const UNIFIED_LEXICON_SYSTEMS: LexiconSystem[] = [
     id: "alchemy_lex",
     name: "Alchemy",
     fontClass: "font-serif italic font-black text-amber-500",
-    textClass: "text-amber-500 border-amber-600/40",
+    textClass: "text-amber-500 border-amber-600/25 hover:bg-amber-600/10 hover:border-amber-600/50",
     tooltipBorder: "border-amber-600/40",
     tooltipShadow: "shadow-[0_0_15px_rgba(217,119,6,0.35)]",
     arrowBorder: "border-t-amber-600/40",
@@ -392,7 +392,7 @@ export const UNIFIED_LEXICON_SYSTEMS: LexiconSystem[] = [
     id: "metemphysics_lex",
     name: "Metemphysics",
     fontClass: "font-serif font-extrabold uppercase tracking-wide bg-gradient-to-r from-orange-400 to-amber-300 bg-clip-text text-transparent hover:brightness-125 animate-pulse",
-    textClass: "text-orange-400 border-orange-500/50",
+    textClass: "text-orange-400 border-orange-500/25 hover:bg-orange-500/10 hover:border-orange-500/50",
     tooltipBorder: "border-orange-500/50",
     tooltipShadow: "shadow-[0_0_20px_rgba(251,146,60,0.5)]",
     arrowBorder: "border-t-orange-500/50",
@@ -424,7 +424,7 @@ export const UNIFIED_LEXICON_SYSTEMS: LexiconSystem[] = [
     id: "ancient_traditions",
     name: "Ancient Traditions",
     fontClass: "font-serif tracking-wider font-light italic",
-    textClass: "text-yellow-500 border-yellow-600/40",
+    textClass: "text-yellow-500 border-yellow-600/25 hover:bg-yellow-600/10 hover:border-yellow-600/50",
     tooltipBorder: "border-yellow-600/40",
     tooltipShadow: "shadow-[0_0_15px_rgba(234,179,8,0.3)]",
     arrowBorder: "border-t-yellow-600/40",
@@ -447,7 +447,7 @@ export const UNIFIED_LEXICON_SYSTEMS: LexiconSystem[] = [
     id: "future_studies",
     name: "Future Studies",
     fontClass: "font-sans font-bold uppercase tracking-widest text-[9.5px] bg-[#0c1a1e] px-1.5 py-0.5 rounded border border-cyan-500/20",
-    textClass: "text-cyan-300 border-cyan-400/30",
+    textClass: "text-cyan-400 border-cyan-500/25 hover:bg-cyan-500/10 hover:border-cyan-500/50",
     tooltipBorder: "border-cyan-400/40",
     tooltipShadow: "shadow-[0_0_15px_rgba(34,211,238,0.35)]",
     arrowBorder: "border-t-cyan-400/40",
@@ -466,3 +466,26 @@ export const UNIFIED_LEXICON_SYSTEMS: LexiconSystem[] = [
     ]
   }
 ];
+
+export function getSystemHeadingColorClass(sysId: string): string {
+  switch (sysId) {
+    case "physics": return "text-white";
+    case "mathematics": return "text-orange-400";
+    case "consciousness_studies": return "text-emerald-400";
+    case "neuroscience": return "text-cyan-400";
+    case "artificial_intelligence": return "text-blue-400";
+    case "philosophy": return "text-indigo-400";
+    case "comparative_religion": return "text-amber-550";
+    case "western_esotericism": return "text-purple-400";
+    case "psychology": return "text-rose-400";
+    case "systems_theory": return "text-teal-400";
+    case "information_science": return "text-lime-400";
+    case "mysticism": return "text-yellow-400";
+    case "sacred_geometry_lex": return "text-orange-350";
+    case "alchemy_lex": return "text-amber-500";
+    case "metemphysics_lex": return "text-orange-400";
+    case "ancient_traditions": return "text-yellow-500";
+    case "future_studies": return "text-cyan-400";
+    default: return "text-orange-400";
+  }
+}

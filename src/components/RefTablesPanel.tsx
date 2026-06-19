@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Table, X, Book, Database, RefreshCw, Layers, BookOpen } from "lucide-react";
 import { METEM_DB } from "../data/metemDb";
-import { UNIFIED_LEXICON_SYSTEMS } from "../data/metemLexicon";
+import { UNIFIED_LEXICON_SYSTEMS, getSystemHeadingColorClass } from "../data/metemLexicon";
 
 export default function RefTablesPanel({ onClose, onSendPrompt }: { onClose: () => void; onSendPrompt: (p: string) => void }) {
   const [activeSubTab, setActiveSubTab] = useState<"constants" | "thermo" | "solfeggio" | "traditions" | "lexicon">("constants");
@@ -290,7 +290,7 @@ export default function RefTablesPanel({ onClose, onSendPrompt }: { onClose: () 
                       {/* System Header */}
                       <div className="flex flex-wrap items-center justify-between gap-1.5 border-b border-white/5 pb-1.5 mb-2">
                         <div className="flex items-center gap-2">
-                          <span className={`${sys.fontClass} text-[11px] uppercase tracking-wider text-orange-400`}>
+                          <span className={`${sys.fontClass} text-[11px] uppercase tracking-wider ${getSystemHeadingColorClass(sys.id)}`}>
                             {sys.name}
                           </span>
                           <span className="text-[8px] font-mono text-gray-500 border border-white/5 px-1 rounded uppercase tracking-[0.15em]">NODE</span>

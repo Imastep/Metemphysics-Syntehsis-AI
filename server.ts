@@ -163,6 +163,36 @@ async function startServer() {
     return { count: tracker.count, allowed: tracker.count <= MAX_REQUESTS_PER_WINDOW };
   };
 
+  // Live Health Endpoint with comprehensive system monitoring
+  app.get("/api/health", (req, res) => {
+    try {
+      const upTimeSec = process.uptime();
+      const upTimeFormatted = `${Math.floor(upTimeSec / 3600)}h ${Math.floor((upTimeSec % 3600) / 60)}m ${Math.floor(upTimeSec % 60)}s`;
+      
+      const healthData = {
+        status: "healthy",
+        uptimeSeconds: upTimeSec,
+        uptimeFormatted: upTimeFormatted,
+        timestamp: new Date().toISOString(),
+        redisCache: {
+          configured: !!redisUrl,
+          active: isRedisReady,
+          mode: isRedisReady ? "scaled_multi_server" : "local_in_memory_fallback"
+        },
+        memoryUsage: process.memoryUsage(),
+        platform: {
+          nodeVersion: process.version,
+          arch: process.arch,
+          platform: process.platform
+        }
+      };
+      
+      return res.status(200).json(healthData);
+    } catch (err: any) {
+      return res.status(500).json({ status: "unhealthy", error: err.message });
+    }
+  });
+
   // Endpoint to save procedurally generated launcher icon to .aistudio folder
   app.post("/api/save-icon", express.json({ limit: "15mb" }), async (req, res) => {
     try {
@@ -337,7 +367,7 @@ CRITICAL FORMULA DIRECTIVE: Never output raw LaTeX mathematical formatting (e.g.
         return raw.replace(/[{}"[\]:]/g, "").slice(0, 100);
       };
 
-      const REQUEST_TIMEOUT_MS = 12000; // 12 seconds optimal threshold for snappy chat replies
+      const REQUEST_TIMEOUT_MS = 30000; // 30 seconds robust threshold for comprehensive synthesis and model warm-ups
       let timeoutId: NodeJS.Timeout | undefined;
 
       const generateResponseWithTimeout = async (): Promise<any> => {

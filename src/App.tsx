@@ -31,7 +31,8 @@ import {
   Hash,
   X,
   Copy,
-  Check
+  Check,
+  Network
 } from "lucide-react";
 import { METEM_DB, GRAPH } from "./data/metemDb";
 import { UNIFIED_LEXICON_SYSTEMS } from "./data/metemLexicon";
@@ -46,6 +47,7 @@ import RefToolsPanel from "./components/RefToolsPanel";
 import HawkinsProgramPanel from "./components/HawkinsProgramPanel";
 import CelestialScalePanel from "./components/CelestialScalePanel";
 import NumerologyPanel from "./components/NumerologyPanel";
+import KnodeGraphPanel from "./components/KnodeGraphPanel";
 
 // Reusable Tooltip component with instant-rendered definitions relative to systems
 function Tooltip({ children, content }: { children: React.ReactNode; content: string }) {
@@ -85,54 +87,327 @@ const getSmallestSummary = (text: string): string => {
 };
 
 const firstQueries = [
-  { label: "T × S = C Axiom Proof", query: "What is the absolute proof and physical significance of the fundamental Metemphysics law T × S = C?", icon: Flame, color: "hover:border-orange-500/60 hover:text-orange-400 font-bold" },
-  { label: "Entropy S = C / T", query: "How is calculated molar entropy derived using S = C / T under standard and cosmic light parameters?", icon: Atom, color: "hover:border-amber-500/60 hover:text-amber-300 font-bold" }
+  { label: "T × S = C Axiom Proof", query: "Explain the T × S = C law simply.", icon: Flame, color: "hover:border-orange-500/60 hover:text-orange-400 font-bold", score: 99 },
+  { label: "Entropy S = C / T", query: "How is entropy derived from S = C / T?", icon: Atom, color: "hover:border-amber-500/60 hover:text-amber-300 font-bold", score: 94 }
 ];
 
-const getDynamicSuggestions = (lastModelText: string) => {
-  const text = lastModelText.toLowerCase();
-  
-  if (text.includes("chakra") || text.includes("solfeggio") || text.includes("hz") || text.includes("vibration") || text.includes("anahata")) {
-    return [
-      { label: "Ajna H-Calibration", query: "Explain the Solfeggio calibration for Ajna and the H-calibration parameter.", icon: Flame, color: "hover:border-orange-500/50 hover:text-orange-400" },
-      { label: "Frequency of Love (528Hz)", query: "Detail the high-coherence H-value of 528 Hz vibration under T × S = C.", icon: Sparkles, color: "hover:border-amber-500/50 hover:text-amber-400" }
-    ];
-  }
-  if (text.includes("entropy") || text.includes("molar") || text.includes("thermodynamic") || text.includes("boltzmann")) {
-    return [
-      { label: "Bio S° Limits", query: "What are the molecular molar entropy limits in cellular life?", icon: Dna, color: "hover:border-orange-500/50 hover:text-orange-355" },
-      { label: "Boltzmann Scaling", query: "How does the Boltzmann constant scale under the cosmic wave C constant?", icon: Atom, color: "hover:border-amber-500/50 hover:text-amber-300" }
-    ];
-  }
-  if (text.includes("bio") || text.includes("metabolic") || text.includes("life") || text.includes("ecosystem") || text.includes("cellular")) {
-    return [
-      { label: "Mitochondrial dΩ/dt", query: "Analyze the dΩ/dt throughput within human mitochondrial respiration.", icon: Dna, color: "hover:border-orange-500/50 hover:text-orange-400" },
-      { label: "Biosphere S-Molar Boundaries", query: "Compare the carbon-based molar entropy of biosystem boundaries.", icon: BarChart, color: "hover:border-amber-500/50 hover:text-amber-400" }
-    ];
-  }
-  if (text.includes("system") || text.includes("aurobindo") || text.includes("wilber") || text.includes("developmental")) {
-    return [
-      { label: "Ken Wilber 4-Quadrants", query: "Map Ken Wilber's Quadrants to thermodynamic state entropy.", icon: Compass, color: "hover:border-orange-550/50 hover:text-orange-350" },
-      { label: "Supermind Evolution", query: "How does Sri Aurobindo's 'Supermind' relate to thermodynamic state limits?", icon: Sparkles, color: "hover:border-amber-550/50 hover:text-amber-300" }
-    ];
-  }
-  if (text.includes("hawkins") || text.includes("attractor") || text.includes("calibrat")) {
-    return [
-      { label: "Calibrating Joy (540)", query: "Analyze the thermodynamic characteristics of Hawkins Logarithmic field 540.", icon: Cpu, color: "hover:border-orange-500/50 hover:text-orange-350" },
-      { label: "Integrity Inversion Point (200)", query: "Why is the critical threshold of 200 in Hawkins Map the absolute entropy inversion point?", icon: Activity, color: "hover:border-amber-500/50 hover:text-amber-300" }
-    ];
-  }
-  if (text.includes("calc") || text.includes("solver") || text.includes("equation") || text.includes("c_light")) {
-    return [
-      { label: "Planck normalized S", query: "Under Planck normalized constant C = 1, prove that T = 1 / S.", icon: Calculator, color: "hover:border-orange-500/50 hover:text-orange-400" },
-      { label: "Eudaimonia dΩ/dt", query: "Describe the specific physical formula of dynamic daily eudaimonia dΩ/dt.", icon: Sparkles, color: "hover:border-amber-500/50 hover:text-amber-400" }
-    ];
+const getDynamicSuggestions = (lastUserText: string, lastModelText: string) => {
+  const userText = (lastUserText || "").toLowerCase();
+  const modelText = (lastModelText || "").toLowerCase();
+
+  const candidates = [
+    {
+      label: "T × S = C Axiom Proof",
+      query: "Explain the T × S = C law simply.",
+      icon: Flame,
+      color: "hover:border-orange-500/60 hover:text-orange-400 font-bold",
+      keywords: ["axiom", "proof", "law", "t x s = c", "txsc", "t*s=c", "fundamental", "barrier", "constant"]
+    },
+    {
+      label: "Entropy S = C / T",
+      query: "How is entropy derived from S = C / T?",
+      icon: Atom,
+      color: "hover:border-amber-500/60 hover:text-amber-300 font-bold",
+      keywords: ["entropy", "s = c / t", "c / t", "parameter", "dispersion", "derivation", "thermodynamic", "boltzmann"]
+    },
+    {
+      label: "Knode Graph Transitions",
+      query: "How are Knode transition coordinates calculated?",
+      icon: Network,
+      color: "hover:border-orange-550 hover:text-orange-400",
+      keywords: ["knode", "graph", "route", "link", "topology", "transition", "coordinates", "network"]
+    },
+    {
+      label: "Linked systems list",
+      query: "Which databases intersect with the active Knode?",
+      icon: BookOpen,
+      color: "hover:border-amber-500 hover:text-amber-400",
+      keywords: ["linked", "db", "database", "intersect", "active", "system", "alignment"]
+    },
+    {
+      label: "Nondual Vedic S-Limit",
+      query: "How does Vedantic nonduality align with S-limit state dispersion?",
+      icon: BookOpen,
+      color: "hover:border-orange-500/50 hover:text-orange-400",
+      keywords: ["nondual", "vedant", "hindu", "s-limit", "state dispersion", "liberation", "advaita", "oneness", "upanishad", "religion", "tradition"]
+    },
+    {
+      label: "Hermetic Kybalion Vibration",
+      query: "Explain Kybalion vibration under T × S = C standards.",
+      icon: Sparkles,
+      color: "hover:border-amber-500/50 hover:text-amber-400",
+      keywords: ["hermetic", "kybalion", "vibration", "principle", "polarity", "rhythm", "emerald", "thoth", "tradition", "alchemy"]
+    },
+    {
+      label: "Schwarzschild Boundary limits",
+      query: "How does Schwarzschild density fit T × S = C?",
+      icon: Sparkles,
+      color: "hover:border-orange-500 hover:text-orange-400",
+      keywords: ["schwarzschild", "boundary", "density", "black hole", "mass", "horizon", "gravity", "geometry"]
+    },
+    {
+      label: "FMCS Planetary Scale",
+      query: "Tell me about the Celestial Mass scale.",
+      icon: Compass,
+      color: "hover:border-amber-500 hover:text-amber-300",
+      keywords: ["fmcs", "planetary", "stellar", "scale", "mass", "celestial", "evolution", "galaxy", "universe", "stars"]
+    },
+    {
+      label: "Nine-Vessel Dimensionality",
+      query: "Explain Pythagorean nine-vessel reductions.",
+      icon: Hash,
+      color: "hover:border-orange-500 hover:text-orange-400",
+      keywords: ["nine-vessel", "pythagor", "numer", "reduction", "geometry", "vessel", "dimensional", "archetype", "nine"]
+    },
+    {
+      label: "Golden Ratio (Phi) S-Limit",
+      query: "How does the golden ratio optimize entropy?",
+      icon: Layers,
+      color: "hover:border-amber-500 hover:text-amber-400",
+      keywords: ["golden ratio", "phi", "optimize", "fibonacci", "fractal", "limitation", "ratio"]
+    },
+    {
+      label: "Ajna H-Calibration",
+      query: "What is Ajna Solfeggio calibration?",
+      icon: Flame,
+      color: "hover:border-orange-500/50 hover:text-orange-400",
+      keywords: ["ajna", "solfeggio", "calibration", "chakra", "third eye", "h-calibration", "vibration", "hz", "frequency"]
+    },
+    {
+      label: "Frequency of Love (528Hz)",
+      query: "Explain the 528 Hz vibration in T × S = C.",
+      icon: Sparkles,
+      color: "hover:border-amber-500/50 hover:text-amber-400",
+      keywords: ["love", "528", "528hz", "coherence", "anahata", "heart", "frequency", "hz", "vibration"]
+    },
+    {
+      label: "Bio S° Limits",
+      query: "What are cellular molar entropy limits?",
+      icon: Dna,
+      color: "hover:border-orange-500/50 hover:text-orange-455",
+      keywords: ["bio", "cellular", "molar", "entropy", "cellular life", "limit", "clausius", "molecular", "respiration"]
+    },
+    {
+      label: "Boltzmann Scaling",
+      query: "How does Boltzmann's constant scale with C?",
+      icon: Atom,
+      color: "hover:border-amber-500/50 hover:text-amber-300",
+      keywords: ["boltzmann", "constant", "scale", "clausius", "thermodynamic", "entropy", "wave"]
+    },
+    {
+      label: "Mitochondrial dΩ/dt",
+      query: "Analyze human mitochondrial respiration.",
+      icon: Dna,
+      color: "hover:border-orange-500/50 hover:text-orange-400",
+      keywords: ["mitochondrial", "domega/dt", "respiration", "metabolic", "cellular", "energy", "life", "cell"]
+    },
+    {
+      label: "Biosphere S-Molar Boundaries",
+      query: "Compare carbon molar entropy boundaries.",
+      icon: BarChart,
+      color: "hover:border-amber-500/50 hover:text-amber-400",
+      keywords: ["biosphere", "carbon", "boundary", "molar", "ecosystem", "respiration", "envelope"]
+    },
+    {
+      label: "Ken Wilber 4-Quadrants",
+      query: "How do Ken Wilber's quadrants relate to entropy?",
+      icon: Compass,
+      color: "hover:border-orange-550/50 hover:text-orange-355",
+      keywords: ["wilber", "quadrant", "developmental", "spiral", "integral", "all quadrants", "aqal", "quadrants"]
+    },
+    {
+      label: "Supermind Evolution",
+      query: "How does Aurobindo's 'Supermind' relate to T × S = C?",
+      icon: Sparkles,
+      color: "hover:border-amber-550/50 hover:text-amber-300",
+      keywords: ["aurobindo", "supermind", "evolution", "consciousness", "divine", "integral yoga", "descent", "system", "state"]
+    },
+    {
+      label: "Calibrating Joy (540)",
+      query: "Explain Hawkins attractor field 540.",
+      icon: Cpu,
+      color: "hover:border-orange-500/50 hover:text-orange-355",
+      keywords: ["hawkins", "attractor", "540", "joy", "calibration", "power vs force", "levels of consciousness"]
+    },
+    {
+      label: "Integrity Inversion Point (200)",
+      query: "Why is 200 the critical threshold in Hawkins Map?",
+      icon: Activity,
+      color: "hover:border-amber-500/50 hover:text-amber-300",
+      keywords: ["inversion", "200", "integrity", "hawkins", "courage", "critical", "threshold", "attractor", "map"]
+    },
+    {
+      label: "Planck normalized S",
+      query: "Under Planck constant C = 1, does T = 1 / S?",
+      icon: Calculator,
+      color: "hover:border-orange-500/50 hover:text-orange-400",
+      keywords: ["planck", "normalized", "c = 1", "proof", "solver", "equation", "fundamental"]
+    },
+    {
+      label: "Eudaimonia dΩ/dt",
+      query: "What is the formula of daily eudaimonia dΩ/dt?",
+      icon: Sparkles,
+      color: "hover:border-amber-500/50 hover:text-amber-400",
+      keywords: ["eudaimonia", "domega", "domega/dt", "formula", "daily", "fulfillment", "spirit", "happiness"]
+    }
+  ];
+
+  // 1. Identify active nodes/glossary items based on wordReg pattern matching
+  const activeNodes = METEM_GLOSSARY.map(item => {
+    let matchesUser = false;
+    let matchesModel = false;
+    try {
+      matchesUser = item.wordReg.test(userText);
+    } catch {}
+    try {
+      matchesModel = item.wordReg.test(modelText);
+    } catch {}
+
+    let nodeScore = 0;
+    if (matchesUser && matchesModel) {
+      nodeScore = 120; // Highest relevance (intersecting seeker and response node highlights)
+    } else if (matchesUser) {
+      nodeScore = 95;  // Highly relevant targeted seeker/user inquiry
+    } else if (matchesModel) {
+      nodeScore = 75;  // Response highlighted active node
+    }
+
+    return {
+      item,
+      nodeScore,
+      matchesUser,
+      matchesModel
+    };
+  }).filter(n => n.nodeScore > 0)
+    .sort((a, b) => b.nodeScore - a.nodeScore);
+
+  const selectedSuggestions: typeof candidates = [];
+  const selectedLabels = new Set<string>();
+
+  // 2. Loop through our top-ranking active nodes, find their best matching candidates
+  for (const node of activeNodes) {
+    if (selectedSuggestions.length >= 3) break;
+
+    let bestCand = null;
+    let maxMatchVal = -1;
+
+    for (const cand of candidates) {
+      if (selectedLabels.has(cand.label)) continue;
+
+      let matchVal = 0;
+      if (cand.keywords.includes(node.item.key)) {
+        matchVal += 80;
+      }
+      
+      cand.keywords.forEach(kw => {
+        if (kw === node.item.key) matchVal += 30;
+        try {
+          if (node.item.wordReg.test(kw) || kw.includes(node.item.key) || node.item.key.includes(kw)) {
+            matchVal += 20;
+          }
+        } catch {}
+      });
+
+      try {
+        if (node.item.wordReg.test(cand.label) || node.item.wordReg.test(cand.query)) {
+          matchVal += 40;
+        }
+      } catch {}
+
+      if (matchVal > maxMatchVal) {
+        maxMatchVal = matchVal;
+        bestCand = cand;
+      }
+    }
+
+    if (bestCand && maxMatchVal > 0) {
+      let finalScore = 65;
+      if (node.nodeScore === 120) {
+        finalScore = Math.min(99, Math.round(92 + (maxMatchVal % 8)));
+      } else if (node.nodeScore === 95) {
+        finalScore = Math.min(94, Math.round(84 + (maxMatchVal % 10)));
+      } else {
+        finalScore = Math.min(84, Math.round(72 + (maxMatchVal % 12)));
+      }
+
+      selectedSuggestions.push({
+        ...bestCand,
+        score: finalScore
+      } as any);
+      selectedLabels.add(bestCand.label);
+    }
   }
 
-  return [
-    { label: "Eudaimonia dΩ/dt Limit", query: "How does dΩ/dt impact daily eudaimonia?", icon: Atom, color: "hover:border-orange-500/50 hover:text-orange-450" },
-    { label: "Physical-Consciousness Dual", query: "State the mathematical and thermodynamic proof connecting time duration T and state entropy S under T × S = C.", icon: Activity, color: "hover:border-amber-500/50 hover:text-amber-400" }
-  ];
+  // 3. Fallback filler if fewer than 3 suggestions found
+  if (selectedSuggestions.length < 3) {
+    const scoredCandidates = candidates
+      .filter(cand => !selectedLabels.has(cand.label))
+      .map(cand => {
+        let seekerPoints = 0;
+        let responsePoints = 0;
+
+        activeNodes.forEach(node => {
+          let hasOverlap = cand.keywords.includes(node.item.key);
+          cand.keywords.forEach(kw => {
+            try {
+              if (node.item.wordReg.test(kw) || kw.includes(node.item.key) || node.item.key.includes(kw)) {
+                hasOverlap = true;
+              }
+            } catch {}
+          });
+          try {
+            if (node.item.wordReg.test(cand.label) || node.item.wordReg.test(cand.query)) {
+              hasOverlap = true;
+            }
+          } catch {}
+
+          if (hasOverlap) {
+            if (node.matchesUser) seekerPoints += 25;
+            if (node.matchesModel) responsePoints += 15;
+          }
+        });
+
+        cand.keywords.forEach(kw => {
+          if (userText.includes(kw)) seekerPoints += 10;
+          if (modelText.includes(kw)) responsePoints += 5;
+        });
+
+        const rawPoints = (seekerPoints * 2.0) + responsePoints;
+
+        let score = 0;
+        if (seekerPoints > 0) {
+          score = Math.min(99, Math.round(82 + Math.min(17, seekerPoints * 0.4 + responsePoints * 0.15)));
+        } else if (responsePoints > 0) {
+          score = Math.min(85, Math.round(65 + Math.min(19, responsePoints * 0.7)));
+        } else {
+          const seed = cand.label.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+          score = Math.min(68, Math.round(45 + (seed % 23)));
+        }
+
+        return {
+          ...cand,
+          seekerPoints,
+          rawPoints,
+          score
+        };
+      });
+
+    scoredCandidates.sort((a, b) => {
+      if (b.seekerPoints !== a.seekerPoints) return b.seekerPoints - a.seekerPoints;
+      if (b.rawPoints !== a.rawPoints) return b.rawPoints - a.rawPoints;
+      return b.score - a.score;
+    });
+
+    for (const cand of scoredCandidates) {
+      if (selectedSuggestions.length >= 3) break;
+      selectedSuggestions.push(cand);
+      selectedLabels.add(cand.label);
+    }
+  }
+
+  selectedSuggestions.sort((a: any, b: any) => (b.score || 0) - (a.score || 0));
+
+  return selectedSuggestions.slice(0, 3);
 };
 
 function cleanMathText(text: string): string {
@@ -298,6 +573,459 @@ UNIFIED_LEXICON_SYSTEMS.forEach(sys => {
     });
   });
 });
+
+function getSystemIdForOntologyItem(id: string, category: string): string {
+  const mid = id.toLowerCase();
+
+  // Explicit mappings to ensure high accuracy:
+  if (mid === "physics") return "physics";
+  if (mid === "mathematics_science" || mid.includes("mathematics") || mid === "godel_incompr_formula") return "mathematics";
+  if (mid === "neuroscience" || mid === "pribram_disc" || mid === "leary") return "neuroscience";
+  if (mid === "ai" || mid === "shannon_info_formula") return "artificial_intelligence";
+  if (mid === "philosophy" || mid.includes("plato") || mid.includes("aristotle") || mid.includes("lao_tzu") || mid === "stoicism" || mid === "platonism" || mid === "virtues_ethics" || mid === "kohlberg") return "philosophy";
+  
+  if (mid === "alchemy_transmute" || mid === "alchemy_rose") return "alchemy_lex";
+  if (mid === "sacred_geometry" || mid.includes("fibonacci_phi_formula") || mid === "pythagorean_monad_formula") return "sacred_geometry_lex";
+  
+  if (mid === "metemphysics_discovery" || mid === "god_eq" || mid === "timeliness" || mid === "rate_ordering" || mid === "conscious_omega" || mid === "uncertainty_princ" || mid === "omega_resonance" || mid === "order_qty" || mid === "soul_conserv" || mid === "mean_omega") return "metemphysics_lex";
+  
+  if (mid.includes("egypt_thoth") || mid.includes("aboriginal_dream") || mid.includes("norse_runes") || mid.includes("shamanism") || mid.includes("mayan_cosmology") || mid.includes("vedic_yugas") || mid.includes("i_ching")) return "ancient_traditions";
+  
+  if (mid.includes("future_studies") || mid === "future_studies") return "future_studies";
+  
+  if (mid === "shannon" || mid.includes("shannon") || mid.includes("information_science")) return "information_science";
+  
+  if (mid === "systems_theory" || mid === "spiral_dynamics" || mid === "wilber" || mid === "maslow") return "systems_theory";
+  
+  if (mid === "psychology_science" || mid === "psychology_jung" || mid === "jung_disc" || mid === "james_disc" || mid === "loevinger" || mid === "erikson" || mid === "piaget" || mid === "kegan" || mid === "enneagram_sys") return "psychology";
+  
+  if (mid === "kashmir_shaivism" || mid === "dzogchen" || mid === "hesychasm" || mid === "integral_zen" || mid === "chakra" || mid === "abraham_hicks" || mid === "aurobindo" || mid === "teresa_of_avila" || mid === "sufi_maqamat") return "mysticism";
+  
+  // Mappings by subcategory or category
+  if (category === "religion" || category === "religions") {
+    if (mid === "gnosticism" || mid === "kabbalah" || mid === "hermeticism" || mid === "neoplatonism" || mid === "pythagoreanism" || mid === "essene" || mid === "theosophy_blavatsky" || mid === "astrology_cosmic" || mid === "kabbalah_sefirot" || mid === "gurdjieff" || mid === "human_design" || mid === "astrology_systems") {
+      return "western_esotericism";
+    }
+    return "comparative_religion";
+  }
+
+  if (category === "discoveries") {
+    if (mid === "einstein" || mid === "boltzmann" || mid === "planck" || mid === "heisenberg" || mid === "prigogine" || mid === "hawking_discovery" || mid === "newton" || mid === "penrose_discovery" || mid === "copenhagen_duality" || mid === "tesla_discovery" || mid.includes("einstein_rel_formula") || mid.includes("boltzmann_entropy_formula") || mid.includes("planck_energy_formula") || mid.includes("hawking_entropy_formula") || mid.includes("schrodinger_wave_formula") || mid.includes("heisenberg_unc_formula")) {
+      return "physics";
+    }
+    if (mid === "darwin") return "consciousness_studies";
+  }
+
+  // General fallbacks based on substrings
+  if (mid.includes("physics") || mid.includes("quantum") || mid.includes("relativity") || mid.includes("gravity") || mid.includes("entropy") || mid.includes("energy")) return "physics";
+  if (mid.includes("math") || mid.includes("geometry") || mid.includes("num") || mid.includes("ratio") || mid.includes("interval")) return "mathematics";
+  if (mid.includes("neuro") || mid.includes("brain") || mid.includes("mind") || mid.includes("cogni")) return "neuroscience";
+  if (mid.includes("ai") || mid.includes("comput") || mid.includes("learn") || mid.includes("network")) return "artificial_intelligence";
+  if (mid.includes("philosophy") || mid.includes("epistem") || mid.includes("logic")) return "philosophy";
+  if (mid.includes("psycho") || mid.includes("behavior") || mid.includes("archetype") || mid.includes("ego")) return "psychology";
+  if (mid.includes("mystic") || mid.includes("awake") || mid.includes("enlight") || mid.includes("spiritual") || mid.includes("consciousness")) return "mysticism";
+  if (mid.includes("alchemy")) return "alchemy_lex";
+  if (mid.includes("sacred") || mid.includes("vesica") || mid.includes("solids")) return "sacred_geometry_lex";
+  if (mid.includes("religion") || mid.includes("theolog") || mid.includes("faith") || mid.includes("tradition") || mid.includes("church") || mid.includes("catholic")) return "comparative_religion";
+  if (mid.includes("esoteric") || mid.includes("hermet") || mid.includes("kabbalah") || mid.includes("occult")) return "western_esotericism";
+  if (mid.includes("system") || mid.includes("thinking") || mid.includes("feedback") || mid.includes("emerg")) return "systems_theory";
+  if (mid.includes("info") || mid.includes("data") || mid.includes("shannon") || mid.includes("retriev")) return "information_science";
+  if (mid.includes("ancient") || mid.includes("primeval") || mid.includes("primordial") || mid.includes("templ") || mid.includes("myth")) return "ancient_traditions";
+  if (mid.includes("future") || mid.includes("singularity") || mid.includes("posthuman") || mid.includes("evolve")) return "future_studies";
+  if (mid.includes("life") || mid.includes("biolog") || mid.includes("cell") || mid.includes("dna") || mid.includes("gaia")) return "consciousness_studies";
+
+  return "physics"; // general fallback
+}
+
+function getOntologyItemColors(id: string, category: string) {
+  const systemId = getSystemIdForOntologyItem(id, category);
+
+  switch (systemId) {
+    case "physics":
+      return {
+        borderClass: "border-white/10 hover:border-white/50 shadow-[0_0_12px_rgba(255,255,255,0.1)] bg-[#040404] hover:bg-white/5",
+        textClass: "text-white/95 font-bold",
+        hoverClass: "hover:bg-white/5",
+        bgClass: "bg-white/[0.01]",
+        textHoverClass: "group-hover:text-white",
+        badgeClass: "text-white border-white/20 bg-white/5",
+        fontClass: "font-sans font-bold text-xs"
+      };
+
+    case "mathematics":
+      return {
+        borderClass: "border-orange-500/15 hover:border-orange-500/50 shadow-[0_0_12px_rgba(249,115,22,0.1)] bg-[#0c0604] hover:bg-orange-500/5",
+        textClass: "text-orange-400/95 font-semibold",
+        hoverClass: "hover:bg-orange-500/10",
+        bgClass: "bg-orange-500/[0.01]",
+        textHoverClass: "group-hover:text-orange-350",
+        badgeClass: "text-orange-400 border-orange-500/30 bg-orange-500/5",
+        fontClass: "font-mono font-semibold text-xs tracking-wider"
+      };
+
+    case "consciousness_studies":
+      return {
+        borderClass: "border-emerald-500/15 hover:border-emerald-500/50 shadow-[0_0_12px_rgba(16,185,129,0.1)] bg-[#040c04] hover:bg-emerald-500/5",
+        textClass: "text-emerald-400/95 font-medium italic",
+        hoverClass: "hover:bg-emerald-500/10",
+        bgClass: "bg-emerald-500/[0.01]",
+        textHoverClass: "group-hover:text-emerald-350",
+        badgeClass: "text-emerald-400 border-emerald-500/30 bg-emerald-500/5",
+        fontClass: "font-sans font-medium italic text-xs"
+      };
+
+    case "neuroscience":
+      return {
+        borderClass: "border-cyan-500/15 hover:border-cyan-500/50 shadow-[0_0_12px_rgba(6,182,212,0.1)] bg-[#040c0c] hover:bg-cyan-500/5",
+        textClass: "text-cyan-400/95 font-extrabold uppercase tracking-tight",
+        hoverClass: "hover:bg-cyan-500/10",
+        bgClass: "bg-cyan-500/[0.01]",
+        textHoverClass: "group-hover:text-cyan-300",
+        badgeClass: "text-cyan-400 border-cyan-500/30 bg-cyan-500/5",
+        fontClass: "font-sans font-extrabold tracking-tight uppercase text-[10.5px]"
+      };
+
+    case "artificial_intelligence":
+      return {
+        borderClass: "border-blue-500/15 hover:border-blue-500/50 shadow-[0_0_12px_rgba(59,130,246,0.1)] bg-[#04040c] hover:bg-blue-500/10",
+        textClass: "text-blue-400 font-bold",
+        hoverClass: "hover:bg-blue-500/10",
+        bgClass: "bg-blue-500/[0.01]",
+        textHoverClass: "group-hover:text-blue-300",
+        badgeClass: "text-blue-400 border-blue-500/30 bg-blue-500/5",
+        fontClass: "font-mono font-bold text-[11px]"
+      };
+
+    case "philosophy":
+      return {
+        borderClass: "border-indigo-500/15 hover:border-indigo-500/50 shadow-[0_0_12px_rgba(99,102,241,0.1)] bg-[#04040c] hover:bg-indigo-500/5",
+        textClass: "text-indigo-400/95 font-bold",
+        hoverClass: "hover:bg-indigo-500/10",
+        bgClass: "bg-indigo-500/[0.01]",
+        textHoverClass: "group-hover:text-indigo-300",
+        badgeClass: "text-indigo-400 border-indigo-500/30 bg-indigo-500/5",
+        fontClass: "font-serif font-bold text-xs"
+      };
+
+    case "comparative_religion":
+      return {
+        borderClass: "border-amber-500/15 hover:border-amber-500/50 shadow-[0_0_12px_rgba(245,158,11,0.1)] bg-[#0c0804] hover:bg-amber-500/5",
+        textClass: "text-amber-500/95 font-semibold uppercase tracking-wider",
+        hoverClass: "hover:bg-amber-500/10",
+        bgClass: "bg-amber-500/[0.01]",
+        textHoverClass: "group-hover:text-amber-400",
+        badgeClass: "text-amber-500 border-amber-500/30 bg-amber-500/5",
+        fontClass: "font-serif tracking-wider font-semibold uppercase text-[10px]"
+      };
+
+    case "western_esotericism":
+      return {
+        borderClass: "border-purple-500/15 hover:border-purple-500/50 shadow-[0_0_12px_rgba(168,85,247,0.1)] bg-[#0c040c] hover:bg-purple-500/5",
+        textClass: "text-purple-400/95 font-semibold italic",
+        hoverClass: "hover:bg-purple-500/10",
+        bgClass: "bg-purple-500/[0.01]",
+        textHoverClass: "group-hover:text-purple-300",
+        badgeClass: "text-purple-400 border-purple-500/30 bg-purple-500/5",
+        fontClass: "font-serif font-semibold italic capitalize text-xs"
+      };
+
+    case "psychology":
+      return {
+        borderClass: "border-rose-500/15 hover:border-rose-500/50 shadow-[0_0_12px_rgba(244,63,94,0.1)] bg-[#0c0404] hover:bg-rose-500/5",
+        textClass: "text-rose-400/95 font-normal italic",
+        hoverClass: "hover:bg-rose-500/10",
+        bgClass: "bg-rose-500/[0.01]",
+        textHoverClass: "group-hover:text-rose-300",
+        badgeClass: "text-rose-400 border-rose-500/30 bg-rose-500/5",
+        fontClass: "font-sans tracking-wide font-normal italic text-xs"
+      };
+
+    case "systems_theory":
+      return {
+        borderClass: "border-teal-500/15 hover:border-teal-500/50 shadow-[0_0_12px_rgba(20,184,166,0.1)] bg-[#040c0c] hover:bg-teal-500/5",
+        textClass: "text-teal-400/95 font-bold tracking-tight",
+        hoverClass: "hover:bg-teal-500/10",
+        bgClass: "bg-teal-500/[0.01]",
+        textHoverClass: "group-hover:text-teal-300",
+        badgeClass: "text-teal-400 border-teal-500/30 bg-teal-500/5",
+        fontClass: "font-mono font-bold tracking-tight text-[11px]"
+      };
+
+    case "information_science":
+      return {
+        borderClass: "border-lime-500/15 hover:border-lime-500/50 shadow-[0_0_12px_rgba(132,204,22,0.1)] bg-[#080c04] hover:bg-lime-500/5",
+        textClass: "text-lime-400/95 font-semibold uppercase",
+        hoverClass: "hover:bg-lime-500/10",
+        bgClass: "bg-lime-500/[0.01]",
+        textHoverClass: "group-hover:text-lime-300",
+        badgeClass: "text-lime-400 border-lime-500/30 bg-lime-500/5",
+        fontClass: "font-mono font-semibold text-[10.5px] uppercase"
+      };
+
+    case "mysticism":
+      return {
+        borderClass: "border-yellow-500/15 hover:border-yellow-500/50 shadow-[0_0_15px_rgba(234,179,8,0.15)] bg-[#0c0a04] hover:bg-yellow-500/5",
+        textClass: "text-yellow-400/95 font-extrabold tracking-widest",
+        hoverClass: "hover:bg-yellow-500/10",
+        bgClass: "bg-yellow-500/[0.01]",
+        textHoverClass: "group-hover:text-yellow-350",
+        badgeClass: "text-yellow-400 border-yellow-500/30 bg-yellow-500/5",
+        fontClass: "font-serif tracking-widest font-extrabold text-xs"
+      };
+
+    case "sacred_geometry_lex":
+      return {
+        borderClass: "border-orange-400/20 hover:border-orange-400/50 shadow-[0_0_12px_rgba(251,146,60,0.1)] bg-[#0c0604] hover:bg-orange-500/5",
+        textClass: "text-orange-350/95 font-semibold uppercase tracking-widest",
+        hoverClass: "hover:bg-orange-500/10",
+        bgClass: "bg-orange-500/[0.01]",
+        textHoverClass: "group-hover:text-orange-300",
+        badgeClass: "text-orange-350 border-orange-400/25 bg-orange-500/5",
+        fontClass: "font-sans tracking-widest font-semibold uppercase text-xs"
+      };
+
+    case "alchemy_lex":
+      return {
+        borderClass: "border-amber-600/15 hover:border-amber-600/50 shadow-[0_0_12px_rgba(217,119,6,0.1)] bg-[#0c0804] hover:bg-amber-600/5",
+        textClass: "text-amber-500/95 font-black italic",
+        hoverClass: "hover:bg-amber-600/5",
+        bgClass: "bg-amber-600/[0.01]",
+        textHoverClass: "group-hover:text-amber-300",
+        badgeClass: "text-amber-500 border-amber-600/25 bg-amber-600/5",
+        fontClass: "font-serif italic font-black text-xs"
+      };
+
+    case "metemphysics_lex":
+      return {
+        borderClass: "border-orange-500/35 hover:border-orange-500/80 shadow-[0_0_15px_rgba(255,106,0,0.15)] bg-gradient-to-r from-orange-400/5 to-amber-300/5 backdrop-blur-md bg-[#0f0702]",
+        textClass: "text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-amber-300 font-extrabold uppercase tracking-wide",
+        hoverClass: "hover:bg-orange-500/15",
+        bgClass: "bg-orange-500/[0.02]",
+        textHoverClass: "group-hover:brightness-125 group-hover:text-orange-300",
+        badgeClass: "text-orange-400 border-orange-500/40 bg-orange-500/5",
+        fontClass: "font-serif font-extrabold uppercase tracking-wide text-xs"
+      };
+
+    case "ancient_traditions":
+      return {
+        borderClass: "border-yellow-600/15 hover:border-yellow-600/50 shadow-[0_0_12px_rgba(234,179,8,0.1)] bg-[#0c0c04] hover:bg-yellow-600/5",
+        textClass: "text-yellow-500/95 font-light italic tracking-wider",
+        hoverClass: "hover:bg-yellow-600/5",
+        bgClass: "bg-yellow-600/[0.01]",
+        textHoverClass: "group-hover:text-yellow-300",
+        badgeClass: "text-yellow-500 border-yellow-600/25 bg-yellow-600/5",
+        fontClass: "font-serif tracking-wider font-light italic text-xs"
+      };
+
+    case "future_studies":
+      return {
+        borderClass: "border-cyan-500/20 hover:border-cyan-500/50 shadow-[0_0_12px_rgba(34,211,238,0.1)] bg-[#040c0c] hover:bg-cyan-500/10",
+        textClass: "text-cyan-400/95 font-bold uppercase tracking-widest",
+        hoverClass: "hover:bg-cyan-500/10",
+        bgClass: "bg-cyan-500/[0.01]",
+        textHoverClass: "group-hover:text-cyan-300",
+        badgeClass: "text-cyan-400 border-cyan-500/35 bg-cyan-500/5",
+        fontClass: "font-sans font-bold uppercase tracking-widest text-[9.5px]"
+      };
+
+    default:
+      return {
+        borderClass: "border-orange-500/15 hover:border-orange-500/50",
+        textClass: "text-[#e4d9c0]",
+        hoverClass: "hover:bg-orange-950/10",
+        bgClass: "bg-[#040404]",
+        textHoverClass: "group-hover:text-orange-400",
+        badgeClass: "text-orange-400 border-orange-500/30 bg-orange-500/10",
+        fontClass: "font-mono font-bold text-xs"
+      };
+  }
+}
+
+function getSystemsLabItemStyle(id: string) {
+  switch (id) {
+    case "entropy": // Physics
+      return {
+        systemId: "physics",
+        borderClass: "border-white/10 hover:border-white/50 hover:bg-white/5 hover:shadow-[0_0_12px_rgba(255,255,255,0.1)]",
+        textColorClass: "text-white/95", 
+        accentColorClass: "text-white", 
+        iconBgClass: "bg-white/5",
+        iconBorderClass: "border-white/20",
+        iconColorClass: "text-white/90",
+        fontClass: "font-sans font-bold",
+        tooltipBorder: "border-white/40",
+        tooltipShadow: "shadow-[0_0_15px_rgba(255,255,255,0.25)]",
+        arrowBorder: "border-t-white/40",
+        chevronColor: "text-white/40"
+      };
+    case "celestialscale": // Mathematics (or astrophysics, mapped to mathematics)
+      return {
+        systemId: "mathematics",
+        borderClass: "border-orange-500/15 hover:border-orange-500/50 hover:bg-orange-500/5 hover:shadow-[0_0_12px_rgba(249,115,22,0.15)]",
+        textColorClass: "text-orange-400/95",
+        accentColorClass: "text-orange-450",
+        iconBgClass: "bg-orange-500/[0.04]",
+        iconBorderClass: "border-orange-500/20",
+        iconColorClass: "text-orange-450",
+        fontClass: "font-mono font-semibold tracking-wider",
+        tooltipBorder: "border-orange-500/40",
+        tooltipShadow: "shadow-[0_0_15px_rgba(249,115,22,0.3)]",
+        arrowBorder: "border-t-orange-500/40",
+        chevronColor: "text-orange-500/40"
+      };
+    case "bio": // Consciousness Studies
+      return {
+        systemId: "consciousness_studies",
+        borderClass: "border-emerald-500/15 hover:border-emerald-500/50 hover:bg-emerald-500/5 hover:shadow-[0_0_12px_rgba(16,185,129,0.15)]",
+        textColorClass: "text-emerald-400/95",
+        accentColorClass: "text-emerald-400",
+        iconBgClass: "bg-emerald-500/[0.04]",
+        iconBorderClass: "border-emerald-500/20",
+        iconColorClass: "text-emerald-400",
+        fontClass: "font-sans font-medium italic",
+        tooltipBorder: "border-emerald-500/40",
+        tooltipShadow: "shadow-[0_0_15px_rgba(16,185,129,0.3)]",
+        arrowBorder: "border-t-emerald-500/40",
+        chevronColor: "text-emerald-500/40"
+      };
+    case "knodegraph": // Artificial Intelligence
+      return {
+        systemId: "artificial_intelligence",
+        borderClass: "border-blue-500/15 hover:border-blue-500/50 hover:bg-blue-500/5 hover:shadow-[0_0_12px_rgba(59,130,246,0.15)]",
+        textColorClass: "text-blue-400",
+        accentColorClass: "text-blue-450",
+        iconBgClass: "bg-blue-500/[0.04]",
+        iconBorderClass: "border-blue-500/20",
+        iconColorClass: "text-blue-450",
+        fontClass: "font-mono font-bold uppercase text-[10px]",
+        tooltipBorder: "border-blue-500/40",
+        tooltipShadow: "shadow-[0_0_15px_rgba(59,130,246,0.35)]",
+        arrowBorder: "border-t-blue-500/40",
+        chevronColor: "text-blue-500/40"
+      };
+    case "hawkinsprogram": // Psychology
+      return {
+        systemId: "psychology",
+        borderClass: "border-rose-500/15 hover:border-rose-500/50 hover:bg-rose-500/5 hover:shadow-[0_0_12px_rgba(244,63,94,0.15)]",
+        textColorClass: "text-rose-400/95",
+        accentColorClass: "text-rose-400",
+        iconBgClass: "bg-rose-500/[0.04]",
+        iconBorderClass: "border-rose-500/20",
+        iconColorClass: "text-rose-400",
+        fontClass: "font-sans tracking-wide font-normal italic",
+        tooltipBorder: "border-rose-500/40",
+        tooltipShadow: "shadow-[0_0_15px_rgba(244,63,94,0.3)]",
+        arrowBorder: "border-t-rose-500/40",
+        chevronColor: "text-rose-500/40"
+      };
+    case "systems": // Systems Theory
+      return {
+        systemId: "systems_theory",
+        borderClass: "border-teal-500/15 hover:border-teal-500/50 hover:bg-teal-500/5 hover:shadow-[0_0_12px_rgba(20,184,166,0.15)]",
+        textColorClass: "text-teal-400/95",
+        accentColorClass: "text-teal-400",
+        iconBgClass: "bg-teal-500/[0.04]",
+        iconBorderClass: "border-teal-500/20",
+        iconColorClass: "text-teal-400",
+        fontClass: "font-mono font-bold tracking-tight",
+        tooltipBorder: "border-teal-500/40",
+        tooltipShadow: "shadow-[0_0_15px_rgba(20,184,166,0.3)]",
+        arrowBorder: "border-t-teal-500/40",
+        chevronColor: "text-teal-500/40"
+      };
+    case "reftools": // Information Science
+      return {
+        systemId: "information_science",
+        borderClass: "border-lime-500/15 hover:border-lime-500/50 hover:bg-lime-500/5 hover:shadow-[0_0_12px_rgba(132,204,22,0.15)]",
+        textColorClass: "text-lime-400/95",
+        accentColorClass: "text-lime-450",
+        iconBgClass: "bg-lime-500/[0.04]",
+        iconBorderClass: "border-lime-500/20",
+        iconColorClass: "text-lime-450",
+        fontClass: "font-mono font-semibold uppercase text-[10.5px]",
+        tooltipBorder: "border-lime-500/40",
+        tooltipShadow: "shadow-[0_0_15px_rgba(132,204,22,0.3)]",
+        arrowBorder: "border-t-lime-500/40",
+        chevronColor: "text-lime-500/40"
+      };
+    case "chakra": // Mysticism
+      return {
+        systemId: "mysticism",
+        borderClass: "border-yellow-500/15 hover:border-yellow-500/50 hover:bg-yellow-500/5 hover:shadow-[0_0_15px_rgba(234,179,8,0.2)]",
+        textColorClass: "text-yellow-400/95",
+        accentColorClass: "text-yellow-400",
+        iconBgClass: "bg-yellow-500/[0.04]",
+        iconBorderClass: "border-yellow-500/20",
+        iconColorClass: "text-yellow-400",
+        fontClass: "font-serif tracking-widest font-extrabold text-xs",
+        tooltipBorder: "border-yellow-500/40",
+        tooltipShadow: "shadow-[0_0_15px_rgba(234,179,8,0.35)]",
+        arrowBorder: "border-t-yellow-500/40",
+        chevronColor: "text-yellow-500/40"
+      };
+    case "numerology": // Sacred Geometry Lex
+      return {
+        systemId: "sacred_geometry_lex",
+        borderClass: "border-orange-400/15 hover:border-orange-400/50 hover:bg-orange-500/5 hover:shadow-[0_0_12px_rgba(251,146,60,0.15)]",
+        textColorClass: "text-orange-350/95",
+        accentColorClass: "text-orange-400",
+        iconBgClass: "bg-orange-500/[0.04]",
+        iconBorderClass: "border-orange-450/20",
+        iconColorClass: "text-orange-400",
+        fontClass: "font-sans tracking-widest font-semibold uppercase text-xs",
+        tooltipBorder: "border-orange-400/40",
+        tooltipShadow: "shadow-[0_0_15px_rgba(251,146,60,0.35)]",
+        arrowBorder: "border-t-orange-400/40",
+        chevronColor: "text-orange-400/45"
+      };
+    case "codereader": // Western Esotericism
+      return {
+        systemId: "western_esotericism",
+        borderClass: "border-purple-500/15 hover:border-purple-500/50 hover:bg-purple-500/5 hover:shadow-[0_0_12px_rgba(168,85,247,0.15)]",
+        textColorClass: "text-purple-400/95",
+        accentColorClass: "text-purple-400",
+        iconBgClass: "bg-purple-500/[0.04]",
+        iconBorderClass: "border-purple-500/20",
+        iconColorClass: "text-purple-400",
+        fontClass: "font-serif font-semibold italic capitalize",
+        tooltipBorder: "border-purple-500/40",
+        tooltipShadow: "shadow-[0_0_15px_rgba(168,85,247,0.35)]",
+        arrowBorder: "border-t-purple-500/40",
+        chevronColor: "text-purple-500/40"
+      };
+    case "calc": // Metemphysics Lex
+      return {
+        systemId: "metemphysics_lex",
+        borderClass: "border-orange-500/35 hover:border-orange-500/80 hover:bg-orange-500/15 hover:shadow-[0_0_15px_rgba(255,106,0,0.25)] bg-gradient-to-r from-orange-400/5 to-amber-300/5",
+        textColorClass: "text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-amber-300",
+        accentColorClass: "text-orange-450",
+        iconBgClass: "bg-orange-500/10",
+        iconBorderClass: "border-orange-500/40",
+        iconColorClass: "text-orange-400",
+        fontClass: "font-serif font-extrabold uppercase tracking-wide text-xs",
+        tooltipBorder: "border-orange-500/40",
+        tooltipShadow: "shadow-[0_0_15px_rgba(255,106,0,0.35)]",
+        arrowBorder: "border-t-orange-500/40",
+        chevronColor: "text-orange-500/40"
+      };
+    case "reftables": // Comparative Religion
+    default:
+      return {
+        systemId: "comparative_religion",
+        borderClass: "border-amber-500/15 hover:border-amber-500/50 hover:bg-amber-500/5 hover:shadow-[0_0_12px_rgba(245,158,11,0.15)]",
+        textColorClass: "text-amber-500/95",
+        accentColorClass: "text-amber-500",
+        iconBgClass: "bg-amber-500/[0.04]",
+        iconBorderClass: "border-amber-500/20",
+        iconColorClass: "text-amber-500",
+        fontClass: "font-serif tracking-wider font-semibold uppercase text-[10px]",
+        tooltipBorder: "border-amber-500/40",
+        tooltipShadow: "shadow-[0_0_15px_rgba(245,158,11,0.3)]",
+        arrowBorder: "border-t-amber-500/40",
+        chevronColor: "text-amber-500/40"
+      };
+  }
+}
 
 function renderKeywordsWithTooltips(text: string): React.ReactNode[] | string {
   let tokens: { 
@@ -860,6 +1588,40 @@ export default function App() {
     setTimeout(() => {
       setCopiedIndex((prev) => prev === index ? null : prev);
     }, 2000);
+  };
+
+  const getStatusDotBg = () => {
+    if (offlineMode) return "bg-red-500";
+    if (studioMode === "socratic") return "bg-cyan-400";
+    if (studioMode === "strict_calc") return "bg-amber-500";
+    return "bg-orange-500";
+  };
+
+  const getStatusText = () => {
+    if (offlineMode) return "Local Backup";
+    if (studioMode === "socratic") return "Socratic Active";
+    if (studioMode === "strict_calc") return "Calculator Active";
+    return "Omniscient Active";
+  };
+
+  const getCogSelectorColors = () => {
+    switch (studioMode) {
+      case "socratic":
+        return {
+          border: "border-cyan-500/35 shadow-[0_0_10px_rgba(34,211,238,0.1)]",
+          text: "text-cyan-400",
+        };
+      case "strict_calc":
+        return {
+          border: "border-amber-500/35 shadow-[0_0_10px_rgba(245,158,11,0.1)]",
+          text: "text-amber-500",
+        };
+      default:
+        return {
+          border: "border-orange-500/35 shadow-[0_0_10px_rgba(255,106,0,0.05)]",
+          text: "text-orange-400",
+        };
+    }
   };
 
   // Sync up to 25 chat responses to Local Storage
@@ -1654,7 +2416,7 @@ export default function App() {
 
         {/* Center segment - Metemphysics Cog Mode Selector */}
         <div className="flex justify-center items-center">
-          <div className="flex items-center gap-1.5 px-2.5 py-1 bg-[#0a0a0c] border border-orange-500/35 rounded shadow-[0_0_10px_rgba(255,106,0,0.05)]">
+          <div className={`flex items-center gap-1.5 px-2.5 py-1 bg-[#0a0a0c] border rounded transition-all duration-300 ${getCogSelectorColors().border}`}>
             <span className="text-[9px] font-mono text-gray-500 uppercase tracking-tight">Metemphysics Cog:</span>
             <select
               value={studioMode}
@@ -1663,11 +2425,11 @@ export default function App() {
                 setStudioMode(nMode);
                 handleSendMessage(`Switching dynamic Metemphysics calibration mode to: ${nMode.toUpperCase()}`);
               }}
-              className="bg-transparent text-orange-400 font-mono text-[9px] uppercase font-bold outline-none cursor-pointer p-0.5"
+              className={`bg-transparent font-mono text-[9px] uppercase font-bold outline-none cursor-pointer p-0.5 transition-colors duration-300 ${getCogSelectorColors().text}`}
             >
-              <option value="omniscient" className="bg-black text-orange-400">Omniscient Mode</option>
-              <option value="socratic" className="bg-black text-orange-400">Socratic Guide</option>
-              <option value="strict_calc" className="bg-black text-orange-400">Strict Calculator</option>
+              <option value="omniscient" className="bg-black text-orange-400 font-bold uppercase text-[9px]">Omniscient Mode</option>
+              <option value="socratic" className="bg-black text-cyan-400 font-bold uppercase text-[9px]">Socratic Guide</option>
+              <option value="strict_calc" className="bg-black text-amber-500 font-bold uppercase text-[9px]">Strict Calculator</option>
             </select>
           </div>
         </div>
@@ -1675,8 +2437,8 @@ export default function App() {
         {/* Right segment - Status Rails */}
         <div className="flex items-center justify-end min-w-[50px] sm:min-w-[150px]">
           <div className="hidden sm:flex items-center gap-1.5 px-2 py-1 bg-black border border-gray-800 font-mono text-[9px] rounded">
-            <span className="w-2 h-2 rounded-full bg-orange-500 animate-pulse"></span>
-            <span className="text-gray-400 uppercase font-bold">{offlineMode ? "Local Backup" : "Omniscient Active"}</span>
+            <span className={`w-2 h-2 rounded-full ${getStatusDotBg()} animate-pulse`}></span>
+            <span className="text-gray-400 uppercase font-bold">{getStatusText()}</span>
           </div>
         </div>
       </header>
@@ -1738,7 +2500,7 @@ export default function App() {
           </div>
 
           {/* Tab Content Body */}
-          <div className="flex-1 p-5 overflow-y-auto flex flex-col custom-scroll">
+          <div className="flex-1 p-5 flex flex-col min-h-0">
             
             {/* TAB 1: ONTOLOGY DIRECTORY */}
             {sidebarTab === "ontology" && (
@@ -1749,31 +2511,55 @@ export default function App() {
                       <BookOpen className="w-4 h-4 text-orange-500 drop-shadow-[0_0_4px_rgba(255,95,0,0.4)]" /> SYNTHESIS
                     </h3>
                     {/* Tooltip for the overall Synthesis Table */}
-                    <span className="pointer-events-none absolute left-0 top-full mt-2 w-64 p-2.5 bg-[#090503]/95 border border-orange-500/40 text-[9.5px] text-[#dacbb6] font-mono rounded shadow-[0_0_15px_rgba(255,95,0,0.35)] opacity-0 group-hover/synthesis-title:opacity-100 transition-opacity duration-200 z-50 text-left leading-relaxed">
+                    <span className="pointer-events-none absolute left-0 top-full mt-2 w-64 p-2.5 bg-[#090503]/95 border border-orange-500/40 text-[9.5px] text-[#dacbb6] font-mono rounded shadow-[0_0_15px_rgba(255,95,0,0.35)] invisible group-hover/synthesis-title:visible opacity-0 group-hover/synthesis-title:opacity-100 transition-all duration-200 z-50 text-left leading-relaxed">
                       <strong className="text-orange-400 block mb-1 font-serif uppercase tracking-wider">Unified Synthesis Engine</strong>
                       An integrated cross-disciplinary database pairing human sciences, spiritual traditions, evolutionary models, and constants under absolute T × S = C thermodynamic limits.
                       <span className="absolute top-[-4px] left-8 border-x-4 border-x-transparent border-b-4 border-b-orange-500/40" />
                     </span>
                   </div>
-                  <span className="text-[8px] font-mono text-orange-500 uppercase tracking-widest bg-orange-500/10 px-1 py-0.5 rounded border border-orange-500/20">METEM_DB v14.0</span>
                 </div>
 
                 {/* Category Toggle */}
                 <div className="grid grid-cols-5 gap-1 mb-3">
-                  {(["science", "religions", "discoveries", "systems", "formulas"] as const).map((cat) => (
-                    <button
-                      key={cat}
-                      disabled={typing}
-                      onClick={() => setSelectedDbCategory(cat)}
-                      className={`py-1 rounded text-[9px] font-mono uppercase border transition-all cursor-pointer text-center ${
-                        selectedDbCategory === cat
-                           ? "bg-orange-500/15 border-orange-500/60 text-orange-400 font-bold shadow-[0_0_8px_rgba(255,106,0,0.15)]"
-                           : "border-transparent text-gray-500 hover:text-[#eeeae4] hover:bg-white/5"
-                      } ${typing ? "opacity-50 cursor-not-allowed" : ""}`}
-                    >
-                      {cat === "religions" ? "tradition" : cat === "formulas" ? "formula" : cat}
-                    </button>
-                  ))}
+                  {(["science", "religions", "discoveries", "systems", "formulas"] as const).map((cat) => {
+                    const isActive = selectedDbCategory === cat;
+                    let catStyle = "border-transparent text-gray-500 hover:text-white hover:bg-white/5";
+                    if (isActive) {
+                      if (cat === "science") {
+                        catStyle = "bg-white/10 border-white/50 text-white font-bold shadow-[0_0_8px_rgba(255,255,255,0.15)] font-sans";
+                      } else if (cat === "religions") {
+                        catStyle = "bg-amber-500/10 border-amber-500/50 text-amber-400 font-bold shadow-[0_0_8px_rgba(245,158,11,0.15)] font-serif";
+                      } else if (cat === "discoveries") {
+                        catStyle = "bg-yellow-500/10 border-yellow-500/50 text-yellow-400 font-bold shadow-[0_0_8px_rgba(234,179,8,0.15)] font-serif italic";
+                      } else if (cat === "systems") {
+                        catStyle = "bg-teal-500/10 border-teal-500/50 text-teal-400 font-bold shadow-[0_0_8px_rgba(20,184,166,0.15)] font-mono";
+                      } else if (cat === "formulas") {
+                        catStyle = "bg-orange-500/10 border-orange-500/50 text-orange-400 font-bold shadow-[0_0_8px_rgba(249,115,22,0.15)] font-mono";
+                      }
+                    } else {
+                      if (cat === "science") {
+                        catStyle = "border-transparent text-gray-500 hover:text-white hover:bg-white/5 font-sans";
+                      } else if (cat === "religions") {
+                        catStyle = "border-transparent text-gray-500 hover:text-amber-400 hover:bg-amber-500/5 font-serif";
+                      } else if (cat === "discoveries") {
+                        catStyle = "border-transparent text-gray-500 hover:text-yellow-400 hover:bg-yellow-500/5 font-serif italic";
+                      } else if (cat === "systems") {
+                        catStyle = "border-transparent text-gray-500 hover:text-teal-400 hover:bg-teal-500/5 font-mono";
+                      } else if (cat === "formulas") {
+                        catStyle = "border-transparent text-gray-500 hover:text-orange-400 hover:bg-orange-500/5 font-mono";
+                      }
+                    }
+                    return (
+                      <button
+                        key={cat}
+                        disabled={typing}
+                        onClick={() => setSelectedDbCategory(cat)}
+                        className={`py-1 rounded text-[9px] uppercase border transition-all cursor-pointer text-center ${catStyle} ${typing ? "opacity-50 cursor-not-allowed" : ""}`}
+                      >
+                        {cat === "religions" ? "tradition" : cat === "formulas" ? "formula" : cat}
+                      </button>
+                    );
+                  })}
                 </div>
 
                 {/* Search Input inline */}
@@ -1788,60 +2574,63 @@ export default function App() {
 
                 {/* Scrollable list */}
                 <div className="flex-1 overflow-y-auto space-y-2 pr-1 custom-scroll min-h-[480px] lg:min-h-0 border-b border-orange-500/10 pb-2">
-                  {filteredItems.map((item) => (
-                    <div
-                      key={item.id}
-                      onClick={() => {
-                        if (typing) return;
-                        if (selectedDbCategory === "formulas") {
-                          handleSendMessage(`Formulate and synthesize the Metemphysics Equation: ${item.name}. Analyze its meaning (${item.summary}), explain what its symbols represent within T × S = C conservation dynamics, and evaluate its mathematical & spiritual significance.`);
-                        } else {
-                          handleSendMessage(`Detail the specific metemphysical aspect of '${item.name}' under ${selectedDbCategory} category and explain its J/S significance.`);
-                        }
-                      }}
-                      className={`group bg-[#040404] border border-orange-500/15 hover:border-orange-500/50 rounded p-2.5 cursor-pointer transition-all hover:bg-orange-950/10 shadow-[0_0_10px_rgba(255,95,0,0.02)] hover:shadow-[0_0_15px_rgba(212,175,55,0.06)] ${
-                        typing ? "opacity-60 cursor-not-allowed pointer-events-none" : ""
-                      }`}
-                    >
-                      <div className="flex justify-between items-start gap-2">
-                        <div className="flex flex-col">
-                          <span className="font-mono font-bold text-xs text-[#e4d9c0] group-hover:text-orange-400 transition-colors tracking-wide">{item.name}</span>
-                          {item.omegaVal && (
-                            <span className="text-[9px] font-mono text-[#c9a84c] font-bold tracking-wider mt-0.5">{item.omegaVal}</span>
+                  {filteredItems.map((item) => {
+                    const colors = getOntologyItemColors(item.id, selectedDbCategory);
+                    return (
+                      <div
+                        key={item.id}
+                        onClick={() => {
+                          if (typing) return;
+                          if (selectedDbCategory === "formulas") {
+                            handleSendMessage(`Formulate and synthesize the Metemphysics Equation: ${item.name}. Analyze its meaning (${item.summary}), explain what its symbols represent within T × S = C conservation dynamics, and evaluate its mathematical & spiritual significance.`);
+                          } else {
+                            handleSendMessage(`Detail the specific metemphysical aspect of '${item.name}' under ${selectedDbCategory} category and explain its J/S significance.`);
+                          }
+                        }}
+                        className={`group bg-[#040404]/80 border ${colors.borderClass} rounded p-2.5 cursor-pointer transition-all ${colors.hoverClass} shadow-[0_0_10px_rgba(0,0,0,0.2)] ${
+                          typing ? "opacity-60 cursor-not-allowed pointer-events-none" : ""
+                        }`}
+                      >
+                        <div className="flex justify-between items-start gap-2">
+                          <div className="flex flex-col">
+                            <span className={`${colors.fontClass || "font-mono font-bold text-xs"} ${colors.textClass} ${colors.textHoverClass} transition-colors tracking-wide`}>{item.name}</span>
+                            {item.omegaVal && (
+                              <span className="text-[9px] font-mono text-[#c9a84c] font-bold tracking-wider mt-0.5">{item.omegaVal}</span>
+                            )}
+                          </div>
+                          {/* Interactive Tooltip on the category / subcategory tags */}
+                          <span className="relative group/tag inline-block">
+                            <span className={`text-[8px] font-mono border px-1.5 py-0.5 rounded uppercase cursor-help transition-all ${colors.badgeClass}`}>
+                              {item.subcategory}
+                            </span>
+                            <span className="pointer-events-none absolute right-0 top-full mt-1.5 w-52 p-2.5 bg-black border border-orange-500/40 text-[9.5px] text-[#dacbb6] font-mono rounded shadow-[0_0_12px_rgba(255,95,0,0.25)] invisible group-hover/tag:visible opacity-0 group-hover/tag:opacity-100 transition-all duration-200 z-50 text-right leading-normal">
+                              Classification: <strong className="text-orange-400 uppercase font-bold">{selectedDbCategory === "religions" ? "Tradition" : selectedDbCategory === "formulas" ? "Formula" : selectedDbCategory}</strong>. Integrated calibration index value: <strong className="text-amber-400">{item.omegaVal || "Ω = Dynamic"}</strong>.
+                              <span className="absolute top-[-4px] right-4 border-x-4 border-x-transparent border-b-4 border-b-orange-500/40" />
+                            </span>
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-[#afbbc9] mt-1 line-clamp-2 leading-relaxed font-serif italic">{item.summary}</p>
+                        <div className="flex items-center justify-between mt-2 pt-1 border-t border-white/5">
+                          <div className="flex flex-wrap gap-1">
+                            {item.concepts.slice(0, 3).map((tag, idx) => (
+                              <span key={idx} className="bg-white/[0.02] px-1 py-0.5 rounded text-[8px] font-mono text-gray-400 border border-white/5">
+                                #{tag}
+                              </span>
+                            ))}
+                          </div>
+                          {selectedDbCategory === "formulas" ? (
+                            <span className="text-[8px] font-mono text-orange-400 group-hover:text-amber-300 font-bold tracking-widest uppercase flex items-center gap-1 transition-colors">
+                              Devise Auto ✦
+                            </span>
+                          ) : (
+                            <span className="text-[8px] font-mono text-gray-500 group-hover:text-amber-500 transition-colors">
+                              Query ◈
+                            </span>
                           )}
                         </div>
-                        {/* Interactive Tooltip on the category / subcategory tags */}
-                        <span className="relative group/tag inline-block">
-                          <span className="text-[8px] font-mono text-orange-400 border border-orange-500/30 px-1.5 py-0.5 rounded bg-orange-500/5 uppercase cursor-help hover:bg-orange-500/10 transition-colors">
-                            {item.subcategory}
-                          </span>
-                          <span className="pointer-events-none absolute right-0 bottom-full mb-1.5 w-52 p-2.5 bg-black border border-orange-500/40 text-[9.5px] text-[#dacbb6] font-mono rounded shadow-[0_0_12px_rgba(255,95,0,0.25)] opacity-0 group-hover/tag:opacity-100 transition-opacity duration-200 z-50 text-right leading-normal">
-                            Classification: <strong className="text-orange-400 uppercase font-bold">{selectedDbCategory === "religions" ? "Tradition" : selectedDbCategory === "formulas" ? "Formula" : selectedDbCategory}</strong>. Integrated calibration index value: <strong className="text-amber-400">{item.omegaVal || "Ω = Dynamic"}</strong>.
-                            <span className="absolute bottom-[-4px] right-4 border-x-4 border-x-transparent border-t-4 border-t-orange-500/40" />
-                          </span>
-                        </span>
                       </div>
-                      <p className="text-[11px] text-[#afbbc9] mt-1 line-clamp-2 leading-relaxed font-serif italic">{item.summary}</p>
-                      <div className="flex items-center justify-between mt-2 pt-1 border-t border-orange-500/5">
-                        <div className="flex flex-wrap gap-1">
-                          {item.concepts.slice(0, 3).map((tag, idx) => (
-                            <span key={idx} className="bg-orange-950/10 px-1 py-0.5 rounded text-[8px] font-mono text-amber-500/70 border border-orange-500/5">
-                              #{tag}
-                            </span>
-                          ))}
-                        </div>
-                        {selectedDbCategory === "formulas" ? (
-                          <span className="text-[8px] font-mono text-orange-400 group-hover:text-amber-300 font-bold tracking-widest uppercase flex items-center gap-1 transition-colors">
-                            Devise Auto ✦
-                          </span>
-                        ) : (
-                          <span className="text-[8px] font-mono text-gray-500 group-hover:text-amber-500 transition-colors">
-                            Query ◈
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                   {filteredItems.length === 0 && (
                     <div className="text-center text-xs text-gray-500 pt-6 font-mono">No matching records found.</div>
                   )}
@@ -2161,10 +2950,10 @@ export default function App() {
               return (
                 <div key={idx} id={`msg-${idx}`} className={`flex flex-col ${isUser ? "items-end" : "items-start"}`}>
                   <div 
-                    className={`max-w-[90%] rounded-xl p-4 shadow-lg transition-all duration-300 ${
+                    className={`rounded-xl p-4 shadow-lg transition-all duration-300 ${
                       isUser
-                        ? "bg-gradient-to-br from-orange-950/20 via-[#150a00]/70 to-black border border-orange-500/40 text-[#eeeae4] shadow-[0_0_12px_rgba(255,95,0,0.08)]"
-                        : "bg-[#0b0705] border border-orange-500/15 border-l-4 border-l-orange-500 text-[#dcd7cb] shadow-[0_0_15px_rgba(212,175,55,0.05)]"
+                        ? "max-w-[90%] bg-gradient-to-br from-orange-950/20 via-[#150a00]/70 to-black border border-orange-500/40 text-[#eeeae4] shadow-[0_0_12px_rgba(255,95,0,0.08)]"
+                        : "w-full bg-[#0b0705] border border-orange-500/15 border-l-4 border-l-orange-500 text-[#dcd7cb] shadow-[0_0_15px_rgba(212,175,55,0.05)]"
                     }`}
                   >
                     {/* Identity Row */}
@@ -2179,7 +2968,7 @@ export default function App() {
                         <Sparkles className="w-3 h-3 text-orange-500" />
                         <span>Metemphysics Console</span>
                         <span className="text-gray-650">·</span>
-                        <span className="text-gray-400">Coherence: 94.9%</span>
+                        <span className="text-gray-400">Coherence: 95.0%</span>
                         <span className="ml-auto flex items-center gap-2">
                           <span className="text-orange-500 font-bold hidden xs:inline">Ω-Matrix Calibrated</span>
                           <button
@@ -2273,59 +3062,61 @@ export default function App() {
                         )}
 
                         {/* References Section */}
-                        <div className="border-t border-orange-500/10 pt-2.5">
-                          <p className="text-[10px] text-gray-550 font-mono uppercase mb-2 tracking-widest flex items-center gap-1.5">
-                            <BookOpen className="w-3 h-3 text-orange-500" /> REFERENCES
-                          </p>
-                          <div className="space-y-1.5">
-                            {getRelevantReferences(m.text, idx > 0 ? messages[idx - 1].text : undefined).map((ref, refIdx) => {
-                              const isPeak = refIdx === 0;
-                              return (
-                                <div 
-                                  key={refIdx} 
-                                  className={`rounded-lg p-2.5 border transition-all duration-200 text-left ${
-                                    isPeak 
-                                      ? "bg-gradient-to-r from-orange-950/25 via-[#1a0f02]/40 to-black border-orange-500/25 hover:border-orange-500/40 shadow-[0_0_10px_rgba(255,95,0,0.04)]" 
-                                      : "bg-[#090605] border-orange-500/10 hover:border-orange-500/20"
-                                  }`}
-                                >
-                                  <div className="flex flex-wrap items-center justify-between gap-1 mb-1">
-                                    <span className="text-[11px] font-bold text-orange-300 font-serif leading-tight">
-                                      {ref.title}
-                                    </span>
-                                    <div className="flex items-center gap-1.5">
-                                      {isPeak && (
-                                        <span className="text-[8.5px] font-mono px-1 py-0.5 bg-orange-500/15 text-orange-400 border border-orange-500/30 rounded font-semibold animate-pulse uppercase tracking-wider">
-                                          ★ Resonates Highest ({ref.resonance}%)
-                                        </span>
-                                      )}
-                                      {!isPeak && (
-                                        <span className="text-[8.5px] font-mono text-gray-400">
-                                          Resonance: {ref.resonance}%
-                                        </span>
-                                      )}
-                                      <a 
-                                        href={ref.link} 
-                                        target="_blank" 
-                                        rel="noopener noreferrer" 
-                                        className="text-[9px] font-mono px-1.5 py-0.5 bg-orange-500/10 hover:bg-orange-500/25 border border-orange-500/20 hover:border-orange-555 rounded text-orange-300 hover:text-orange-200 transition-all cursor-pointer flex items-center gap-0.5"
-                                        title="Search on Google Scholar"
-                                      >
-                                        Scholar <ChevronRight className="w-2.5 h-2.5" />
-                                      </a>
+                        {idx > 0 && (
+                          <div className="border-t border-orange-500/10 pt-2.5">
+                            <p className="text-[10px] text-gray-550 font-mono uppercase mb-2 tracking-widest flex items-center gap-1.5">
+                              <BookOpen className="w-3 h-3 text-orange-500" /> REFERENCES
+                            </p>
+                            <div className="space-y-1.5">
+                              {getRelevantReferences(m.text, idx > 0 ? messages[idx - 1].text : undefined).map((ref, refIdx) => {
+                                const isPeak = refIdx === 0;
+                                return (
+                                  <div 
+                                    key={refIdx} 
+                                    className={`rounded-lg p-2.5 border transition-all duration-200 text-left ${
+                                      isPeak 
+                                        ? "bg-gradient-to-r from-orange-950/25 via-[#1a0f02]/40 to-black border-orange-500/25 hover:border-orange-500/40 shadow-[0_0_10px_rgba(255,95,0,0.04)]" 
+                                        : "bg-[#090605] border-orange-500/10 hover:border-orange-500/20"
+                                    }`}
+                                  >
+                                    <div className="flex flex-wrap items-center justify-between gap-1 mb-1">
+                                      <span className="text-[11px] font-bold text-orange-300 font-serif leading-tight">
+                                        {ref.title}
+                                      </span>
+                                      <div className="flex items-center gap-1.5">
+                                        {isPeak && (
+                                          <span className="text-[8.5px] font-mono px-1 py-0.5 bg-orange-500/15 text-orange-400 border border-orange-500/30 rounded font-semibold animate-pulse uppercase tracking-wider">
+                                            ★ Resonates Highest ({ref.resonance}%)
+                                          </span>
+                                        )}
+                                        {!isPeak && (
+                                          <span className="text-[8.5px] font-mono text-gray-400">
+                                            Resonance: {ref.resonance}%
+                                          </span>
+                                        )}
+                                        <a 
+                                          href={ref.link} 
+                                          target="_blank" 
+                                          rel="noopener noreferrer" 
+                                          className="text-[9px] font-mono px-1.5 py-0.5 bg-orange-500/10 hover:bg-orange-500/25 border border-orange-500/20 hover:border-orange-555 rounded text-orange-300 hover:text-orange-200 transition-all cursor-pointer flex items-center gap-0.5"
+                                          title="Search on Google Scholar"
+                                        >
+                                          Scholar <ChevronRight className="w-2.5 h-2.5" />
+                                        </a>
+                                      </div>
                                     </div>
+                                    <div className="text-[9.5px] text-gray-500 font-mono mb-1">
+                                      By {ref.authors} &nbsp;·&nbsp; {ref.source} ({ref.year})
+                                    </div>
+                                    <p className="text-[10px] text-[#dacbb6] leading-relaxed font-sans">
+                                      {ref.description}
+                                    </p>
                                   </div>
-                                  <div className="text-[9.5px] text-gray-500 font-mono mb-1">
-                                    By {ref.authors} &nbsp;·&nbsp; {ref.source} ({ref.year})
-                                  </div>
-                                  <p className="text-[10px] text-[#dacbb6] leading-relaxed font-sans">
-                                    {ref.description}
-                                  </p>
-                                </div>
-                              );
-                            })}
+                                );
+                              })}
+                            </div>
                           </div>
-                        </div>
+                        )}
                       </div>
                     )}
                   </div>
@@ -2361,31 +3152,6 @@ export default function App() {
               <span>{throttleWarning}</span>
             </div>
           )}
-
-          {/* Unique Suggestion Panel with Icons & Categorized Query Triggers */}
-          <div className="px-4 py-2.5 border-t border-orange-500/20 bg-[#060606] flex flex-wrap gap-1.5 items-center flex-shrink-0">
-            <span className="text-[11px] font-mono text-orange-450 uppercase tracking-widest mr-2 select-none border-r border-[#ff5f00]/15 pr-2 hidden md:inline">Suggested Queries:</span>
-            {(() => {
-              const lastModelMsg = [...messages].reverse().find((m) => m.role === "model");
-              const dynamicSuggestions = lastModelMsg ? getDynamicSuggestions(lastModelMsg.text) : [];
-              return [...firstQueries, ...dynamicSuggestions];
-            })().map((chip) => {
-              const Icon = chip.icon;
-              return (
-                <button
-                  key={chip.label}
-                  disabled={typing}
-                  onClick={() => !typing && handleSendMessage(chip.query)}
-                  className={`px-2.5 py-1 bg-black text-[10.5px] font-mono rounded-lg cursor-pointer transition-all border border-orange-500/15 flex items-center gap-1.5 ${chip.color} ${
-                    typing ? "opacity-30 cursor-not-allowed pointer-events-none" : ""
-                  }`}
-                >
-                  <Icon className="w-3 h-3 text-orange-500" />
-                  <span>{chip.label}</span>
-                </button>
-              );
-            })}
-          </div>
 
           {/* Terminal Input Bar */}
           <div className="p-3 sm:p-4 border-t border-orange-500/25 bg-black rounded-b-xl flex gap-2 sm:gap-3 shadow-[0_-4px_12px_rgba(0,0,0,0.5)] flex-shrink-0">
@@ -2457,7 +3223,6 @@ export default function App() {
               </h3>
               <p className="text-[8.5px] font-mono text-gray-500 mt-0.5">Thermodynamic &amp; dynamic solvers</p>
             </div>
-            <span className="text-[7.5px] font-mono text-amber-500 uppercase tracking-widest bg-orange-500/10 px-1.5 py-0.5 rounded border border-orange-500/20">DB PRO</span>
           </div>
 
           {/* Scrolling launcher list with slightly smaller buttons */}
@@ -2476,36 +3241,38 @@ export default function App() {
               { id: "hawkinsprogram", name: "David Hawkins Program", desc: "Logarithmic field calibrator", icon: Cpu, color: "hover:border-orange-500/60 hover:bg-orange-500/5 hover:shadow-[0_0_12px_rgba(212,175,55,0.1)]", tip: "Thermodynamic simulation modeling level of attractor fields (H-numbers) on logarithmic scale matrices." },
               { id: "celestialscale", name: "Celestial Scale (FMCS)", desc: "Cosmic Metemphysical Scales", icon: Sparkles, color: "hover:border-orange-500/60 hover:bg-orange-500/5 hover:shadow-[0_0_12px_rgba(212,175,55,0.15)]", tip: "Astrophysical tracker evaluating planetary masses, stellar outputs, and Schwarzschild densities for deep space calibration." },
               { id: "numerology", name: "Numerology Scale", desc: "Number & Shape archetypes scale", icon: Hash, color: "hover:border-orange-500/60 hover:bg-orange-500/5 hover:shadow-[0_0_12px_rgba(255,106,0,0.15)]", tip: "Analytical grid using Pythagorean digit reductions (0-9) to output geometrical and archetypal descriptors." },
+              { id: "knodegraph", name: "Knode Graph Routing", desc: "Linked systems topological map", icon: Network, color: "hover:border-orange-550/65 hover:bg-orange-500/5 hover:shadow-[0_0_15px_rgba(255,95,0,0.15)]", tip: "Interactive topological network system visualizer mapping discrete Knode gateways and linked semantic database associations." },
             ].sort((a, b) => a.name.localeCompare(b.name)).map((p) => {
               const IconComp = p.icon;
+              const styles = getSystemsLabItemStyle(p.id);
               return (
                 <div key={p.id} className="relative group/lab-item lg:flex-1 lg:flex lg:flex-col lg:justify-center">
                   <button
                     onClick={() => setActivePanel(p.id)}
-                    className={`w-full bg-[#050505] p-2.5 lg:py-2.5 lg:px-3 rounded-lg border border-orange-500/15 text-left transition-[#e4d9c0] duration-350 transform hover:-translate-y-0.5 cursor-pointer flex items-center justify-between shadow-[0_0_6px_rgba(255,95,0,0.01)] ${p.color}`}
+                    className={`w-full bg-[#050505] p-2.5 lg:py-2.5 lg:px-3 rounded-lg border text-left transition-[#e4d9c0] duration-350 transform hover:-translate-y-0.5 cursor-pointer flex items-center justify-between shadow-[0_0_6px_rgba(255,95,0,0.01)] ${styles.borderClass}`}
                   >
                     <div className="flex items-center gap-2.5 min-w-0">
-                      <div className="flex-shrink-0 w-7 h-7 lg:w-8 lg:h-8 rounded bg-orange-950/15 border border-orange-500/20 flex items-center justify-center">
-                        <IconComp className="w-3.5 h-3.5 lg:w-4 lg:h-4 text-orange-450" />
+                      <div className={`flex-shrink-0 w-7 h-7 lg:w-8 lg:h-8 rounded border flex items-center justify-center ${styles.iconBgClass} ${styles.iconBorderClass}`}>
+                        <IconComp className={`w-3.5 h-3.5 lg:w-4 lg:h-4 ${styles.iconColorClass}`} />
                       </div>
                       <div className="min-w-0">
-                        <h4 className="font-serif font-bold text-[10.5px] lg:text-[11px] text-white tracking-wide line-clamp-1">{p.name}</h4>
+                        <h4 className={`text-[10.5px] lg:text-[11px] tracking-wide line-clamp-1 ${styles.fontClass} ${styles.textColorClass}`}>{p.name}</h4>
                         <p className="text-[8.5px] lg:text-[9px] text-gray-500 font-mono truncate mt-0.5">{p.desc}</p>
                       </div>
                     </div>
-                    <ChevronRight className="w-3.5 h-3.5 text-gray-600 flex-shrink-0 ml-1" />
+                    <ChevronRight className={`w-3.5 h-3.5 flex-shrink-0 ml-1 ${styles.chevronColor}`} />
                   </button>
 
                   {/* Desktop view absolute left-side tooltip */}
-                  <span className="pointer-events-none absolute right-[103%] top-1/2 -translate-y-1/2 w-52 p-2.5 bg-black/95 border border-orange-500/40 text-[9.5px] text-[#dacbb6] font-mono rounded shadow-[0_0_15px_rgba(255,95,0,0.3)] opacity-0 group-hover/lab-item:opacity-100 transition-opacity duration-200 z-50 text-left leading-normal whitespace-normal break-words hidden lg:block">
+                  <span className={`pointer-events-none absolute right-[103%] top-1/2 -translate-y-1/2 w-52 p-2.5 bg-black/95 text-[9.5px] text-[#dacbb6] font-mono rounded opacity-0 group-hover/lab-item:opacity-100 transition-opacity duration-200 z-50 text-left leading-normal whitespace-normal break-words border hidden lg:block ${styles.tooltipBorder} ${styles.tooltipShadow}`}>
                     {p.tip}
-                    <span className="absolute left-full top-1/2 -translate-y-1/2 border-y-4 border-y-transparent border-l-4 border-l-orange-500/40" />
+                    <span className={`absolute left-full top-1/2 -translate-y-1/2 border-y-4 border-y-transparent border-l-4 ${styles.arrowBorder.replace("border-t-", "border-l-")}`} />
                   </span>
 
                   {/* Mobile view top-side tooltip */}
-                  <span className="pointer-events-none absolute left-1/2 -translate-x-1/2 bottom-[105%] mb-1 w-48 p-2 bg-black border border-orange-500/45 text-[9px] text-[#dacbb6] font-mono rounded shadow-[0_0_12px_rgba(255,95,0,0.25)] opacity-0 group-hover/lab-item:opacity-100 transition-opacity duration-200 z-50 text-center leading-normal whitespace-normal break-words lg:hidden">
+                  <span className={`pointer-events-none absolute left-1/2 -translate-x-1/2 bottom-[105%] mb-1 w-48 p-2 bg-black text-[9px] text-[#dacbb6] font-mono rounded opacity-0 group-hover/lab-item:opacity-100 transition-opacity duration-200 z-50 text-center leading-normal whitespace-normal break-words border lg:hidden ${styles.tooltipBorder} ${styles.tooltipShadow}`}>
                     {p.tip}
-                    <span className="absolute top-full left-1/2 -translate-x-1/2 border-x-4 border-x-transparent border-t-4 border-t-orange-500/45" />
+                    <span className={`absolute top-full left-1/2 -translate-x-1/2 border-x-4 border-x-transparent border-t-4 ${styles.arrowBorder}`} />
                   </span>
                 </div>
               );
@@ -2517,7 +3284,7 @@ export default function App() {
       </main>
 
       {/* FOOTER RAILS */}
-      <footer className="border-t border-orange-500/20 bg-black px-6 py-4 flex flex-col md:flex-row items-center justify-between text-[11px] font-mono text-gray-500 gap-4 mt-8">
+      <footer className="border-t border-orange-500/20 bg-black px-6 py-4 flex flex-col md:flex-row items-center justify-between text-[11px] font-mono text-gray-500 gap-4 mt-0">
         <a 
           href="https://metemphysics.com/" 
           target="_blank" 
@@ -2665,6 +3432,14 @@ export default function App() {
       )}
       {activePanel === "numerology" && (
         <NumerologyPanel onClose={() => setActivePanel(null)} onSendPrompt={handleLaunchPanelFromReader} />
+      )}
+      {activePanel === "knodegraph" && (
+        <KnodeGraphPanel
+          onClose={() => setActivePanel(null)}
+          onSendPrompt={handleLaunchPanelFromReader}
+          currentNodeId={currentNodeId}
+          setCurrentNodeId={setCurrentNodeId}
+        />
       )}
 
     </div>
