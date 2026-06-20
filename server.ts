@@ -367,7 +367,7 @@ CRITICAL FORMULA DIRECTIVE: Never output raw LaTeX mathematical formatting (e.g.
         return raw.replace(/[{}"[\]:]/g, "").slice(0, 100);
       };
 
-      const REQUEST_TIMEOUT_MS = 30 * 60 * 1000; // 30 minutes robust threshold for comprehensive synthesis and model warm-ups
+      const REQUEST_TIMEOUT_MS = 13.2 * 1000; // 13.2s robust threshold for comprehensive synthesis and model warm-ups
       let timeoutId: NodeJS.Timeout | undefined;
 
       const generateResponseWithTimeout = async (): Promise<any> => {
@@ -479,11 +479,11 @@ CRITICAL FORMULA DIRECTIVE: Never output raw LaTeX mathematical formatting (e.g.
     console.log(`Server running on http://0.0.0.0:${PORT}`);
   });
 
-  // Apply timeout cancellation fix (30 minutes) at the server socket and header level
-  server.timeout = 30 * 60 * 1000;
-  server.headersTimeout = 30 * 60 * 1000;
-  server.requestTimeout = 30 * 60 * 1000;
-  server.keepAliveTimeout = 30 * 60 * 1000;
+  // Apply timeout cancellation fix (660s hang) at the server socket and header level
+  server.timeout = 660 * 1000;
+  server.headersTimeout = 660 * 1000;
+  server.requestTimeout = 660 * 1000;
+  server.keepAliveTimeout = 660 * 1000;
 }
 
 startServer();
