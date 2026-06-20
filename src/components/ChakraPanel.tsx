@@ -543,11 +543,11 @@ export default function ChakraPanel({ onClose, onSendPrompt }: { onClose: () => 
     <div className="fixed lg:absolute inset-0 bg-[#050505] text-[#eeeae4] overflow-y-auto z-[200] p-6 border-2 border-orange-500/20 rounded-2xl animate-fadeIn">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between pb-6 border-b border-[#c9a84c]/20 mb-6 gap-4">
+        <div className="flex flex-col md:flex-row md:items-center justify-between pb-6 border-b border-orange-500/20 mb-6 gap-4">
           <div className="flex items-center gap-3">
-            <Music className="w-8 h-8 text-[#c9a84c] animate-pulse" />
+            <Music className="w-8 h-8 text-orange-400 animate-pulse" />
             <div>
-              <h2 className="font-serif text-2xl font-bold text-[#c9a84c] tracking-wider">♬ — MUSIC &amp; CHAKRA ATLAS (v13.2 V)</h2>
+              <h2 className="font-serif text-2xl font-bold text-orange-400 tracking-wider">♬ — MUSIC &amp; CHAKRA ATLAS (v13.2 V)</h2>
               <p className="text-xs text-[#8898aa] font-mono mt-1">T × S = C · Sound as Cosmic Order · Interactive Pure-Tone Generator</p>
             </div>
           </div>
@@ -580,7 +580,7 @@ export default function ChakraPanel({ onClose, onSendPrompt }: { onClose: () => 
                 stopActiveFrequency();
                 onClose();
               }}
-              className="flex items-center gap-1 bg-[#c9a84c]/10 border border-[#c9a84c]/30 rounded px-4 py-2 text-xs font-mono text-[#c9a84c] hover:bg-[#c9a84c]/20 transition-all cursor-pointer"
+              className="flex items-center gap-1 bg-orange-500/10 border border-orange-500/30 rounded px-4 py-2 text-xs font-mono text-orange-400 hover:bg-orange-500/20 transition-all cursor-pointer"
             >
               <X className="w-4 h-4" /> CLOSE ATLAS
             </button>
@@ -604,8 +604,8 @@ export default function ChakraPanel({ onClose, onSendPrompt }: { onClose: () => 
               onClick={() => setActiveTab(tab.id as any)}
               className={`font-mono text-xs tracking-wider uppercase px-4 py-2 border rounded transition-all cursor-pointer ${
                 activeTab === tab.id
-                  ? "bg-[#c9a84c]/10 border-[#c9a84c] text-[#c9a84c]"
-                  : "bg-transparent border-[#c9a84c]/18 text-[#8898aa] hover:border-[#c9a84c]/40 hover:text-[#e8d5a3]"
+                  ? "bg-orange-500/10 border-orange-500 text-orange-400 font-bold"
+                  : "bg-transparent border-orange-500/20 text-[#8898aa] hover:border-orange-500/45 hover:text-orange-300"
               }`}
             >
               {tab.label}
@@ -618,7 +618,7 @@ export default function ChakraPanel({ onClose, onSendPrompt }: { onClose: () => 
           <div className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="bg-[#0a0a0a]/80 border border-orange-500/15 rounded p-4 animate-fadeIn">
-                <h4 className="font-mono text-xs tracking-widest text-[#c9a84c] uppercase mb-2">Chakra Metemphysics</h4>
+                <h4 className="font-mono text-xs tracking-widest text-orange-400 uppercase mb-2">Chakra Metemphysics</h4>
                 <p className="text-sm text-[#8898aa] leading-relaxed">
                   Each chakra is a specific J/S configuration of the living system. Root chakra = tipping point (J/S=0). Heart chakra = eudaimonia (J/S=1.0). Crown = revelation (J/S=950). The seven chakras are seven Omega phase states made physical.
                 </p>
@@ -637,7 +637,7 @@ export default function ChakraPanel({ onClose, onSendPrompt }: { onClose: () => 
                 <div 
                   key={c.n}
                   onClick={() => onSendPrompt(`Explain Chakra ${c.n} (${c.name} / ${c.sk}) in the context of T x S = C and its v13.2 V properties: ratio=${c.ratio}, tSec=${c.tSec}, mantra=${c.mantra}, crystals=${c.crystals}, gland=${c.gland}, phaseAngle=${c.phaseAngle}`)}
-                  className={`flex flex-col lg:flex-row lg:items-center gap-4 p-5 border border-orange-500/15 rounded-lg hover:border-[#c9a84c]/30 hover:bg-white/[0.01] transition-all cursor-pointer relative overflow-hidden group ${
+                  className={`flex flex-col lg:flex-row lg:items-center gap-4 p-5 border border-orange-500/15 rounded-lg hover:border-orange-500/30 hover:bg-white/[0.01] transition-all cursor-pointer relative overflow-hidden group ${
                     c.hi ? "bg-orange-500/5 border-orange-500/25" : "bg-[#0d0d0d]/50"
                   }`}
                 >
@@ -749,7 +749,7 @@ export default function ChakraPanel({ onClose, onSendPrompt }: { onClose: () => 
           <div className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="bg-[#0a0a0a]/80 border border-orange-500/15 rounded p-4 font-mono">
-                <h4 className="text-xs tracking-widest text-[#c9a84c] uppercase mb-2">Geometric Consonance</h4>
+                <h4 className="text-xs tracking-widest text-orange-400 uppercase mb-2">Geometric Consonance</h4>
                 <p className="text-sm text-[#8898aa] leading-relaxed">
                   Simple integer ratios = high order = high Omega = consonant. The ratio of two frequencies is the J/S ratio in sound. 2:1 (octave) is maximally ordered.
                 </p>
@@ -772,7 +772,7 @@ export default function ChakraPanel({ onClose, onSendPrompt }: { onClose: () => 
                   }`}
                 >
                   <div className="font-serif text-sm font-semibold text-[#e8d5a3]">{iv.name}</div>
-                  <div className="font-mono text-xl font-bold text-[#c9a84c] my-2">{iv.ratio}</div>
+                  <div className="font-mono text-xl font-bold text-orange-400 my-2">{iv.ratio}</div>
                   <div className="font-mono text-[11px] text-teal-400 mb-1">J/S: {iv.js}</div>
                   <div className="font-mono text-[10px] text-[#8898aa]">Ω: {iv.omega}</div>
                   <div className="text-[11px] text-[#8898aa] italic mt-2">{iv.char}</div>
@@ -816,17 +816,17 @@ export default function ChakraPanel({ onClose, onSendPrompt }: { onClose: () => 
               <table className="w-full text-left border-collapse font-mono text-xs">
                 <thead>
                   <tr className="bg-white/5 border-b border-white/10">
-                    <th className="p-3 text-[#c9a84c]">Action</th>
-                    <th className="p-3 text-[#c9a84c]">Frequency</th>
-                    <th className="p-3 text-[#c9a84c]">Acoustic Title</th>
-                    <th className="p-3 text-[#c9a84c]">Chakra Allocation</th>
-                    <th className="p-3 text-[#c9a84c]">Pythagorean Ratio</th>
-                    <th className="p-3 text-[#c9a84c]">Period T</th>
-                    <th className="p-3 text-[#c9a84c]">Angularity θ</th>
-                    <th className="p-3 text-[#c9a84c]">Hawkins H</th>
-                    <th className="p-3 text-[#c9a84c]">J/S Index</th>
-                    <th className="p-3 text-[#c9a84c]">Ω Order</th>
-                    <th className="p-3 text-[#c9a84c]">Metemphysics Resonance Synthesis</th>
+                    <th className="p-3 text-orange-400">Action</th>
+                    <th className="p-3 text-orange-400">Frequency</th>
+                    <th className="p-3 text-orange-400">Acoustic Title</th>
+                    <th className="p-3 text-orange-400">Chakra Allocation</th>
+                    <th className="p-3 text-orange-400">Pythagorean Ratio</th>
+                    <th className="p-3 text-orange-400">Period T</th>
+                    <th className="p-3 text-orange-400">Angularity θ</th>
+                    <th className="p-3 text-orange-400">Hawkins H</th>
+                    <th className="p-3 text-orange-400">J/S Index</th>
+                    <th className="p-3 text-orange-400">Ω Order</th>
+                    <th className="p-3 text-orange-400">Metemphysics Resonance Synthesis</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -834,7 +834,7 @@ export default function ChakraPanel({ onClose, onSendPrompt }: { onClose: () => 
                     <tr 
                       key={s.hz} 
                       onClick={() => onSendPrompt(`Explain Solfeggio frequency ${s.hz}Hz inside metemphysics system 13.2 V with values: name=${s.name}, ratio=${s.ratio}, period=${s.tSec}, angle=${s.phaseAngle}, J/S=${s.js}`)}
-                      className={`hover:bg-white/5 cursor-pointer border-b border-white/5 transition-all text-xs ${s.hi ? "bg-[#c9a84c]/5" : ""}`}
+                      className={`hover:bg-white/5 cursor-pointer border-b border-white/5 transition-all text-xs ${s.hi ? "bg-orange-500/10" : ""}`}
                     >
                       <td className="p-3">
                         <button
@@ -856,7 +856,7 @@ export default function ChakraPanel({ onClose, onSendPrompt }: { onClose: () => 
                           )}
                         </button>
                       </td>
-                      <td className="p-3 text-sm font-black text-[#c9a84c]">{s.hz}Hz</td>
+                      <td className="p-3 text-sm font-black text-orange-400">{s.hz}Hz</td>
                       <td className="p-3 font-serif italic text-white text-xs">{s.name}</td>
                       <td className="p-3 flex items-center gap-2">
                         <span className="w-2.5 h-2.5 rounded-full shadow-sm" style={{ backgroundColor: s.color }}></span>
@@ -882,13 +882,13 @@ export default function ChakraPanel({ onClose, onSendPrompt }: { onClose: () => 
           <div className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="bg-[#0a0a0a]/80 border border-orange-500/15 rounded p-4">
-                <h4 className="font-mono text-xs tracking-widest text-[#c9a84c] uppercase mb-2">Major Scale = Joy (J/S = 2.38)</h4>
+                <h4 className="font-mono text-xs tracking-widest text-orange-400 uppercase mb-2">Major Scale = Joy (J/S = 2.38)</h4>
                 <p className="text-sm text-[#8898aa] leading-relaxed">
                   Major scale pattern of intervals produces maximum consonance. It sits at H = 540 = J/S = 2.38 (Joy). This is why major keys feel inherently &quot;happy&quot; — they operate in deep flourishing.
                 </p>
               </div>
               <div className="bg-[#0a0a0a]/80 border border-orange-500/15 rounded p-4">
-                <h4 className="font-mono text-xs tracking-widest text-[#c9a84c] uppercase mb-2">Pentatonic = Universal Coherence</h4>
+                <h4 className="font-mono text-xs tracking-widest text-orange-400 uppercase mb-2">Pentatonic = Universal Coherence</h4>
                 <p className="text-sm text-[#8898aa] leading-relaxed">
                   5 tones. Universal to human groups. Pentatonic = J/S = 7.41 (Phase 5 Transcendent). Intuitively loved because it maps directly to our crown/spiritual integration layer.
                 </p>
@@ -899,12 +899,12 @@ export default function ChakraPanel({ onClose, onSendPrompt }: { onClose: () => 
               <table className="w-full text-left border-collapse font-mono text-xs">
                 <thead>
                   <tr className="bg-white/5">
-                    <th className="p-3 text-[#c9a84c]">Musical Scale</th>
-                    <th className="p-3 text-[#c9a84c]">Interval Count</th>
-                    <th className="p-3 text-[#c9a84c]">Interval Blueprint</th>
-                    <th className="p-3 text-[#c9a84c]">J/S Value</th>
-                    <th className="p-3 text-[#c9a84c]">Ω Order</th>
-                    <th className="p-3 text-[#c9a84c]">Character of System</th>
+                    <th className="p-3 text-orange-400">Musical Scale</th>
+                    <th className="p-3 text-orange-400">Interval Count</th>
+                    <th className="p-3 text-orange-400">Interval Blueprint</th>
+                    <th className="p-3 text-orange-400">J/S Value</th>
+                    <th className="p-3 text-orange-400">Ω Order</th>
+                    <th className="p-3 text-orange-400">Character of System</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -912,7 +912,7 @@ export default function ChakraPanel({ onClose, onSendPrompt }: { onClose: () => 
                     <tr 
                       key={s.name} 
                       onClick={() => onSendPrompt(`What is the Metemphysics mapping of the ${s.name}?`)}
-                      className={`hover:bg-white/5 cursor-pointer border-b border-white/5 ${s.hi ? "bg-[#c9a84c]/5" : ""}`}
+                      className={`hover:bg-white/5 cursor-pointer border-b border-white/5 ${s.hi ? "bg-orange-500/10" : ""}`}
                     >
                       <td className="p-3 text-sm font-semibold text-[#e4d9c0]">{s.name}</td>
                       <td className="p-3 text-center text-[#8898aa]">{s.tones}</td>
@@ -933,7 +933,7 @@ export default function ChakraPanel({ onClose, onSendPrompt }: { onClose: () => 
           <div className="space-y-8">
             {/* Header intro box */}
             <div className="bg-[#0a0a0a]/80 border border-orange-500/15 rounded p-5 shadow-[inset_0_1px_3px_rgba(255,100,0,0.05)]">
-              <h4 className="font-mono text-xs tracking-widest text-[#c9a84c] uppercase mb-2">Entropy &amp; Order in Music Genres</h4>
+              <h4 className="font-mono text-xs tracking-widest text-orange-400 uppercase mb-2">Entropy &amp; Order in Music Genres</h4>
               <p className="text-sm text-[#8898aa] leading-relaxed">
                 Different musical genres act as precise thermodynamic coordinates, transporting the listener to specific, mathematical J/S states. While atonal extremities induce targeted structural dissipation, pure wave coherence acts as an absolute entropy-reversing generator. Connect with any row below to query the oracle.
               </p>
@@ -943,7 +943,7 @@ export default function ChakraPanel({ onClose, onSendPrompt }: { onClose: () => 
             <div className="bg-[#080808]/90 border border-white/5 rounded-lg p-5 space-y-3 shadow-2xl">
               <div className="flex justify-between items-center border-b border-white/10 pb-2 mb-4">
                 <span className="font-serif text-sm font-bold text-[#e4d9c0] tracking-wide">Dynamic Coherence &amp; Entropic Dissolution Spectrum</span>
-                <span className="font-mono text-[9px] text-[#c9a84c] uppercase tracking-widest font-black">Interactive J/S State Map</span>
+                <span className="font-mono text-[9px] text-orange-400 uppercase tracking-widest font-black">Interactive J/S State Map</span>
               </div>
               <div className="space-y-2.5">
                 {GENRES.map((g, i) => {
@@ -1016,7 +1016,7 @@ export default function ChakraPanel({ onClose, onSendPrompt }: { onClose: () => 
               <div className="overflow-x-auto custom-scroll">
                 <table className="w-full text-left border-collapse font-mono text-xs">
                   <thead>
-                    <tr className="bg-white/5 text-[#c9a84c] border-b border-white/10 uppercase tracking-widest text-[9px] font-bold">
+                    <tr className="bg-white/5 text-orange-400 border-b border-white/10 uppercase tracking-widest text-[9px] font-bold">
                       <th className="p-3">GENRE / STYLE</th>
                       <th className="p-3 text-center">H</th>
                       <th className="p-3 text-center">J/S</th>
@@ -1127,12 +1127,12 @@ export default function ChakraPanel({ onClose, onSendPrompt }: { onClose: () => 
               <table className="w-full text-left border-collapse font-mono text-xs">
                 <thead>
                   <tr className="bg-white/5">
-                    <th className="p-3 text-[#c9a84c]">Composer / Artist</th>
-                    <th className="p-3 text-[#c9a84c]">Hawkins Calibration</th>
-                    <th className="p-3 text-[#c9a84c]">Computed J/S</th>
-                    <th className="p-3 text-[#c9a84c]">Ω Order</th>
-                    <th className="p-3 text-[#c9a84c]">Prime Landmark Creation</th>
-                    <th className="p-3 text-[#c9a84c]">Metemphysical Translation</th>
+                    <th className="p-3 text-orange-400">Composer / Artist</th>
+                    <th className="p-3 text-orange-400">Hawkins Calibration</th>
+                    <th className="p-3 text-orange-400">Computed J/S</th>
+                    <th className="p-3 text-orange-400">Ω Order</th>
+                    <th className="p-3 text-orange-400">Prime Landmark Creation</th>
+                    <th className="p-3 text-orange-400">Metemphysical Translation</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -1140,7 +1140,7 @@ export default function ChakraPanel({ onClose, onSendPrompt }: { onClose: () => 
                     <tr 
                       key={c.name}
                       onClick={() => onSendPrompt(`Describe the metemphysical work and J/S frequency of ${c.name}`)}
-                      className={`hover:bg-white/5 cursor-pointer border-b border-white/5 ${c.H >= 700 ? "bg-[#c9a84c]/5" : ""}`}
+                      className={`hover:bg-white/5 cursor-pointer border-b border-white/5 ${c.H >= 700 ? "bg-orange-500/10" : ""}`}
                     >
                       <td className="p-3 text-sm font-semibold text-[#ffd700]">{c.name}</td>
                       <td className="p-3 text-center">{c.H}</td>
@@ -1187,12 +1187,12 @@ export default function ChakraPanel({ onClose, onSendPrompt }: { onClose: () => 
               <table className="w-full text-left border-collapse font-mono text-xs">
                 <thead>
                   <tr className="bg-white/5">
-                    <th className="p-3 text-[#c9a84c]">Brainwave System</th>
-                    <th className="p-3 text-[#c9a84c]">Frequency Range</th>
-                    <th className="p-3 text-[#c9a84c]">J/S Value</th>
-                    <th className="p-3 text-[#c9a84c]">Ω Order</th>
-                    <th className="p-3 text-[#c9a84c]">Entraining Sound Architecture</th>
-                    <th className="p-3 text-[#c9a84c]">Metemphysics Synthesis</th>
+                    <th className="p-3 text-orange-400">Brainwave System</th>
+                    <th className="p-3 text-orange-400">Frequency Range</th>
+                    <th className="p-3 text-orange-400">J/S Value</th>
+                    <th className="p-3 text-orange-400">Ω Order</th>
+                    <th className="p-3 text-orange-400">Entraining Sound Architecture</th>
+                    <th className="p-3 text-orange-400">Metemphysics Synthesis</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -1223,7 +1223,7 @@ export default function ChakraPanel({ onClose, onSendPrompt }: { onClose: () => 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {FINDINGS.map((f) => (
                 <div key={f.n} className="bg-[#0d0d0d]/60 border border-orange-500/15 rounded-lg p-5">
-                  <div className="font-mono text-xs text-[#c9a84c] mb-1">REALIZATION #{f.n}</div>
+                  <div className="font-mono text-xs text-orange-400 mb-1">REALIZATION #{f.n}</div>
                   <h4 className="font-serif text-sm font-bold text-[#e8d5a3] mb-2">{f.title}</h4>
                   <p className="text-xs text-[#8898aa] leading-relaxed">{f.text}</p>
                 </div>

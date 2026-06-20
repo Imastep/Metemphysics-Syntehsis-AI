@@ -190,7 +190,7 @@ export default function EntropyPanel({ onClose, onSendPrompt }: { onClose: () =>
       {/* Top Header */}
       <div className="flex items-center justify-between pb-4 border-b border-orange-500/20 mb-4 sticky top-0 bg-[#050505]/95 z-20">
         <div>
-          <h2 className="font-serif text-2xl font-bold text-[#c9a84c] tracking-wider flex items-center gap-2">
+          <h2 className="font-serif text-2xl font-bold text-orange-400 tracking-wider flex items-center gap-2">
             <Table className="w-6 h-6 animate-pulse" /> Σ — THE S° ELEMENT TABLE
           </h2>
           <p className="text-xs text-[#8898aa] font-mono mt-1">Standard Molar Entropy · S° (J mol⁻¹ K⁻¹ at 298 K) · S = k_B ln Ω</p>
@@ -199,20 +199,20 @@ export default function EntropyPanel({ onClose, onSendPrompt }: { onClose: () =>
           <div className="flex gap-2">
             <button 
               onClick={() => { setViewMode("table"); setSortBy("z"); }} 
-              className={`px-3 py-1.5 text-xs font-mono rounded cursor-pointer transition-all border ${viewMode === "table" ? "bg-[#c9a84c]/10 border-[#c9a84c] text-[#c9a84c]" : "border-[#c9a84c]/20 text-[#8898aa]"}`}
+              className={`px-3 py-1.5 text-xs font-mono rounded cursor-pointer transition-all border ${viewMode === "table" ? "bg-orange-500/10 border-orange-500/40 text-orange-400 font-bold" : "border-orange-500/10 text-gray-400 hover:border-orange-500/30 hover:text-white"}`}
             >
               Periodic Grid
             </button>
             <button 
               onClick={() => setViewMode("list")} 
-              className={`px-3 py-1.5 text-xs font-mono rounded cursor-pointer transition-all border ${viewMode === "list" ? "bg-[#c9a84c]/10 border-[#c9a84c] text-[#c9a84c]" : "border-[#c9a84c]/20 text-[#8898aa]"}`}
+              className={`px-3 py-1.5 text-xs font-mono rounded cursor-pointer transition-all border ${viewMode === "list" ? "bg-orange-500/10 border-orange-500/40 text-orange-400 font-bold" : "border-orange-500/10 text-gray-400 hover:border-orange-500/30 hover:text-white"}`}
             >
               List Ledger
             </button>
           </div>
           <button 
             onClick={onClose}
-            className="flex items-center gap-1 bg-[#c9a84c]/10 border border-[#c9a84c]/30 rounded px-4 py-2 text-xs font-mono text-[#c9a84c] hover:bg-[#c9a84c]/20 transition-all cursor-pointer"
+            className="flex items-center gap-1 bg-orange-500/10 border border-orange-500/30 rounded px-4 py-2 text-xs font-mono text-orange-400 hover:bg-orange-500/20 transition-all cursor-pointer"
           >
             <X className="w-4 h-4" /> CLOSE
           </button>
@@ -234,8 +234,8 @@ export default function EntropyPanel({ onClose, onSendPrompt }: { onClose: () =>
               onClick={() => setSortBy(item.id as any)}
               className={`px-3 py-1 text-[10px] font-mono border rounded transition-all cursor-pointer ${
                 sortBy === item.id 
-                  ? "bg-[#c9a84c]/15 border-[#c9a84c]/50 text-[#c9a84c]" 
-                  : "border-[#c9a84c]/15 text-[#8898aa] hover:border-[#c9a84c]/30"
+                  ? "bg-orange-500/15 border-orange-500/50 text-orange-400 font-bold" 
+                  : "border-orange-500/15 text-[#8898aa] hover:border-orange-500/30"
               }`}
             >
               {item.label}
@@ -256,7 +256,7 @@ export default function EntropyPanel({ onClose, onSendPrompt }: { onClose: () =>
         <span style={{ color: "#3a6ea8" }}>● Noble Gas</span>
         <span style={{ color: "#8a5c5c" }}>● Lanthanide</span>
         <span style={{ color: "#6a5c7a" }}>● Actinide</span>
-        <span className="ml-auto text-[#e2b76c] hidden sm:inline">💡 Click any element cell to inspect molecular dimensions</span>
+        <span className="ml-auto text-orange-400 hidden sm:inline">💡 Click any element cell to inspect molecular dimensions</span>
       </div>
 
       {/* Main Panel Content Area */}
@@ -279,7 +279,7 @@ export default function EntropyPanel({ onClose, onSendPrompt }: { onClose: () =>
                   <div
                     key={el.z}
                     onClick={() => setSelectedElement(el)}
-                    className="bg-[#0c0c0c]/90 border border-orange-500/15 rounded p-2 flex flex-col justify-between relative overflow-hidden cursor-pointer hover:scale-108 hover:z-10 hover:border-amber-400/50 hover:shadow-lg hover:shadow-[#c9a84c]/10 transition-all group"
+                    className="bg-[#0c0c0c]/90 border border-orange-500/15 rounded p-2 flex flex-col justify-between relative overflow-hidden cursor-pointer hover:scale-108 hover:z-10 hover:border-orange-500/50 hover:shadow-lg hover:shadow-orange-500/10 transition-all group"
                     style={{ gridColumn: el.col, gridRow: el.row }}
                   >
                     <div className="text-[7.5px] text-white/35 font-mono">{el.z}</div>
@@ -417,17 +417,17 @@ export default function EntropyPanel({ onClose, onSendPrompt }: { onClose: () =>
 
               {/* Details text */}
               <div className="space-y-2">
-                <h4 className="font-mono text-[9px] uppercase tracking-widest text-[#c9a84c]">Thermodynamic Profile</h4>
-                <p className="text-[11px] text-[#8898aa] leading-relaxed italic border-l border-[#c9a84c]/20 pl-2">
+                <h4 className="font-mono text-[9px] uppercase tracking-widest text-orange-400 font-bold">Thermodynamic Profile</h4>
+                <p className="text-[11px] text-[#8898aa] leading-relaxed italic border-l border-orange-500/20 pl-2">
                   {EP_META[selectedElement.cat]}
                 </p>
               </div>
 
               {/* T x S = C calculation result */}
               <div className="bg-[#121212]/40 border border-orange-500/10 rounded p-3 text-xs leading-relaxed space-y-1">
-                <div className="font-mono text-[9px] uppercase tracking-widest text-[#c9a84c] mb-1">T × S = C Reading</div>
+                <div className="font-mono text-[9px] uppercase tracking-widest text-orange-400 font-bold mb-1">T × S = C Reading</div>
                 <div className="text-white/80">
-                  {selectedElement.sym} has standard entropy of <strong className="text-amber-300 font-bold">{selectedElement.s.toFixed(2)} J/mol·K</strong>.
+                  {selectedElement.sym} has standard entropy of <strong className="text-orange-300 font-bold">{selectedElement.s.toFixed(2)} J/mol·K</strong>.
                 </div>
                 <div className="text-[#8898aa] mt-1 text-[11px]">
                   {selectedElement.s < 15 ? (
@@ -443,7 +443,7 @@ export default function EntropyPanel({ onClose, onSendPrompt }: { onClose: () =>
 
             <button
               onClick={() => onSendPrompt(`Analyze the chemical element ${selectedElement.name} (${selectedElement.sym}, entropy S° = ${selectedElement.s} J/mol·K) using the Metemphysics framework`)}
-              className="w-full mt-4 bg-[#c9a84c]/10 border border-[#c9a84c] rounded py-2 text-xs font-mono font-bold text-[#c9a84c] cursor-pointer hover:bg-[#c9a84c]/25 transition-all text-center"
+              className="w-full mt-4 bg-orange-500/10 border border-orange-500/30 rounded py-2 text-xs font-mono font-bold text-orange-400 cursor-pointer hover:bg-orange-500/20 transition-all text-center"
             >
               ✦ Ask Unified AI About {selectedElement.sym} ✦
             </button>
@@ -452,27 +452,27 @@ export default function EntropyPanel({ onClose, onSendPrompt }: { onClose: () =>
       </div>
 
       {/* Meta blocks description footer */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mt-6 p-4 bg-[#c9a84c]/3 border border-[#c9a84c]/10 rounded font-serif">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mt-6 p-4 bg-orange-500/[0.03] border border-orange-500/15 rounded font-serif">
         <div>
-          <h5 className="font-serif text-sm font-bold text-[#c9a84c] mb-1">Low S° — Logos</h5>
+          <h5 className="font-serif text-sm font-bold text-orange-400 mb-1">Low S° — Logos</h5>
           <p className="text-[11px] text-[#8898aa] leading-relaxed italic">
             Elements with low entropy (Be, C, B) embody concentrated form — crystalline order, absolute informational density. Minimum entropic noise, Ω → 1.
           </p>
         </div>
         <div>
-          <h5 className="font-serif text-sm font-bold text-[#c9a84c] mb-1">Rising S° — Becoming</h5>
+          <h5 className="font-serif text-sm font-bold text-orange-400 mb-1">Rising S° — Becoming</h5>
           <p className="text-[11px] text-[#8898aa] leading-relaxed italic">
             Transition metals carry moderate entropy — structured yet highly dynamic. The stage of chemical reactions, bonding, and catalytic transformation. Mid-range Ω.
           </p>
         </div>
         <div>
-          <h5 className="font-serif text-sm font-bold text-[#c9a84c] mb-1">High S° — Eros</h5>
+          <h5 className="font-serif text-sm font-bold text-orange-400 mb-1">High S° — Eros</h5>
           <p className="text-[11px] text-[#8898aa] leading-relaxed italic">
             Gaseous elements approach entropic freedom. S° rises as matter forgets its tight physical confinement, reaching beyond bounded limits toward the infinite.
           </p>
         </div>
         <div>
-          <h5 className="font-serif text-sm font-bold text-[#c9a84c] mb-1">Maximum S° — Apeiron</h5>
+          <h5 className="font-serif text-sm font-bold text-orange-400 mb-1">Maximum S° — Apeiron</h5>
           <p className="text-[11px] text-[#8898aa] leading-relaxed italic">
             Noble gases: complete, completely unreactive, maximally dispersed. Anaximander's apeiron: the boundless, prior to differentiation. Entropy as pure void. Ω → 0.
           </p>

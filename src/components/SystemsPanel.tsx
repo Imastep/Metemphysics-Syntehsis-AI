@@ -490,7 +490,7 @@ export default function SystemsPanel({ onClose, onSendPrompt }: { onClose: () =>
 
             {/* Alignment 950 */}
             <div>
-              <h4 className="font-mono text-xs uppercase tracking-widest text-[#f5edd0] pb-2 border-b border-[#f5edd0]/25 mb-3">
+              <h4 className="font-mono text-xs uppercase tracking-widest text-orange-400 pb-2 border-b border-orange-500/20 mb-3">
                 ALIGNMENT III — J/S = 950 — REVELATION &amp; AVATAR (H=1000)
               </h4>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">

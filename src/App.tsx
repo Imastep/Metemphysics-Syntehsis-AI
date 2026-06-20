@@ -1632,6 +1632,38 @@ export default function App() {
     }
   };
 
+  const getLogoColors = () => {
+    switch (studioMode) {
+      case "socratic":
+        return {
+          border: "border-cyan-500/40",
+          bg: "from-cyan-500/10 to-cyan-950/40",
+          shadow: "shadow-[0_0_15px_rgba(34,211,238,0.25)]",
+          icon: "text-cyan-400",
+          ping: "bg-cyan-400",
+          dot: "bg-cyan-500",
+        };
+      case "strict_calc":
+        return {
+          border: "border-amber-500/40",
+          bg: "from-amber-500/10 to-amber-950/40",
+          shadow: "shadow-[0_0_15px_rgba(245,158,11,0.25)]",
+          icon: "text-amber-500",
+          ping: "bg-amber-400",
+          dot: "bg-amber-500",
+        };
+      default:
+        return {
+          border: "border-orange-500/40",
+          bg: "from-orange-500/10 to-amber-950/40",
+          shadow: "shadow-[0_0_15px_rgba(255,106,0,0.25)]",
+          icon: "text-orange-500",
+          ping: "bg-orange-400",
+          dot: "bg-orange-500",
+        };
+    }
+  };
+
   // Sync up to 25 chat responses to Local Storage
   useEffect(() => {
     if (messages.length > 1) {
@@ -2411,11 +2443,11 @@ export default function App() {
             rel="noopener noreferrer"
             className="flex items-center gap-3 hover:opacity-80 transition-all cursor-pointer"
           >
-            <div className="relative flex items-center justify-center w-10 h-10 rounded-full border border-orange-500/40 bg-gradient-to-br from-orange-500/10 to-amber-950/40 shadow-[0_0_15px_rgba(255,95,0,0.25)]">
-              <Atom className="w-5 h-5 text-orange-500 animate-spin-slow" />
+            <div className={`relative flex items-center justify-center w-10 h-10 rounded-full border bg-gradient-to-br ${getLogoColors().border} ${getLogoColors().bg} ${getLogoColors().shadow}`}>
+              <Atom className={`w-5 h-5 animate-spin-slow ${getLogoColors().icon}`} />
               <span className="absolute -top-1 -right-1 flex h-3.5 w-3.5">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-orange-500"></span>
+                <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${getLogoColors().ping}`}></span>
+                <span className={`relative inline-flex rounded-full h-3.5 w-3.5 ${getLogoColors().dot}`}></span>
               </span>
             </div>
             <span className="hidden md:inline font-serif font-bold text-xs tracking-wider text-[#eeeae4]">METEMPHYSICS</span>
