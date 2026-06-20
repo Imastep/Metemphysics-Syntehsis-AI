@@ -373,19 +373,19 @@ export default function HawkinsProgramPanel({ onClose, onSendPrompt }: { onClose
   };
 
   return (
-    <div className="fixed lg:absolute inset-0 bg-[#040406] text-[#eeeae4] overflow-y-auto z-[200] p-6 border-2 border-[#c9a84c]/25 rounded-2xl custom-scroll">
-      <div className="max-w-6xl mx-auto">
+    <div className="fixed lg:absolute inset-0 bg-[#040406]/98 text-[#eeeae4] z-[200] p-4 sm:p-6 border-2 border-orange-500/25 rounded-2xl flex flex-col min-h-0 overflow-hidden">
+      <div className="max-w-6xl mx-auto w-full flex-1 flex flex-col min-h-0">
         
         {/* TOP META BAR HEADER */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between pb-4 border-b border-[#c9a84c]/20 mb-6 gap-4">
+        <div className="flex flex-col md:flex-row md:items-center justify-between pb-4 border-b border-orange-500/20 mb-4 gap-4 flex-shrink-0">
           <div className="flex items-center gap-3">
-            <Cpu className="w-9 h-9 text-[#c9a84c] drop-shadow-[0_0_8px_rgba(201,168,76,0.35)]" />
+            <Cpu className="w-9 h-9 text-orange-400 drop-shadow-[0_0_8px_rgba(249,115,22,0.35)]" />
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-[10px] font-mono font-bold text-[#c9a84c] bg-[#c9a84c]/15 px-1.5 py-0.2 rounded header-tag">Σ REFERENCE TABLES</span>
+                <span className="text-[10px] font-mono font-bold text-orange-400 bg-orange-500/15 px-1.5 py-0.2 rounded header-tag">Σ REFERENCE TABLES</span>
                 <span className="text-[9px] font-mono text-gray-450">T × S = C  METEMPHYSICS UNIFIED META AI  V13</span>
               </div>
-              <h2 className="font-serif text-xl font-black tracking-wider text-[#e4d9c0] mt-0.5">
+              <h2 className="font-serif text-xl font-black tracking-wider text-orange-200 mt-0.5">
                 Hawkins x Metemphysics • Entropy Table • Full Scale
               </h2>
             </div>
@@ -400,7 +400,7 @@ export default function HawkinsProgramPanel({ onClose, onSendPrompt }: { onClose
         </div>
 
         {/* METEMPHYSICS MENU SELECTOR RAIL */}
-        <div className="flex flex-wrap gap-1.5 mb-6 border-b border-white/5 pb-4">
+        <div className="flex flex-wrap gap-1.5 mb-4 border-b border-white/5 pb-3 flex-shrink-0">
           {[
             { id: "calculator", label: "(Ψ) CALCULATOR" },
             { id: "full_scale", label: "Σ FULL SCALE" },
@@ -414,8 +414,8 @@ export default function HawkinsProgramPanel({ onClose, onSendPrompt }: { onClose
               onClick={() => setActiveTab(tab.id as any)}
               className={`font-mono text-[10px] tracking-widest uppercase px-4 py-2 border rounded-lg cursor-pointer transition-all ${
                 activeTab === tab.id
-                  ? "bg-[#c9a84c]/20 border-[#c9a84c] text-[#e8d5a3] font-extrabold shadow-[0_0_12px_rgba(201,168,76,0.15)]"
-                  : "bg-transparent border-white/10 text-gray-400 hover:border-[#c9a84c]/40 hover:text-white"
+                  ? "bg-orange-500/20 border-orange-500 text-orange-300 font-extrabold shadow-[0_0_12px_rgba(249,115,22,0.15)]"
+                  : "bg-transparent border-white/10 text-gray-400 hover:border-orange-500/40 hover:text-white"
               }`}
             >
               {tab.label}
@@ -424,17 +424,17 @@ export default function HawkinsProgramPanel({ onClose, onSendPrompt }: { onClose
         </div>
 
         {/* DYNAMIC TAB COMPONENT OUTPUTS */}
-        <div className="bg-black/30 border border-white/5 rounded-2xl p-5 shadow-[0_0_30px_rgba(0,0,0,0.7)]">
+        <div className="bg-black/30 border border-white/5 rounded-2xl p-4 sm:p-5 shadow-[0_0_30px_rgba(0,0,0,0.7)] flex-1 min-h-0 flex flex-col overflow-hidden">
           
           {/* TAB 1: (Ψ) CALCULATOR & CONVERGENCE METER */}
           {activeTab === "calculator" && (
-            <div className="space-y-6">
+            <div className="flex-1 min-h-0 overflow-y-auto custom-scroll pr-1 space-y-6">
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
                 
                 {/* Left: Input parameters */}
                 <div className="lg:col-span-5 space-y-5">
                   <div className="border border-orange-500/15 bg-orange-950/5 p-4 rounded-xl space-y-4">
-                    <span className="text-[10px] font-mono text-[#c9a84c] tracking-widest block uppercase">ENTER HAWKINS LEVEL H</span>
+                    <span className="text-[10px] font-mono text-orange-400 tracking-widest block uppercase">ENTER HAWKINS LEVEL H</span>
                     
                     <div className="flex gap-2">
                       <input
@@ -442,12 +442,12 @@ export default function HawkinsProgramPanel({ onClose, onSendPrompt }: { onClose
                         value={typedH}
                         onChange={(e) => setTypedH(e.target.value)}
                         onKeyDown={(e) => e.key === "Enter" && handleComputeClick()}
-                        className="flex-1 bg-black border border-white/10 rounded-lg px-3 py-2 font-mono text-sm text-[#eeeae4] outline-none focus:border-[#c9a84c]/60"
+                        className="flex-1 bg-black border border-white/10 rounded-lg px-3 py-2 font-mono text-sm text-[#eeeae4] outline-none focus:border-orange-500/60"
                         placeholder="1 to 1000"
                       />
                       <button
                         onClick={handleComputeClick}
-                        className="bg-[#c9a84c]/15 hover:bg-[#c9a84c] hover:text-black border border-[#c9a84c]/40 text-[#e8d5a3] px-4 py-1 rounded-lg font-mono text-xs font-bold transition-all cursor-pointer"
+                        className="bg-orange-500/15 hover:bg-orange-500 hover:text-black border border-orange-500/40 text-orange-300 px-4 py-1 rounded-lg font-mono text-xs font-bold transition-all cursor-pointer"
                       >
                         COMPUTE
                       </button>
@@ -460,7 +460,7 @@ export default function HawkinsProgramPanel({ onClose, onSendPrompt }: { onClose
                         max="1000"
                         value={inputH}
                         onChange={handleSliderChange}
-                        className="w-full h-1 bg-white/10 rounded-lg appearance-none cursor-pointer accent-[#c9a84c] pointer-events-auto"
+                        className="w-full h-1 bg-white/10 rounded-lg appearance-none cursor-pointer accent-orange-500 pointer-events-auto"
                       />
                     </div>
 
@@ -474,7 +474,7 @@ export default function HawkinsProgramPanel({ onClose, onSendPrompt }: { onClose
                             onClick={() => setPresetH(pVal)}
                             className={`px-2 py-1.5 rounded text-[9px] font-mono font-bold transition-all border cursor-pointer ${
                               inputH === pVal
-                                ? "bg-[#c9a84c]/20 border-[#c9a84c] text-[#e8d5a3]"
+                                ? "bg-orange-500/20 border-orange-500 text-orange-300"
                                 : "bg-black/50 border-white/5 text-gray-400 hover:border-white/20 hover:text-white"
                             }`}
                           >
@@ -493,10 +493,10 @@ export default function HawkinsProgramPanel({ onClose, onSendPrompt }: { onClose
                   <div className="flex justify-between items-start border-b border-white/10 pb-3 mb-4">
                     <div>
                       <div className="flex items-center gap-1.5">
-                        <span className="w-2 h-2 rounded-full bg-[#c9a84c] animate-pulse"></span>
+                        <span className="w-2 h-2 rounded-full bg-orange-500 animate-pulse"></span>
                         <span className="text-[9px] font-mono text-gray-400 uppercase tracking-widest">Active Calibrated State</span>
                       </div>
-                      <h3 className="font-serif text-3xl font-black text-[#c9a84c] mt-1 tracking-tight">
+                      <h3 className="font-serif text-3xl font-black text-orange-400 mt-1 tracking-tight">
                         H = {inputH}
                       </h3>
                     </div>
@@ -514,7 +514,7 @@ export default function HawkinsProgramPanel({ onClose, onSendPrompt }: { onClose
                     </div>
                     <div className="flex justify-between items-center bg-black/30 p-2 rounded border border-white/5">
                       <span className="text-gray-500 font-bold">Ω CONSTANT:</span>
-                      <span className="text-[#c9a84c] font-black">{metrics.omega.toFixed(3)}</span>
+                      <span className="text-orange-400 font-black">{metrics.omega.toFixed(3)}</span>
                     </div>
 
                     <div className="flex justify-between items-center bg-black/30 p-2 rounded border border-white/5">
@@ -525,7 +525,7 @@ export default function HawkinsProgramPanel({ onClose, onSendPrompt }: { onClose
                     </div>
                     <div className="flex justify-between items-center bg-black/30 p-2 rounded border border-white/5">
                       <span className="text-gray-500 font-bold">J/S STATE:</span>
-                      <span className="text-amber-400 font-black text-[11px] truncate max-w-[120px]">{metrics.stateName}</span>
+                      <span className="text-orange-400 font-black text-[11px] truncate max-w-[120px]">{metrics.stateName}</span>
                     </div>
 
                     <div className="flex justify-between items-center bg-black/30 p-2 rounded border border-white/5">
@@ -543,12 +543,12 @@ export default function HawkinsProgramPanel({ onClose, onSendPrompt }: { onClose
                     </div>
                     <div className="flex justify-between items-center bg-black/30 p-2 rounded border border-white/5">
                       <span className="text-gray-500 font-bold">MEAN Ω_:</span>
-                      <span className="text-[#eedcb0] font-black">{vector.mean.toFixed(3)}</span>
+                      <span className="text-orange-300 font-black">{vector.mean.toFixed(3)}</span>
                     </div>
                   </div>
 
                   {/* Dynamic Phase string Tag block */}
-                  <div className="flex items-center gap-2 text-xs bg-[#c9a84c]/5 border border-[#c9a84c]/20 rounded-lg p-2.5">
+                  <div className="flex items-center gap-2 text-xs bg-orange-500/5 border border-orange-500/20 rounded-lg p-2.5">
                     <span className="font-mono text-gray-500 uppercase font-bold">SYSTEM RESIDENCY PHASE:</span>
                     <span className="px-2 py-0.5 rounded bg-blue-950/40 border border-blue-500/30 text-blue-400 font-bold font-mono text-[10px]">
                       {metrics.phase}
@@ -580,7 +580,7 @@ export default function HawkinsProgramPanel({ onClose, onSendPrompt }: { onClose
                       </div>
                       <div className="w-full bg-white/5 h-2 rounded-full overflow-hidden border border-white/5">
                         <div 
-                          className="bg-amber-500 h-full rounded-full transition-all duration-300"
+                          className="bg-orange-600 h-full rounded-full transition-all duration-300"
                           style={{ width: `${vector.s * 100}%` }}
                         ></div>
                       </div>
@@ -594,7 +594,7 @@ export default function HawkinsProgramPanel({ onClose, onSendPrompt }: { onClose
                       </div>
                       <div className="w-full bg-white/5 h-2 rounded-full overflow-hidden border border-white/5">
                         <div 
-                          className="bg-amber-450 h-full rounded-full transition-all duration-300"
+                          className="bg-orange-500 h-full rounded-full transition-all duration-300"
                           style={{ width: `${vector.i * 100}%` }}
                         ></div>
                       </div>
@@ -608,7 +608,7 @@ export default function HawkinsProgramPanel({ onClose, onSendPrompt }: { onClose
                       </div>
                       <div className="w-full bg-white/5 h-2 rounded-full overflow-hidden border border-white/5">
                         <div 
-                          className="bg-orange-500 h-full rounded-full transition-all duration-300"
+                          className="bg-orange-400 h-full rounded-full transition-all duration-300"
                           style={{ width: `${vector.t * 100}%` }}
                         ></div>
                       </div>
@@ -627,7 +627,7 @@ export default function HawkinsProgramPanel({ onClose, onSendPrompt }: { onClose
                       </div>
                       <div className="w-full bg-white/5 h-2 rounded-full overflow-hidden border border-white/5">
                         <div 
-                          className="bg-yellow-500 h-full rounded-full transition-all duration-300"
+                          className="bg-orange-300 h-full rounded-full transition-all duration-300"
                           style={{ width: `${vector.r * 100}%` }}
                         ></div>
                       </div>
@@ -641,7 +641,7 @@ export default function HawkinsProgramPanel({ onClose, onSendPrompt }: { onClose
                       </div>
                       <div className="w-full bg-white/5 h-2 rounded-full overflow-hidden border border-white/5">
                         <div 
-                          className="bg-emerald-500 h-full rounded-full transition-all duration-300"
+                          className="bg-orange-200 h-full rounded-full transition-all duration-300"
                           style={{ width: `${vector.c * 100}%` }}
                         ></div>
                       </div>
@@ -659,11 +659,11 @@ export default function HawkinsProgramPanel({ onClose, onSendPrompt }: { onClose
 
               {/* INTERPRETIVE ANALYTICS SECTION */}
               <div className="p-4 bg-orange-950/10 border border-orange-500/20 rounded-xl space-y-3">
-                <span className="font-mono text-[9px] text-[#c9a84c] tracking-widest block uppercase font-black">
+                <span className="font-mono text-[9px] text-orange-400 tracking-widest block uppercase font-black">
                   ✦ METEMPHYSICS INTERPRETATION
                 </span>
                 
-                <p className="text-xs text-gray-300 leading-relaxed font-serif italic border-l-2 border-[#c9a84c] pl-3">
+                <p className="text-xs text-gray-300 leading-relaxed font-serif italic border-l-2 border-orange-500 pl-3">
                   "{getDynamicInterpretation(metrics.h, metrics.js, metrics.stateName, metrics.phase, vector.mean)}"
                 </p>
 
@@ -676,7 +676,7 @@ export default function HawkinsProgramPanel({ onClose, onSendPrompt }: { onClose
                     onClick={() => {
                       onSendPrompt(`Analyze the David Hawkins consciousness level of H=${metrics.h}. J/S evaluates to ${metrics.js.toFixed(3)} and Omega order is ${metrics.omega.toFixed(3)}. The speed convergence is ${Math.round(metrics.st)} m/s, and relative cosmic drain index stands at ${metrics.drain.toFixed(3)}%. Detail its metemphysical and spiritual meaning.`);
                     }}
-                    className="bg-[#c9a84c]/20 hover:bg-[#c9a84c] hover:text-black border border-[#c9a84c]/40 text-[#eedcb0] px-3.5 py-1.5 rounded-lg font-mono text-[9px] font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5"
+                    className="bg-orange-500/20 hover:bg-orange-500 hover:text-black border border-orange-500/40 text-orange-300 px-3.5 py-1.5 rounded-lg font-mono text-[9px] font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5"
                   >
                     💬 Put in Chat
                   </button>
@@ -688,7 +688,7 @@ export default function HawkinsProgramPanel({ onClose, onSendPrompt }: { onClose
 
           {/* TAB 2: Σ FULL SCALE DATABASE GRID */}
           {activeTab === "full_scale" && (
-            <div className="space-y-4">
+            <div className="flex-1 min-h-0 flex flex-col space-y-3">
               
               {/* Range Filters */}
               <div className="flex flex-wrap gap-1 border-b border-white/10 pb-3">
@@ -705,7 +705,7 @@ export default function HawkinsProgramPanel({ onClose, onSendPrompt }: { onClose
                     onClick={() => setScaleFilter(f.id as any)}
                     className={`px-3 py-1.5 rounded text-[9.5px] font-mono transition-all border cursor-pointer ${
                       scaleFilter === f.id
-                        ? "bg-[#c9a84c]/15 border-[#c9a84c] text-white font-bold"
+                        ? "bg-orange-500/15 border-orange-500 text-white font-bold"
                         : "bg-transparent border-white/10 text-gray-450 hover:border-white/20 hover:text-white"
                     }`}
                   >
@@ -715,10 +715,10 @@ export default function HawkinsProgramPanel({ onClose, onSendPrompt }: { onClose
               </div>
 
               {/* Scrollable Data Table Container */}
-              <div className="overflow-x-auto max-h-[500px] border border-white/5 rounded-xl custom-scroll">
+              <div className="flex-1 overflow-auto border border-white/5 rounded-xl custom-scroll">
                 <table className="w-full text-left border-collapse font-mono text-[11px]">
-                  <thead className="sticky top-0 bg-[#0d0d0f] z-10 border-b border-[#c9a84c]/20">
-                    <tr className="text-[#eedcb0]">
+                  <thead className="sticky top-0 bg-[#0d0d0f] z-10 border-b border-orange-500/20">
+                    <tr className="text-orange-300">
                       <th className="p-3 text-center">H</th>
                       <th className="p-3">STATE / LABEL</th>
                       <th className="p-3">J/S INDEX</th>
@@ -739,15 +739,15 @@ export default function HawkinsProgramPanel({ onClose, onSendPrompt }: { onClose
                         <tr
                           key={row.h}
                           className={`border-b border-white/5 hover:bg-white/5 transition-colors ${
-                            isTippingPoint ? "bg-[#c9a84c]/10" : ""
+                            isTippingPoint ? "bg-orange-500/10" : ""
                           } ${isHighState && row.h % 100 === 0 ? "bg-amber-900/5" : ""}`}
                         >
-                          <td className="p-3 text-center font-bold text-[#c9a84c]">{row.h}</td>
+                          <td className="p-3 text-center font-bold text-orange-400">{row.h}</td>
                           <td className="p-3 font-serif text-white/90 font-bold">{row.label}</td>
                           <td className={`p-3 font-bold ${row.js < 0 ? "text-red-400" : "text-emerald-400"}`}>
                             {row.js >= 0 ? `+${row.js}` : row.js}
                           </td>
-                          <td className="p-3 text-[#eedcb0] font-bold">{row.omega.toFixed(3)}</td>
+                          <td className="p-3 text-orange-300 font-bold">{row.omega.toFixed(3)}</td>
                           <td className="p-3 text-gray-400">
                             <span className="text-[10px] bg-blue-950/40 border border-blue-500/20 px-2 py-0.5 rounded text-blue-400">
                               {row.phase}
@@ -778,15 +778,15 @@ export default function HawkinsProgramPanel({ onClose, onSendPrompt }: { onClose
 
           {/* TAB 3: ✦ TEACHERS DIRECTORY */}
           {activeTab === "teachers" && (
-            <div className="space-y-4">
-              <span className="text-[10px] font-mono text-[#c9a84c] tracking-widest block uppercase font-bold">
+            <div className="flex-1 min-h-0 flex flex-col space-y-3">
+              <span className="text-[10px] font-mono text-orange-400 tracking-widest block uppercase font-bold flex-shrink-0">
                 CALIBRATED INITIATES, GURUS, AND HISTORICAL TEACHERS
               </span>
 
-              <div className="overflow-x-auto max-h-[500px] border border-white/5 rounded-xl custom-scroll">
+              <div className="flex-1 overflow-auto border border-white/5 rounded-xl custom-scroll">
                 <table className="w-full text-left border-collapse font-mono text-[11px]">
-                  <thead className="sticky top-0 bg-[#0d0d0f] z-10 border-b border-[#c9a84c]/20">
-                    <tr className="text-[#eedcb0]">
+                  <thead className="sticky top-0 bg-[#0d0d0f] z-10 border-b border-orange-500/20">
+                    <tr className="text-orange-300">
                       <th className="p-3">TEACHER / FIGURE</th>
                       <th className="p-3 text-center">H</th>
                       <th className="p-3">J/S</th>
@@ -802,7 +802,7 @@ export default function HawkinsProgramPanel({ onClose, onSendPrompt }: { onClose
                     {TEACHERS_LIST.map((teacher, idx) => (
                       <tr key={idx} className="border-b border-white/5 hover:bg-white/5 transition-all">
                         <td className="p-3 font-serif font-black text-white">{teacher.name}</td>
-                        <td className="p-3 text-center font-bold text-[#c9a84c]">{teacher.H}</td>
+                        <td className="p-3 text-center font-bold text-orange-400">{teacher.H}</td>
                         <td className={`p-3 font-bold ${teacher.js < 0 ? "text-red-400" : "text-emerald-400"}`}>
                           {teacher.js >= 0 ? `+${teacher.js}` : teacher.js}
                         </td>
@@ -835,15 +835,15 @@ export default function HawkinsProgramPanel({ onClose, onSendPrompt }: { onClose
 
           {/* TAB 4: ☰ SACRED TEXTS LEDGER */}
           {activeTab === "sacred_texts" && (
-            <div className="space-y-4">
-              <span className="text-[10px] font-mono text-[#c9a84c] tracking-widest block uppercase font-bold">
+            <div className="flex-1 min-h-0 flex flex-col space-y-3">
+              <span className="text-[10px] font-mono text-orange-400 tracking-widest block uppercase font-bold flex-shrink-0">
                 METEMPHYSICAL LEDGER OF SACRED TEXTS AND SOURCE ANNOTATIONS
               </span>
 
-              <div className="overflow-x-auto max-h-[500px] border border-white/5 rounded-xl custom-scroll">
+              <div className="flex-1 overflow-auto border border-white/5 rounded-xl custom-scroll">
                 <table className="w-full text-left border-collapse font-mono text-[11px]">
-                  <thead className="sticky top-0 bg-[#0d0d0f] z-10 border-b border-[#c9a84c]/20">
-                    <tr className="text-[#eedcb0]">
+                  <thead className="sticky top-0 bg-[#0d0d0f] z-10 border-b border-orange-500/20">
+                    <tr className="text-orange-300">
                       <th className="p-3">TEXT / TREATISE</th>
                       <th className="p-3">TRADITION</th>
                       <th className="p-3 text-center">H</th>
@@ -859,7 +859,7 @@ export default function HawkinsProgramPanel({ onClose, onSendPrompt }: { onClose
                       <tr key={idx} className="border-b border-white/5 hover:bg-white/5 transition-all">
                         <td className="p-3 font-serif font-black text-white">{text.name}</td>
                         <td className="p-3 text-gray-400 font-bold">{text.tradition}</td>
-                        <td className="p-3 text-center font-bold text-[#c9a84c]">{text.H}</td>
+                        <td className="p-3 text-center font-bold text-orange-400">{text.H}</td>
                         <td className={`p-3 font-bold ${text.js < 0 ? "text-red-400" : "text-emerald-400"}`}>
                           {text.js >= 0 ? `+${text.js}` : text.js}
                         </td>
@@ -890,10 +890,10 @@ export default function HawkinsProgramPanel({ onClose, onSendPrompt }: { onClose
 
           {/* TAB 5: J/S DRAIN ATTENUATORS */}
           {activeTab === "drain" && (
-            <div className="space-y-6">
+            <div className="flex-1 min-h-0 flex flex-col space-y-4">
               
               {/* Six Top High Level Summary Cards */}
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 flex-shrink-0">
                 <div className="p-3 bg-red-950/15 border border-red-500/30 rounded-xl text-center">
                   <h4 className="text-xl font-bold text-red-500 font-mono">1000%</h4>
                   <p className="text-[10px] text-gray-300 font-serif font-black mt-1">Shame (H=20)</p>
@@ -914,23 +914,23 @@ export default function HawkinsProgramPanel({ onClose, onSendPrompt }: { onClose
                   <p className="text-[10px] text-gray-300 font-serif font-black mt-1">Love (H=500)</p>
                   <p className="text-[9px] text-gray-500 font-mono mt-0.5">Half standard baseline</p>
                 </div>
-                <div className="p-3 bg-[#c9a84c]/5 border border-[#c9a84c]/20 rounded-xl text-center">
-                  <h4 className="text-xl font-bold text-[#c9a84c] font-mono">2.75%</h4>
+                <div className="p-3 bg-orange-500/5 border border-orange-500/20 rounded-xl text-center">
+                  <h4 className="text-xl font-bold text-orange-450 font-mono">2.75%</h4>
                   <p className="text-[10px] text-white font-serif font-black mt-1">Enlighten (H=700)</p>
                   <p className="text-[9px] text-gray-500 font-mono mt-0.5">Near-zero decay orbit</p>
                 </div>
                 <div className="p-3 bg-blue-950/10 border border-blue-500/30 rounded-xl text-center">
                   <h4 className="text-xl font-bold text-blue-400 font-mono">0.1053%</h4>
-                  <p className="text-[10px] text-[#e8d5a3] font-serif font-black mt-1">Avatar (H=1000)</p>
+                  <p className="text-[10px] text-orange-200 font-serif font-black mt-1">Avatar (H=1000)</p>
                   <p className="text-[9px] text-gray-500 font-mono mt-0.5">The cosmic veil itself</p>
                 </div>
               </div>
 
               {/* Drain metrics grid table */}
-              <div className="overflow-x-auto max-h-[400px] border border-white/5 rounded-xl custom-scroll">
+              <div className="flex-1 overflow-auto border border-white/5 rounded-xl custom-scroll">
                 <table className="w-full text-left border-collapse font-mono text-[11px]">
-                  <thead className="sticky top-0 bg-[#0d0d0f] z-10 border-b border-[#c9a84c]/20">
-                    <tr className="text-[#eedcb0]">
+                  <thead className="sticky top-0 bg-[#0d0d0f] z-10 border-b border-orange-500/20">
+                    <tr className="text-orange-300">
                       <th className="p-3 text-center">H</th>
                       <th className="p-3">EMOTIONAL STATE</th>
                       <th className="p-3 text-center">J/S VALUE</th>
@@ -943,7 +943,7 @@ export default function HawkinsProgramPanel({ onClose, onSendPrompt }: { onClose
                   <tbody>
                     {HAWKINS_ANCHORS.slice(0, 25).map((row) => (
                       <tr key={row.h} className="border-b border-white/5 hover:bg-white/5 transition-all">
-                        <td className="p-3 text-center font-bold text-[#c9a84c]">{row.h}</td>
+                        <td className="p-3 text-center font-bold text-orange-400">{row.h}</td>
                         <td className="p-3 font-serif font-bold text-white">{row.label.split(" — ")[0]} ({row.label.split(" — ")[1] || ""})</td>
                         <td className={`p-3 text-center font-bold ${row.js < 0 ? "text-red-400" : "text-emerald-400"}`}>
                           {row.js >= 0 ? `+${row.js}` : row.js}
@@ -972,10 +972,10 @@ export default function HawkinsProgramPanel({ onClose, onSendPrompt }: { onClose
 
           {/* TAB 6: E S* ENTROPY (Concept Calibrator Engine) */}
           {activeTab === "entropy" && (
-            <div className="space-y-6">
+            <div className="flex-1 min-h-0 overflow-y-auto custom-scroll pr-1 space-y-6">
               
               <div className="border-b border-white/5 pb-2">
-                <span className="text-[10px] font-mono text-[#c9a84c] tracking-widest block uppercase font-bold">
+                <span className="text-[10px] font-mono text-orange-400 tracking-widest block uppercase font-bold">
                   QUANTUM DIAGNOSTIC CALIBRATION ENGINE (E S* ENTROPY)
                 </span>
                 <p className="text-[9.5px] text-gray-400 font-mono mt-0.5">
@@ -998,28 +998,28 @@ export default function HawkinsProgramPanel({ onClose, onSendPrompt }: { onClose
                         onChange={(e) => setCustomConcept(e.target.value)}
                         onKeyDown={(e) => e.key === "Enter" && handleCalibrateConcept()}
                         placeholder="e.g. 'Thermodynamic Love', 'Scientific Reductionism', 'Lotus Heart'"
-                        className="w-full bg-black border border-white/10 rounded-lg px-3 py-2 font-mono text-xs text-[#eeeae4] outline-none focus:border-[#c9a84c]/60"
+                        className="w-full bg-black border border-white/10 rounded-lg px-3 py-2 font-mono text-xs text-[#eeeae4] outline-none focus:border-orange-500/60"
                       />
                     </div>
 
                     <button
                       onClick={handleCalibrateConcept}
                       disabled={calibratingSecs || !customConcept.trim()}
-                      className="w-full py-2 bg-gradient-to-r from-[#c9a84c]/40 to-[#c9a84c]/20 hover:from-[#c9a84c] hover:to-[#eedcb0] hover:text-black hover:shadow-lg disabled:opacity-40 text-[#eedcb0] font-mono font-bold text-[10px] rounded-lg tracking-widest uppercase transition-all duration-300 disabled:cursor-not-allowed flex items-center justify-center gap-2 border border-[#c9a84c]/40 cursor-pointer"
+                      className="w-full py-2 bg-gradient-to-r from-orange-500/40 to-orange-500/20 hover:from-orange-500 hover:to-orange-300 hover:text-black hover:shadow-lg disabled:opacity-40 text-orange-200 font-mono font-bold text-[10px] rounded-lg tracking-widest uppercase transition-all duration-300 disabled:cursor-not-allowed flex items-center justify-center gap-2 border border-orange-500/40 cursor-pointer"
                     >
                       {calibratingSecs ? (
                         <>
-                          <Cpu className="w-3.5 h-3.5 animate-spin text-amber-300" /> CALIBRATING SEMANTIC ATTRACTOR FIELD CODES...
+                          <Cpu className="w-3.5 h-3.5 animate-spin text-orange-400" /> CALIBRATING SEMANTIC ATTRACTOR FIELD CODES...
                         </>
                       ) : (
                         <>
-                          <Sparkles className="w-3.5 h-3.5 text-[#eedcb0]" /> RUN QUANTUM CALIBRATION SCANNER
+                          <Sparkles className="w-3.5 h-3.5 text-orange-300" /> RUN QUANTUM CALIBRATION SCANNER
                         </>
                       )}
                     </button>
                   </div>
 
-                  <div className="p-3 bg-black/40 border border-[#c9a84c]/10 rounded-lg text-[9px] font-mono text-gray-500 leading-normal">
+                  <div className="p-3 bg-black/40 border border-orange-500/10 rounded-lg text-[9px] font-mono text-gray-500 leading-normal">
                     <strong>MATHEMATICAL PROCESS:</strong> The system computes standard unicode vector hashes using prime coordinates multipliers, then indexes the quotient across the Speed of Light boundary equations (T × S = C) to discover local negentropy coordinates matching Hawkins calibrations.
                   </div>
                 </div>
@@ -1028,8 +1028,8 @@ export default function HawkinsProgramPanel({ onClose, onSendPrompt }: { onClose
                 <div className="bg-[#0e0e11] border border-white/5 rounded-xl p-4 flex flex-col justify-between min-h-[200px]">
                   {calibratingSecs && (
                     <div className="flex-1 flex flex-col items-center justify-center space-y-2 py-8">
-                      <Cpu className="w-9 h-9 text-[#c9a84c] animate-spin" />
-                      <span className="font-mono text-[9px] text-[#eedcb0] uppercase tracking-widest animate-pulse">Mapping wave harmonic coordinates...</span>
+                      <Cpu className="w-9 h-9 text-orange-400 animate-spin" />
+                      <span className="font-mono text-[9px] text-orange-350 uppercase tracking-widest animate-pulse">Mapping wave harmonic coordinates...</span>
                     </div>
                   )}
 
@@ -1047,7 +1047,7 @@ export default function HawkinsProgramPanel({ onClose, onSendPrompt }: { onClose
                           <span className="text-[8px] font-mono text-gray-500 block uppercase">CALIBRATION TARGET:</span>
                           <strong className="text-white text-sm font-serif">"{calibResult.concept}"</strong>
                         </div>
-                        <span className="text-xl font-mono text-[#c9a84c] font-black">
+                        <span className="text-xl font-mono text-orange-400 font-black">
                           H = {calibResult.metrics.h}
                         </span>
                       </div>
@@ -1085,7 +1085,7 @@ export default function HawkinsProgramPanel({ onClose, onSendPrompt }: { onClose
                         onClick={() => {
                           onSendPrompt(`Calibrate and explain the dynamic coordinate evaluating '${calibResult.concept}' to H=${calibResult.metrics.h} with entropy budget quotient (J/S) of ${calibResult.metrics.js.toFixed(3)} and standard drain index of ${calibResult.metrics.drain.toFixed(3)}%. Give me details.`);
                         }}
-                        className="w-full py-1 bg-orange-500/10 hover:bg-orange-500 hover:text-black text-[9px] font-mono border border-orange-500/30 text-orange-450 rounded uppercase transition-all cursor-pointer font-black"
+                        className="w-full py-1 bg-orange-500/10 hover:bg-orange-500 hover:text-black text-[9px] font-mono border border-orange-500/30 text-orange-400 rounded uppercase transition-all cursor-pointer font-black"
                       >
                         Submit calibrated ledger record to Oracle Terminal
                       </button>

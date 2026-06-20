@@ -38,11 +38,11 @@ export default function RefTablesPanel({ onClose, onSendPrompt }: { onClose: () 
   ];
 
   return (
-    <div className="fixed lg:absolute inset-0 bg-[#040406] text-[#eeeae4] overflow-y-auto z-[200] p-6 border-2 border-orange-500/25 rounded-2xl">
-      <div className="max-w-6xl mx-auto">
+    <div className="fixed lg:absolute inset-0 bg-[#040406]/98 text-[#eeeae4] z-[200] p-4 sm:p-6 border-2 border-orange-500/25 rounded-2xl flex flex-col min-h-0 overflow-hidden">
+      <div className="max-w-6xl mx-auto w-full flex-1 flex flex-col min-h-0">
         
         {/* Header */}
-        <div className="flex items-center justify-between pb-4 border-b border-orange-500/20 mb-6">
+        <div className="flex items-center justify-between pb-4 border-b border-orange-500/20 mb-4 flex-shrink-0">
           <div className="flex items-center gap-3">
             <Database className="w-8 h-8 text-orange-500 drop-shadow-[0_0_8px_rgba(255,106,0,0.4)]" />
             <div>
@@ -59,7 +59,7 @@ export default function RefTablesPanel({ onClose, onSendPrompt }: { onClose: () 
         </div>
 
         {/* Subnav Toggles */}
-        <div className="flex flex-wrap gap-2 mb-6 border-b border-white/5 pb-4">
+        <div className="flex flex-wrap gap-2 mb-4 border-b border-white/5 pb-3 flex-shrink-0">
           {[
             { id: "constants", label: "⚙ Physical Constants" },
             { id: "thermo", label: "🧪 Thermodynamic Molar S" },
@@ -86,7 +86,7 @@ export default function RefTablesPanel({ onClose, onSendPrompt }: { onClose: () 
 
         {/* SEARCH BAR FOR TRADITIONS / THERMO / LEXICON */}
         {(activeSubTab === "traditions" || activeSubTab === "thermo" || activeSubTab === "lexicon") && (
-          <div className="mb-4">
+          <div className="mb-4 flex-shrink-0">
             <input
               type="text"
               value={searchQuery}
@@ -98,14 +98,14 @@ export default function RefTablesPanel({ onClose, onSendPrompt }: { onClose: () 
         )}
 
         {/* CONTENT TABLES */}
-        <div className="bg-black/40 border border-white/5 rounded-xl p-5 shadow-[0_0_20px_rgba(0,0,0,0.5)]">
+        <div className="bg-black/40 border border-white/5 rounded-xl p-4 sm:p-5 shadow-[0_0_20px_rgba(0,0,0,0.5)] flex-1 min-h-0 flex flex-col overflow-hidden">
           {activeSubTab === "constants" && (
-            <div className="space-y-4">
-              <div className="flex items-center justify-between border-b border-white/10 pb-2">
+            <div className="flex-1 min-h-0 flex flex-col space-y-3">
+              <div className="flex items-center justify-between border-b border-white/10 pb-2 flex-shrink-0">
                 <span className="font-serif font-bold text-sm text-[#e4d9c0]">Fundamental Metemphysical Constants</span>
                 <span className="font-mono text-[9px] text-gray-500">SYSTEM DATA UNIT BASIS</span>
               </div>
-              <div className="overflow-x-auto">
+              <div className="flex-1 overflow-auto custom-scroll pr-1">
                 <table className="w-full text-left font-mono text-[11px] border-collapse">
                   <thead>
                     <tr className="border-b border-white/5 text-orange-400">
@@ -140,12 +140,12 @@ export default function RefTablesPanel({ onClose, onSendPrompt }: { onClose: () 
           )}
 
           {activeSubTab === "thermo" && (
-            <div className="space-y-4">
-              <div className="flex items-center justify-between border-b border-white/10 pb-2">
+            <div className="flex-1 min-h-0 flex flex-col space-y-3">
+              <div className="flex items-center justify-between border-b border-white/10 pb-2 flex-shrink-0">
                 <span className="font-serif font-bold text-sm text-[#e4d9c0]">Standard Molar Entropy (S°) Catalog (298.15 K, 1 Bar)</span>
                 <span className="font-mono text-[9px] text-gray-500">THERMODYNAMIC VALUE REFERENCE</span>
               </div>
-              <div className="overflow-x-auto">
+              <div className="flex-1 overflow-auto custom-scroll pr-1">
                 <table className="w-full text-left font-mono text-[11px] border-collapse">
                   <thead>
                     <tr className="border-b border-white/5 text-orange-400">
@@ -184,12 +184,12 @@ export default function RefTablesPanel({ onClose, onSendPrompt }: { onClose: () 
           )}
 
           {activeSubTab === "solfeggio" && (
-            <div className="space-y-4">
-              <div className="flex items-center justify-between border-b border-white/10 pb-2">
+            <div className="flex-1 min-h-0 flex flex-col space-y-3">
+              <div className="flex items-center justify-between border-b border-white/10 pb-2 flex-shrink-0">
                 <span className="font-serif font-bold text-sm text-[#e4d9c0]">Harmonic Sound Calibration Constant Grid</span>
                 <span className="font-mono text-[9px] text-gray-500">T &amp; S MATRIX RECONCILIATIONS</span>
               </div>
-              <div className="overflow-x-auto">
+              <div className="flex-1 overflow-auto custom-scroll pr-1">
                 <table className="w-full text-left font-mono text-[11px] border-collapse">
                   <thead>
                     <tr className="border-b border-white/5 text-orange-400">
@@ -228,12 +228,12 @@ export default function RefTablesPanel({ onClose, onSendPrompt }: { onClose: () 
           )}
 
           {activeSubTab === "traditions" && (
-            <div className="space-y-4">
-              <div className="flex items-center justify-between border-b border-white/10 pb-2">
+            <div className="flex-1 min-h-0 flex flex-col space-y-3">
+              <div className="flex items-center justify-between border-b border-white/10 pb-2 flex-shrink-0">
                 <span className="font-serif font-bold text-sm text-[#e4d9c0]">All {METEM_DB.religions.length} Major Mystical &amp; Developmental Traditions Ledger</span>
                 <span className="font-mono text-[9px] text-gray-500">COMPLETE SIDEBAR COMPILATION</span>
               </div>
-              <div className="overflow-y-auto max-h-[420px] pr-1 custom-scroll">
+              <div className="flex-1 overflow-auto custom-scroll pr-1">
                 <table className="w-full text-left font-mono text-[10px] border-collapse">
                   <thead>
                     <tr className="border-b border-white/5 text-orange-400 uppercase text-[9px] tracking-wider">
@@ -270,13 +270,13 @@ export default function RefTablesPanel({ onClose, onSendPrompt }: { onClose: () 
           )}
 
           {activeSubTab === "lexicon" && (
-            <div className="space-y-4">
-              <div className="flex items-center justify-between border-b border-white/10 pb-2">
+            <div className="flex-1 min-h-0 flex flex-col space-y-3">
+              <div className="flex items-center justify-between border-b border-white/10 pb-2 flex-shrink-0">
                 <span className="font-serif font-bold text-sm text-[#e4d9c0]">17 Unified Lexicon Systems of Ontology</span>
                 <span className="font-mono text-[9px] text-gray-500">SYSTEMATIC TOOLTIP LEXICON REFERENCE</span>
               </div>
               
-              <div className="overflow-y-auto max-h-[420px] pr-1 custom-scroll space-y-4">
+              <div className="flex-1 overflow-auto custom-scroll pr-1 space-y-4">
                 {UNIFIED_LEXICON_SYSTEMS.map(sys => {
                   const matchingWords = sys.words.filter(w =>
                     w.word.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -348,7 +348,7 @@ export default function RefTablesPanel({ onClose, onSendPrompt }: { onClose: () 
         </div>
 
         {/* Quick Query Box */}
-        <div className="mt-6 flex gap-4 items-center p-4 bg-orange-500/5 border border-orange-500/15 rounded-xl">
+        <div className="mt-4 flex gap-4 items-center p-3 bg-orange-500/5 border border-orange-500/15 rounded-xl flex-shrink-0">
           <Book className="w-5 h-5 text-orange-500 animate-pulse hidden sm:block" />
           <div className="flex-1">
             <h4 className="font-serif text-xs font-bold text-white tracking-wide">Need Detailed Analytical Integration?</h4>

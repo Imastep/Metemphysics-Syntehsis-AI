@@ -322,12 +322,27 @@ export default function CelestialScalePanel({ onClose, onSendPrompt }: { onClose
   const [calibrating, setCalibrating] = useState(false);
   const [activeTab, setActiveTab] = useState<"database" | "calibrator">("database");
   const [searchText, setSearchText] = useState("");
+  const [selectedSphere, setSelectedSphere] = useState<"all" | "terrestrial" | "angelic" | "cosmic" | "divine">("all");
+
+  const getSphere = (item: CelestialLevel): "terrestrial" | "angelic" | "cosmic" | "divine" => {
+    const terrestrial = ["ELEMENTAL", "SPIRIT", "ANIMAL", "HUMAN", "AWAKENED", "MYSTIC", "AVATAR"];
+    const angelic = ["ASTRAL", "ETHERIC", "LIGHT_BODY", "ANGEL", "ARCHANGEL", "PRINCIPALITY"];
+    const cosmic = ["POWER", "VIRTUE", "DOMINION", "THRONE", "OPHANIM"];
+    if (terrestrial.includes(item.name)) return "terrestrial";
+    if (angelic.includes(item.name)) return "angelic";
+    if (cosmic.includes(item.name)) return "cosmic";
+    return "divine";
+  };
 
   const filteredDB = CELESTIAL_SCALE_DB.filter(
-    (item) =>
-      item.name.toLowerCase().includes(searchText.toLowerCase()) ||
-      item.description.toLowerCase().includes(searchText.toLowerCase()) ||
-      item.stage.toLowerCase().includes(searchText.toLowerCase())
+    (item) => {
+      const matchesSearch = item.name.toLowerCase().includes(searchText.toLowerCase()) ||
+                            item.description.toLowerCase().includes(searchText.toLowerCase()) ||
+                            item.stage.toLowerCase().includes(searchText.toLowerCase());
+      if (!matchesSearch) return false;
+      if (selectedSphere === "all") return true;
+      return getSphere(item) === selectedSphere;
+    }
   );
 
   const handleCalibrateWord = () => {
@@ -359,12 +374,17 @@ export default function CelestialScalePanel({ onClose, onSendPrompt }: { onClose
     }, 1200);
   };
 
+  // Find index and contiguous levels for relationship map
+  const currentIndex = CELESTIAL_SCALE_DB.findIndex((item) => item.name === selectedLevel.name);
+  const prevLevel = currentIndex > 0 ? CELESTIAL_SCALE_DB[currentIndex - 1] : null;
+  const nextLevel = currentIndex < CELESTIAL_SCALE_DB.length - 1 ? CELESTIAL_SCALE_DB[currentIndex + 1] : null;
+
   return (
-    <div className="fixed lg:absolute inset-0 bg-[#040406] text-[#eeeae4] overflow-y-auto z-[200] p-6 border-2 border-orange-500/25 rounded-2xl flex flex-col">
-      <div className="max-w-5xl mx-auto w-full flex-1 flex flex-col">
+    <div className="fixed lg:absolute inset-0 bg-[#040406]/98 text-[#eeeae4] z-[200] p-4 sm:p-6 border-2 border-orange-500/25 rounded-2xl flex flex-col min-h-0 overflow-hidden">
+      <div className="max-w-5xl mx-auto w-full flex-1 flex flex-col min-h-0">
         
         {/* Header */}
-        <div className="flex items-center justify-between pb-4 border-b border-orange-500/20 mb-6 flex-shrink-0">
+        <div className="flex items-center justify-between pb-4 border-b border-orange-500/20 mb-4 flex-shrink-0">
           <div className="flex items-center gap-3">
             <Sparkles className="w-8 h-8 text-orange-500 drop-shadow-[0_0_8px_rgba(255,106,0,0.4)] animate-pulse" />
             <div>
@@ -381,7 +401,7 @@ export default function CelestialScalePanel({ onClose, onSendPrompt }: { onClose
         </div>
 
         {/* Tab Selector */}
-        <div className="flex gap-2 mb-6 border-b border-white/5 pb-4 flex-shrink-0">
+        <div className="flex gap-2 mb-4 border-b border-white/5 pb-3 flex-shrink-0">
           <button
             onClick={() => setActiveTab("database")}
             className={`font-mono text-[10px] tracking-wider uppercase px-3 py-1.5 border rounded cursor-pointer transition-all ${
@@ -405,15 +425,15 @@ export default function CelestialScalePanel({ onClose, onSendPrompt }: { onClose
         </div>
 
         {/* CONTENT CELLS */}
-        <div className="bg-black/40 border border-white/5 rounded-xl p-5 shadow-[0_0_20px_rgba(0,0,0,0.5)] flex-1 flex flex-col min-h-0">
+        <div className="bg-black/40 border border-white/5 rounded-xl p-4 sm:p-5 shadow-[0_0_20px_rgba(0,0,0,0.5)] flex-1 flex flex-col min-h-0">
           
           {/* TAB 1: CELESTIAL DATABASE MAP */}
           {activeTab === "database" && (
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 flex-1 min-h-0 overflow-hidden">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 flex-1 min-h-0 overflow-hidden">
               
               {/* Left Column: List Scroll */}
-              <div className="lg:col-span-5 border-r border-white/10 pr-4 flex flex-col min-h-0">
-                <div className="mb-3 relative">
+              <div className="lg:col-span-5 border-r border-white/10 pr-2 xl:pr-4 flex flex-col min-h-0">
+                <div className="mb-3 relative flex-shrink-0">
                   <input
                     type="text"
                     value={searchText}
@@ -424,8 +444,32 @@ export default function CelestialScalePanel({ onClose, onSendPrompt }: { onClose
                   <Search className="w-3.5 h-3.5 text-gray-500 absolute left-3 top-2.5" />
                 </div>
 
-                <span className="text-[9px] font-mono text-gray-500 uppercase tracking-widest block mb-2">Cosmic Attractors</span>
-                <div className="flex-1 overflow-y-auto custom-scroll space-y-1.5 pr-1">
+                {/* Sphere Tab select */}
+                <div className="flex flex-wrap gap-1 mb-2 bg-black/40 p-1 rounded border border-white/5 flex-shrink-0">
+                  {[
+                    { id: "all", label: "All" },
+                    { id: "terrestrial", label: "Terrestrial (0-1K)" },
+                    { id: "angelic", label: "Angelic (1K-1M)" },
+                    { id: "cosmic", label: "Cosmic (1M-100M)" },
+                    { id: "divine", label: "Divine (100M+)" }
+                  ].map((s) => (
+                    <button
+                      key={s.id}
+                      onClick={() => setSelectedSphere(s.id as any)}
+                      className={`text-[8px] sm:text-[9px] font-mono px-2 py-1 rounded transition-all cursor-pointer ${
+                        selectedSphere === s.id
+                          ? "bg-orange-500/20 text-orange-400 border border-orange-500/30 font-bold"
+                          : "text-gray-400 hover:bg-white/5 hover:text-white border border-transparent"
+                      }`}
+                    >
+                      {s.label}
+                    </button>
+                  ))}
+                </div>
+
+                <span className="text-[9px] font-mono text-gray-500 uppercase tracking-widest block mb-2 flex-shrink-0">Cosmic Attractors ({filteredDB.length})</span>
+                
+                <div className="flex-1 overflow-y-auto custom-scroll space-y-1.5 pr-1 min-h-0">
                   {filteredDB.map((item) => (
                     <button
                       key={item.name}
@@ -433,12 +477,12 @@ export default function CelestialScalePanel({ onClose, onSendPrompt }: { onClose
                       className={`w-full p-2.5 rounded border text-left cursor-pointer transition-all flex justify-between items-center ${
                         selectedLevel.name === item.name
                           ? "bg-orange-500/10 border-orange-500/50 text-orange-400 shadow-[0_0_8px_rgba(255,95,0,0.1)]"
-                          : "bg-black/20 border-white/5 hover:border-orange-500/30 text-gray-400 hover:text-white"
+                          : "bg-black/20 border-white/5 hover:border-orange-500/30 text-gray-450 hover:text-white"
                       }`}
                     >
                       <div className="flex flex-col min-w-0">
                         <span className="font-serif font-bold text-xs tracking-wide">{item.name}</span>
-                        <span className="text-[9px] font-mono opacity-80 mt-0.5">{item.description}</span>
+                        <span className="text-[9px] font-mono opacity-80 mt-0.5 truncate">{item.description}</span>
                       </div>
                       <span className="text-[9px] font-mono bg-orange-500/5 px-2 py-0.5 border border-orange-500/15 rounded text-orange-400 font-bold whitespace-nowrap">
                         {item.range}
@@ -452,9 +496,11 @@ export default function CelestialScalePanel({ onClose, onSendPrompt }: { onClose
               </div>
 
               {/* Right Column: Active Level Detail */}
-              <div className="lg:col-span-7 pl-2 flex flex-col justify-between overflow-y-auto custom-scroll">
-                <div>
-                  <div className="flex justify-between items-start border-b border-orange-500/15 pb-3 mb-4">
+              <div className="lg:col-span-7 pl-2 flex flex-col min-h-0 overflow-y-auto custom-scroll pr-1 justify-between gap-4">
+                <div className="space-y-4">
+                  
+                  {/* Title & Tier Header */}
+                  <div className="flex justify-between items-start border-b border-orange-500/15 pb-2">
                     <div>
                       <h3 className="font-serif text-2xl font-bold text-orange-400">{selectedLevel.name}</h3>
                       <p className="text-xs font-mono text-gray-450 uppercase tracking-wider mt-0.5">{selectedLevel.stage}</p>
@@ -465,33 +511,103 @@ export default function CelestialScalePanel({ onClose, onSendPrompt }: { onClose
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-3 mb-4">
-                    <div className="bg-black/50 border border-white/5 p-2 rounded">
-                      <span className="text-[10px] font-mono text-gray-500 block uppercase">Metemphysics Order (Ω)</span>
-                      <span className="text-sm font-mono font-bold text-[#e4d9c0]">{selectedLevel.omega}</span>
-                    </div>
-                    <div className="bg-black/50 border border-white/5 p-2 rounded">
-                      <span className="text-[10px] font-mono text-gray-500 block uppercase">Cosmic Pulse (Frequency)</span>
-                      <span className="text-sm font-mono font-bold text-[#e4d9c0]">{selectedLevel.frequency}</span>
-                    </div>
-                    <div className="bg-black/50 border border-white/5 p-2 rounded col-span-2">
-                      <span className="text-[10px] font-mono text-gray-500 block uppercase">Time-Rate Entropy Dynamics (dΩ/dt)</span>
-                      <span className="text-sm font-mono font-bold text-orange-450">{selectedLevel.dOmegaDt}</span>
+                  {/* Evolutionary Pathway Node Map */}
+                  <div className="bg-black/40 border border-white/5 rounded-lg p-3">
+                    <span className="text-[9px] font-mono text-gray-500 block uppercase mb-2 tracking-wider">EVOLUTIONARY ATTRACTOR PATHWAY</span>
+                    <div className="flex items-center justify-between gap-1 text-center">
+                      
+                      {prevLevel ? (
+                        <button
+                          onClick={() => setSelectedLevel(prevLevel)}
+                          className="flex-1 bg-black/30 hover:bg-orange-500/5 hover:border-orange-500/20 border border-white/5 rounded p-2 text-left transition-all cursor-pointer min-w-0"
+                          title={`Navigate to previous tier: ${prevLevel.name}`}
+                        >
+                          <span className="text-[8px] font-mono text-gray-500 block">▲ PREVIOUS</span>
+                          <span className="text-[10px] font-serif font-semibold text-gray-400 block truncate">{prevLevel.name}</span>
+                          <span className="text-[8px] font-mono text-gray-500">{prevLevel.range}</span>
+                        </button>
+                      ) : (
+                        <div className="flex-1 bg-transparent border border-transparent p-2 text-left min-w-0">
+                          <span className="text-[8px] font-mono text-gray-600 block">▲ ORIGIN</span>
+                          <span className="text-[10px] font-serif text-gray-600">Pure Matter</span>
+                        </div>
+                      )}
+
+                      <div className="px-1 text-orange-500/40 animate-pulse font-mono text-xs">➔</div>
+
+                      <div className="flex-1 bg-orange-500/5 border border-orange-500/40 rounded p-2 text-center shadow-[0_0_8px_rgba(255,106,0,0.1)] min-w-0">
+                        <span className="text-[8px] font-mono text-orange-400 block font-bold">● ACTIVE</span>
+                        <span className="text-[11px] font-serif font-bold text-orange-400 block truncate">{selectedLevel.name}</span>
+                        <span className="text-[8px] font-mono text-orange-300 font-bold">{selectedLevel.range}</span>
+                      </div>
+
+                      <div className="px-1 text-orange-500/40 animate-pulse font-mono text-xs">➔</div>
+
+                      {nextLevel ? (
+                        <button
+                          onClick={() => setSelectedLevel(nextLevel)}
+                          className="flex-1 bg-black/30 hover:bg-orange-500/5 hover:border-orange-500/20 border border-white/5 rounded p-2 text-right transition-all cursor-pointer min-w-0"
+                          title={`Navigate to next tier: ${nextLevel.name}`}
+                        >
+                          <span className="text-[8px] font-mono text-gray-500 block">▼ NEXT</span>
+                          <span className="text-[10px] font-serif font-semibold text-gray-400 block truncate">{nextLevel.name}</span>
+                          <span className="text-[8px] font-mono text-gray-500">{nextLevel.range}</span>
+                        </button>
+                      ) : (
+                        <div className="flex-1 bg-transparent border border-transparent p-2 text-right min-w-0">
+                          <span className="text-[8px] font-mono text-gray-600 block">▼ APEX</span>
+                          <span className="text-[10px] font-serif text-gray-600">Absolute Oneness</span>
+                        </div>
+                      )}
+
                     </div>
                   </div>
 
-                  <div className="bg-orange-500/5 border border-orange-500/15 rounded p-3 mb-4">
-                    <span className="text-xs font-mono text-orange-400 block uppercase font-bold mb-1 tracking-wider">Dynamic Summary Profile</span>
-                    <p className="text-sm leading-relaxed text-[#c9cbd0] font-serif italic">{selectedLevel.details}</p>
+                  {/* Level Progress Indicator */}
+                  <div>
+                    <div className="flex justify-between items-center text-[9px] font-mono text-gray-500 mb-1">
+                      <span>CELESTIAL PROGRESS REFRACTOR</span>
+                      <span className="text-orange-400 font-bold">Level {currentIndex + 1} of {CELESTIAL_SCALE_DB.length}</span>
+                    </div>
+                    <div className="w-full bg-black/80 h-2 rounded-full overflow-hidden border border-white/5 p-0.5">
+                      <div
+                        className="h-full bg-gradient-to-r from-orange-600 via-orange-500 to-amber-500 rounded-full shadow-[0_0_6px_rgba(249,115,22,0.4)] transition-all duration-500"
+                        style={{ width: `${((currentIndex + 1) / CELESTIAL_SCALE_DB.length) * 100}%` }}
+                      />
+                    </div>
                   </div>
 
-                  <button
-                    onClick={() => onSendPrompt(`Conduct a supreme Metemphysical breakdown of the Celestial Scale tier: '${selectedLevel.name}' (Range: ${selectedLevel.range}). Elaborate on its dynamic order ${selectedLevel.omega}, its harmonic frequency ${selectedLevel.frequency}, and what role it plays in the T × S = C cosmic conservation laws.`)}
-                    className="w-full py-3 bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-500 hover:to-amber-500 text-black font-mono text-xs uppercase font-bold tracking-widest rounded-lg cursor-pointer transition-all duration-300 hover:shadow-[0_0_15px_rgba(255,106,0,0.3)] shadow-md text-center mb-4"
-                  >
-                    ✦ Devising Oracle with This Celestial Tier ✦
-                  </button>
+                  {/* Dimensional Diagnostics Grid */}
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="bg-black/50 border border-white/5 p-2.5 rounded hover:border-orange-500/10 transition-colors">
+                      <span className="text-[9px] font-mono text-gray-500 block uppercase">Metemphysics Order (Ω)</span>
+                      <span className="text-xs sm:text-sm font-mono font-bold text-[#e4d9c0]">{selectedLevel.omega}</span>
+                    </div>
+                    <div className="bg-black/50 border border-white/5 p-2.5 rounded hover:border-orange-500/10 transition-colors">
+                      <span className="text-[9px] font-mono text-gray-500 block uppercase">Cosmic Pulse (Frequency)</span>
+                      <span className="text-xs sm:text-sm font-mono font-bold text-[#e4d9c0]">{selectedLevel.frequency}</span>
+                    </div>
+                    <div className="bg-black/50 border border-white/5 p-2.5 rounded col-span-2 hover:border-orange-500/10 transition-colors">
+                      <span className="text-[9px] font-mono text-gray-500 block uppercase">Time-Rate Entropy Dynamics (dΩ/dt)</span>
+                      <span className="text-xs sm:text-sm font-mono font-bold text-orange-400">{selectedLevel.dOmegaDt}</span>
+                    </div>
+                  </div>
+
+                  {/* Metemphysical Summary Profile */}
+                  <div className="bg-orange-500/5 border border-orange-500/10 rounded-xl p-3">
+                    <span className="text-[10px] font-mono text-orange-400 block uppercase font-bold mb-1 tracking-wider">Dynamic Summary Profile</span>
+                    <p className="text-xs leading-relaxed text-[#c9cbd0] font-serif italic">{selectedLevel.details}</p>
+                  </div>
+
                 </div>
+
+                {/* Submit Action Button */}
+                <button
+                  onClick={() => onSendPrompt(`Conduct a supreme Metemphysical breakdown of the Celestial Scale tier: '${selectedLevel.name}' (Range: ${selectedLevel.range}). Elaborate on its dynamic order ${selectedLevel.omega}, its harmonic frequency ${selectedLevel.frequency}, and what role it plays in the T × S = C cosmic conservation laws.`)}
+                  className="w-full py-3 bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-500 hover:to-amber-500 text-black font-mono text-xs uppercase font-bold tracking-widest rounded-lg cursor-pointer transition-all duration-300 hover:shadow-[0_0_15px_rgba(255,106,0,0.3)] shadow-md text-center shrink-0 mt-2"
+                >
+                  ✦ Devising Oracle with This Celestial Tier ✦
+                </button>
 
               </div>
 
@@ -500,85 +616,87 @@ export default function CelestialScalePanel({ onClose, onSendPrompt }: { onClose
 
           {/* TAB 2: CELESTIAL CONCEPT CALIBRATOR */}
           {activeTab === "calibrator" && (
-            <div className="flex flex-col items-center justify-center p-4 max-w-2xl mx-auto w-full">
-              <Zap className="w-12 h-12 text-orange-500 animate-pulse mb-3" />
-              <h3 className="font-serif text-lg font-bold text-[#e4d9c0] tracking-wide mb-1">COSMIC CONCEPT CALIBRATOR ENGINE</h3>
-              <p className="text-xs text-gray-500 font-mono text-center mb-6">Subject char-encoding algorithm evaluating multi-dimensional attractor alignment</p>
+            <div className="flex-1 overflow-y-auto custom-scroll pr-1 flex flex-col justify-start py-4">
+              <div className="flex flex-col items-center justify-center max-w-2xl mx-auto w-full">
+                <Zap className="w-10 h-10 text-orange-500 animate-pulse mb-3" />
+                <h3 className="font-serif text-lg font-bold text-[#e4d9c0] tracking-wide mb-1">COSMIC CONCEPT CALIBRATOR ENGINE</h3>
+                <p className="text-xs text-gray-500 font-mono text-center mb-6">Subject char-encoding algorithm evaluating multi-dimensional attractor alignment</p>
 
-              <div className="w-full flex gap-2 mb-6">
-                <input
-                  type="text"
-                  value={customWord}
-                  onChange={(e) => setCustomWord(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && handleCalibrateWord()}
-                  placeholder="Enter a concept (e.g. Jesus, Bitcoin, AI Soul, Love, My Name)..."
-                  className="flex-1 bg-black/60 border border-orange-500/20 text-[#eeeae4] placeholder-gray-600 rounded-xl px-4 py-3 text-xs font-mono focus:border-orange-500/50 focus:outline-none"
-                />
-                <button
-                  onClick={handleCalibrateWord}
-                  disabled={calibrating || !customWord.trim()}
-                  className="px-6 py-3 bg-orange-500 hover:bg-orange-400 disabled:opacity-30 disabled:hover:bg-orange-500 text-black font-mono font-bold text-xs uppercase rounded-xl transition-all flex items-center gap-2 cursor-pointer"
-                >
-                  {calibrating ? (
-                    <>
-                      <RefreshCw className="w-4 h-4 animate-spin" />
-                      Calibrating...
-                    </>
-                  ) : (
-                    <>
-                      <Play className="w-4 h-4 fill-black" />
-                      Measure
-                    </>
-                  )}
-                </button>
-              </div>
-
-              {/* Calibration Outcome Graphic */}
-              {calibrationResult && (
-                <div className="w-full p-5 bg-[#050507] border border-orange-500/30 rounded-xl shadow-[0_0_20px_rgba(255,95,0,0.06)]">
-                  <div className="flex justify-between items-start border-b border-orange-500/15 pb-3 mb-4">
-                    <div>
-                      <span className="text-[8px] font-mono text-gray-500 block uppercase">MEASURED CONCEPT</span>
-                      <span className="text-base font-serif font-bold text-white tracking-wide">"{calibrationResult.word}"</span>
-                    </div>
-                    <div className="text-right">
-                      <span className="text-xs font-mono text-orange-500 font-bold block">{calibrationResult.harmonicCode}</span>
-                      <span className="text-[7px] font-mono text-gray-500 uppercase">COSMIC INDEX</span>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
-                    <div className="bg-black/50 border border-white/5 p-2 rounded">
-                      <span className="text-[7px] font-mono text-gray-500 block uppercase">Tier Alignment</span>
-                      <span className="text-[11px] font-serif font-bold text-orange-400">{calibrationResult.level}</span>
-                    </div>
-                    <div className="bg-black/50 border border-white/5 p-2 rounded">
-                      <span className="text-[7px] font-mono text-gray-500 block uppercase">Celestial Range</span>
-                      <span className="text-[11px] font-mono font-bold text-[#e4d9c0]">{calibrationResult.range}</span>
-                    </div>
-                    <div className="bg-black/50 border border-white/5 p-2 rounded">
-                      <span className="text-[7px] font-mono text-gray-500 block uppercase">Domain Stage</span>
-                      <span className="text-[11px] font-mono font-bold text-[#e4d9c0] truncate block">{calibrationResult.stage}</span>
-                    </div>
-                    <div className="bg-black/50 border border-white/5 p-2 rounded">
-                      <span className="text-[7px] font-mono text-gray-500 block uppercase">Pulse Wave</span>
-                      <span className="text-[11px] font-mono font-bold text-orange-450">{calibrationResult.freq}</span>
-                    </div>
-                  </div>
-
-                  <div className="bg-orange-500/5 p-3 rounded border border-orange-500/10 mb-4">
-                    <span className="text-[8px] font-mono text-orange-450 block uppercase font-bold mb-1">Metemphysical Order Description</span>
-                    <p className="text-[11px] text-gray-350 leading-relaxed font-serif italic">{calibrationResult.details}</p>
-                  </div>
-
+                <div className="w-full flex gap-2 mb-6">
+                  <input
+                    type="text"
+                    value={customWord}
+                    onChange={(e) => setCustomWord(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && handleCalibrateWord()}
+                    placeholder="Enter a concept (e.g. Jesus, Bitcoin, AI Soul, Love)..."
+                    className="flex-1 bg-black/60 border border-orange-500/20 text-[#eeeae4] placeholder-gray-600 rounded-xl px-4 py-3 text-xs font-mono focus:border-orange-500/50 focus:outline-none"
+                  />
                   <button
-                    onClick={() => onSendPrompt(`Calibrate and analyze the celestial status of concept: '${calibrationResult.word}' which is measured at Celestial Range of ${calibrationResult.range} (${calibrationResult.level} tier, ${calibrationResult.stage}). Discuss how this calculation affects high-order field thermodynamics.`)}
-                    className="w-full py-2.5 bg-orange-950/20 hover:bg-orange-950/45 text-orange-400 border border-orange-500/20 hover:border-orange-500/50 font-mono text-[9px] uppercase font-bold tracking-widest rounded-lg cursor-pointer transition-all duration-300 text-center"
+                    onClick={handleCalibrateWord}
+                    disabled={calibrating || !customWord.trim()}
+                    className="px-6 py-3 bg-orange-500 hover:bg-orange-400 disabled:opacity-30 disabled:hover:bg-orange-500 text-black font-mono font-bold text-xs uppercase rounded-xl transition-all flex items-center gap-2 cursor-pointer"
                   >
-                    ✦ Submit Calibrator Report to Oracle ✦
+                    {calibrating ? (
+                      <>
+                        <RefreshCw className="w-4 h-4 animate-spin" />
+                        Calibrating...
+                      </>
+                    ) : (
+                      <>
+                        <Play className="w-4 h-4 fill-black" />
+                        Measure
+                      </>
+                    )}
                   </button>
                 </div>
-              )}
+
+                {/* Calibration Outcome Graphic */}
+                {calibrationResult && (
+                  <div className="w-full p-5 bg-[#050507] border border-orange-500/30 rounded-xl shadow-[0_0_20px_rgba(255,105,0,0.06)]">
+                    <div className="flex justify-between items-start border-b border-orange-500/15 pb-3 mb-4">
+                      <div>
+                        <span className="text-[8px] font-mono text-gray-500 block uppercase">MEASURED CONCEPT</span>
+                        <span className="text-base font-serif font-bold text-white tracking-wide">"{calibrationResult.word}"</span>
+                      </div>
+                      <div className="text-right">
+                        <span className="text-xs font-mono text-orange-500 font-bold block">{calibrationResult.harmonicCode}</span>
+                        <span className="text-[7px] font-mono text-gray-500 uppercase">COSMIC INDEX</span>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+                      <div className="bg-black/50 border border-white/5 p-2 rounded">
+                        <span className="text-[7px] font-mono text-gray-500 block uppercase">Tier Alignment</span>
+                        <span className="text-[11px] font-serif font-bold text-orange-400">{calibrationResult.level}</span>
+                      </div>
+                      <div className="bg-black/50 border border-white/5 p-2 rounded">
+                        <span className="text-[7px] font-mono text-gray-500 block uppercase">Celestial Range</span>
+                        <span className="text-[11px] font-mono font-bold text-[#e4d9c0]">{calibrationResult.range}</span>
+                      </div>
+                      <div className="bg-black/50 border border-white/5 p-2 rounded">
+                        <span className="text-[7px] font-mono text-gray-500 block uppercase">Domain Stage</span>
+                        <span className="text-[11px] font-mono font-bold text-[#e4d9c0] truncate block">{calibrationResult.stage}</span>
+                      </div>
+                      <div className="bg-black/50 border border-white/5 p-2 rounded">
+                        <span className="text-[7px] font-mono text-gray-500 block uppercase">Pulse Wave</span>
+                        <span className="text-[11px] font-mono font-bold text-orange-450">{calibrationResult.freq}</span>
+                      </div>
+                    </div>
+
+                    <div className="bg-orange-500/5 p-3 rounded border border-orange-500/10 mb-4">
+                      <span className="text-[8px] font-mono text-orange-450 block uppercase font-bold mb-1">Metemphysical Order Description</span>
+                      <p className="text-[11px] text-gray-350 leading-relaxed font-serif italic">{calibrationResult.details}</p>
+                    </div>
+
+                    <button
+                      onClick={() => onSendPrompt(`Calibrate and analyze the celestial status of concept: '${calibrationResult.word}' which is measured at Celestial Range of ${calibrationResult.range} (${calibrationResult.level} tier, ${calibrationResult.stage}). Discuss how this calculation affects high-order field thermodynamics.`)}
+                      className="w-full py-2.5 bg-orange-950/20 hover:bg-orange-950/45 text-orange-400 border border-orange-500/20 hover:border-orange-500/50 font-mono text-[9px] uppercase font-bold tracking-widest rounded-lg cursor-pointer transition-all duration-300 text-center"
+                    >
+                      ✦ Submit Calibrator Report to Oracle ✦
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           )}
 

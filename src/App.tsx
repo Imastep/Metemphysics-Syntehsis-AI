@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import { jsPDF } from "jspdf";
 import { 
   Compass, 
@@ -32,7 +32,9 @@ import {
   X,
   Copy,
   Check,
-  Network
+  Network,
+  Scale,
+  Zap
 } from "lucide-react";
 import { METEM_DB, GRAPH } from "./data/metemDb";
 import { UNIFIED_LEXICON_SYSTEMS } from "./data/metemLexicon";
@@ -618,10 +620,11 @@ function getSystemIdForOntologyItem(id: string, category: string): string {
   }
 
   if (category === "discoveries") {
-    if (mid === "einstein" || mid === "boltzmann" || mid === "planck" || mid === "heisenberg" || mid === "prigogine" || mid === "hawking_discovery" || mid === "newton" || mid === "penrose_discovery" || mid === "copenhagen_duality" || mid === "tesla_discovery" || mid.includes("einstein_rel_formula") || mid.includes("boltzmann_entropy_formula") || mid.includes("planck_energy_formula") || mid.includes("hawking_entropy_formula") || mid.includes("schrodinger_wave_formula") || mid.includes("heisenberg_unc_formula")) {
+    if (mid === "einstein" || mid === "boltzmann" || mid === "planck" || mid === "heisenberg" || mid === "prigogine" || mid === "hawking_discovery" || mid === "newton" || mid === "penrose_discovery" || mid === "copenhagen_duality" || mid === "tesla_discovery" || mid === "bohm" || mid === "wheeler" || mid.includes("einstein_rel_formula") || mid.includes("boltzmann_entropy_formula") || mid.includes("planck_energy_formula") || mid.includes("hawking_entropy_formula") || mid.includes("schrodinger_wave_formula") || mid.includes("heisenberg_unc_formula")) {
       return "physics";
     }
     if (mid === "darwin") return "consciousness_studies";
+    if (mid === "hofstadter") return "systems_theory";
   }
 
   // General fallbacks based on substrings
@@ -1561,7 +1564,7 @@ export default function App() {
   const [activePanel, setActivePanel] = useState<string | null>(null);
 
   // Studio Mode & Dynamic constant constants on top right
-  const [studioMode, setStudioMode] = useState<string>("omniscient"); // "omniscient" | "socratic" | "strict_calc"
+  const [studioMode, setStudioMode] = useState<string>("basic"); // "omniscient" | "socratic" | "strict_calc"
   const [conservedLimit, setConservedLimit] = useState<string>("standard"); // "standard" | "planck" | "solfeggio" | "cosmic"
 
   // Chat State
@@ -1602,14 +1605,20 @@ export default function App() {
     if (offlineMode) return "bg-red-500";
     if (studioMode === "socratic") return "bg-cyan-400";
     if (studioMode === "strict_calc") return "bg-amber-500";
-    return "bg-orange-500";
+    if (studioMode === "discovery") return "bg-emerald-500";
+    if (studioMode === "basic") return "bg-orange-500";
+    if (studioMode === "omniscient") return "bg-gray-400";
+    return "bg-gray-400";
   };
 
   const getStatusText = () => {
     if (offlineMode) return "Local Backup";
     if (studioMode === "socratic") return "Socratic Active";
     if (studioMode === "strict_calc") return "Calculator Active";
-    return "Omniscient Active";
+    if (studioMode === "discovery") return "Researching Coordinates...";
+    if (studioMode === "basic") return "Basic Engine Active";
+    if (studioMode === "omniscient") return "Omniscient Active";
+    return "Basic Engine Active";
   };
 
   const getCogSelectorColors = () => {
@@ -1624,10 +1633,21 @@ export default function App() {
           border: "border-amber-500/35 shadow-[0_0_10px_rgba(245,158,11,0.1)]",
           text: "text-amber-500",
         };
-      default:
+      case "discovery":
+        return {
+          border: "border-emerald-500/35 shadow-[0_0_10px_rgba(16,185,129,0.1)]",
+          text: "text-emerald-400",
+        };
+      case "basic":
         return {
           border: "border-orange-500/35 shadow-[0_0_10px_rgba(255,106,0,0.05)]",
-          text: "text-orange-400",
+          text: "text-orange-400 font-extrabold",
+        };
+      case "omniscient":
+      default:
+        return {
+          border: "border-white/10 shadow-[0_0_5px_rgba(255,255,255,0.02)]",
+          text: "text-[#eeeae4]/90",
         };
     }
   };
@@ -1652,7 +1672,16 @@ export default function App() {
           ping: "bg-amber-400",
           dot: "bg-amber-500",
         };
-      default:
+      case "discovery":
+        return {
+          border: "border-emerald-500/40",
+          bg: "from-emerald-500/10 to-emerald-950/40",
+          shadow: "shadow-[0_0_15px_rgba(16,185,129,0.25)]",
+          icon: "text-emerald-400",
+          ping: "bg-emerald-400",
+          dot: "bg-emerald-500",
+        };
+      case "basic":
         return {
           border: "border-orange-500/40",
           bg: "from-orange-500/10 to-amber-950/40",
@@ -1660,6 +1689,16 @@ export default function App() {
           icon: "text-orange-500",
           ping: "bg-orange-400",
           dot: "bg-orange-500",
+        };
+      case "omniscient":
+      default:
+        return {
+          border: "border-white/10",
+          bg: "from-white/5 to-black",
+          shadow: "shadow-none",
+          icon: "text-white/80",
+          ping: "bg-white/30",
+          dot: "bg-white/60",
         };
     }
   };
@@ -1872,6 +1911,19 @@ export default function App() {
   const [dbSearch, setDbSearch] = useState("");
   const [selectedRelDomain, setSelectedRelDomain] = useState<string>("");
   const [expandedSupportCard, setExpandedSupportCard] = useState<string | null>(null);
+
+  // Ontological Reasoning Engine States
+  const [ontologyMode, setOntologyMode] = useState<"directory" | "reasoning" | "contradiction">("directory");
+  const [reasoningSource, setReasoningSource] = useState<string>("");
+  const [reasoningTarget, setReasoningTarget] = useState<string>("");
+  const [reasoningResult, setReasoningResult] = useState<any>(null);
+  const [reasoningSecs, setReasoningSecs] = useState<boolean>(false);
+
+  // Contradiction Engine States
+  const [contradictionSource, setContradictionSource] = useState<string>("");
+  const [contradictionTarget, setContradictionTarget] = useState<string>("");
+  const [contradictionResult, setContradictionResult] = useState<any>(null);
+  const [contradictionSecs, setContradictionSecs] = useState<boolean>(false);
   
   // Real-time Sidebar and Formula states
   const [sidebarTab, setSidebarTab] = useState<"ontology" | "states" | "formulas" | "harmonics">("ontology");
@@ -2394,6 +2446,257 @@ export default function App() {
     handleSendMessage(prompt);
   };
 
+  // Compile all available assets/concepts from METEM_DB for reasoning selections
+  const reasoningOptions = useMemo(() => {
+    const list: { id: string; name: string; category: string; omegaVal?: string; concepts: string[]; summary: string }[] = [];
+    Object.keys(METEM_DB).forEach((cat) => {
+      METEM_DB[cat as any].forEach((item) => {
+        list.push({
+          id: item.id,
+          name: item.name,
+          category: cat,
+          omegaVal: item.omegaVal,
+          concepts: item.concepts || [],
+          summary: item.summary
+        });
+      });
+    });
+    return list.sort((a, b) => a.name.localeCompare(b.name));
+  }, []);
+
+  const computedSuggestedQueries = useMemo(() => {
+    // 1. Get the last user message and the last model message
+    let lastUserMsg = "";
+    let lastModelMsg = "";
+    
+    // Look backward through messages
+    for (let i = messages.length - 1; i >= 0; i--) {
+      const msg = messages[i];
+      if (msg.role === "user" && !lastUserMsg) {
+        lastUserMsg = msg.text;
+      }
+      if (msg.role === "model" && !lastModelMsg) {
+        lastModelMsg = msg.text;
+      }
+      if (lastUserMsg && lastModelMsg) break;
+    }
+
+    const userText = lastUserMsg.toLowerCase();
+    const modelText = lastModelMsg.toLowerCase();
+
+    const candidatesList: any[] = [];
+
+    // Iterate through all systems and words from UNIFIED_LEXICON_SYSTEMS
+    UNIFIED_LEXICON_SYSTEMS.forEach(sys => {
+      sys.words.forEach(w => {
+        const wordLower = w.word.toLowerCase();
+        let inputMatchScore = 0;
+        let responseMatchScore = 0;
+
+        // Weight based on user input match
+        if (userText && wordLower.length > 2) {
+          if (userText.includes(wordLower)) {
+            inputMatchScore += 100;
+          } else {
+            const parts = wordLower.split(/\s+/);
+            let partMatches = 0;
+            parts.forEach(part => {
+              if (part.length > 3 && userText.includes(part)) {
+                partMatches++;
+              }
+            });
+            if (parts.length > 0) {
+              inputMatchScore += (partMatches / parts.length) * 60;
+            }
+          }
+        }
+
+        // Weight based on model response match
+        if (modelText && wordLower.length > 2) {
+          if (modelText.includes(wordLower)) {
+            responseMatchScore += 100;
+          } else {
+            const parts = wordLower.split(/\s+/);
+            let partMatches = 0;
+            parts.forEach(part => {
+              if (part.length > 3 && modelText.includes(part)) {
+                partMatches++;
+              }
+            });
+            if (parts.length > 0) {
+              responseMatchScore += (partMatches / parts.length) * 60;
+            }
+          }
+        }
+
+        // Apply weights: 80% input, 20% response
+        let finalWeight = (inputMatchScore * 0.8) + (responseMatchScore * 0.2);
+
+        // Active node boost
+        if (currentNodeId && currentNodeId.toLowerCase().includes(wordLower.replace(/[^a-z0-9]/g, ""))) {
+          finalWeight += 25;
+        }
+
+        // Variational noise based on word contents to avoid stagnation and add flavor
+        const wordHash = w.word.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+        finalWeight += (wordHash % 12);
+
+        candidatesList.push({
+          word: w.word,
+          tip: w.tip,
+          system: sys.name,
+          baseWeight: finalWeight,
+          hash: wordHash
+        });
+      });
+    });
+
+    // Sort by final weight descending
+    candidatesList.sort((a, b) => b.baseWeight - a.baseWeight);
+
+    // Take top 3
+    const top3 = candidatesList.slice(0, 3);
+
+    const templates = [
+      (word: string) => `How does ${word} calibrate against standard Time × Entropy = C boundary constraints?`,
+      (word: string) => `Analyze the entropic profile of '${word}' and its correlation to subjective time dilation.`,
+      (word: string) => `What is the metemphysical significance of '${word}' in the orchestration of conscious observers?`,
+      (word: string) => `Explain the thermodynamic and informational leakage of '${word}' under the T × S = C absolute limit.`,
+      (word: string) => `How does the attractor calibration of '${word}' interface with the standard Solfeggio acoustic grid?`,
+      (word: string) => `Deconstruct the dualistic tension between '${word}' and absolute entropic heat-death.`
+    ];
+
+    return top3.map((cand, idx) => {
+      // Use idx + hash to select variety of template
+      const templateIdx = (cand.hash + idx * 2) % templates.length;
+      const formattedQuery = templates[templateIdx](cand.word);
+      const calculatedScore = Math.min(99, Math.max(35, Math.round(cand.baseWeight * 1.5 + 40)));
+
+      return {
+        word: cand.word,
+        system: cand.system,
+        tip: cand.tip,
+        query: formattedQuery,
+        resonance: calculatedScore
+      };
+    });
+  }, [messages, currentNodeId]);
+
+  const handleTriggerReasoning = () => {
+    if (!reasoningSource || !reasoningTarget) return;
+    setReasoningSecs(true);
+    
+    setTimeout(() => {
+      const src = reasoningOptions.find(o => o.id === reasoningSource);
+      const tgt = reasoningOptions.find(o => o.id === reasoningTarget);
+      if (!src || !tgt) {
+        setReasoningSecs(false);
+        return;
+      }
+      
+      const parseOmega = (val?: string) => {
+        if (!val) return 500;
+        const match = val.match(/\d+/);
+        return match ? parseInt(match[0], 10) : 500;
+      };
+      
+      const sOmega = parseOmega(src.omegaVal);
+      const tOmega = parseOmega(tgt.omegaVal);
+      const resonanceVal = 1 - (Math.abs(sOmega - tOmega) / 1000);
+      const deltaS = (Math.sin(sOmega) * Math.cos(tOmega) * 0.45).toFixed(4);
+      const synH = Math.round((sOmega + tOmega) / 2);
+      
+      const hashFactor = ((src.name.length * tgt.name.length) % 10) / 100;
+      const finalConfidence = Math.min(99, Math.round((resonanceVal * 0.82 + 0.12 + hashFactor) * 100));
+      
+      // Dynamic Synthesis explanation weaving
+      let specificDetail = "this correlation forms a highly stable holographic feedback loop where both domains act as reciprocal reflections of the universal Speed limit of Light, preserving information density.";
+      
+      const allConcepts = [...src.concepts, ...tgt.concepts];
+      if (allConcepts.some(c => ["entropy", "time", "thermodynamics"].includes(c.toLowerCase()))) {
+        specificDetail = "the temporal dynamics reconcile statistical entropy dissipation. Base fluctuations structure negentropy outwards to sustain structural complexity without burning vital biological reserves.";
+      } else if (allConcepts.some(c => ["physics", "quantum", "light", "gravity", "geometry"].includes(c.toLowerCase()))) {
+        specificDetail = "this reveals a precise cosmological isomorphism. Holographic boundary dimensions scale structural space-time parameters directly to absolute Planck quantum limits.";
+      } else if (allConcepts.some(c => ["buddhism", "taoism", "hinduism", "mystical", "christianity", "sufism"].includes(c.toLowerCase()))) {
+        specificDetail = "the synthesis evokes spiritual illumination, dissolving standard dualistic ego partitions into formless nondual quietude. Absolute focus meets standard metabolic rest coordinates.";
+      } else if (allConcepts.some(c => ["chakra", "kundalini", "nadis"].includes(c.toLowerCase()))) {
+        specificDetail = "the alignment triggers cardiac coherent nodes, generating stable electromagnetic fields which synchronize metabolic speed-of-light transceivers near standard coronal metrics.";
+      } else if (allConcepts.some(c => ["formula", "formulas", "equation"].includes(c.toLowerCase()))) {
+        specificDetail = "the mathematical constraints satisfy the absolute T × S = C conservation vector. The rate of change differential dΩ/dt balances perfectly across the co-resonance boundaries.";
+      }
+
+      const summaryText = `An extraordinary metemphysical alignment is discovered! Placing the qualitative characteristics of ${src.name} alongside ${tgt.name} establishes a unified systemic bridge with a confidence rating of ${finalConfidence}%. Under the conservation theorem T × S = C, this connection maps to a synthesized attractor level of H = ${synH} (Co-resonance coefficient Ω = ${sOmega}). Specifically, ${specificDetail}`;
+
+      setReasoningResult({
+        sourceName: src.name,
+        targetName: tgt.name,
+        confidence: finalConfidence,
+        synH,
+        deltaS,
+        resonance: (resonanceVal * 100).toFixed(1),
+        summary: summaryText
+      });
+      setReasoningSecs(false);
+    }, 900);
+  };
+
+  const handleTriggerContradiction = () => {
+    if (!contradictionSource || !contradictionTarget) return;
+    setContradictionSecs(true);
+    
+    setTimeout(() => {
+      const src = reasoningOptions.find(o => o.id === contradictionSource);
+      const tgt = reasoningOptions.find(o => o.id === contradictionTarget);
+      if (!src || !tgt) {
+        setContradictionSecs(false);
+        return;
+      }
+      
+      const parseOmega = (val?: string) => {
+        if (!val) return 500;
+        const match = val.match(/\d+/);
+        return match ? parseInt(match[0], 10) : 500;
+      };
+      
+      const sOmega = parseOmega(src.omegaVal);
+      const tOmega = parseOmega(tgt.omegaVal);
+      
+      const baseDiff = Math.abs(sOmega - tOmega);
+      const dialecticalFriction = Math.min(98, Math.max(15, Math.round((baseDiff / 1000) * 80 + 15 + ((src.name.length + tgt.name.length) % 10))));
+      const paradoxBudget = Math.round(120 + (sOmega * 0.38) + (tOmega * 0.45));
+      const resolutionH = Math.min(1000, Math.max(500, Math.round(200 + (sOmega + tOmega) / 2 + (dialecticalFriction * 3.5))));
+      const entropicDeformation = (Math.cos(sOmega) * Math.sin(tOmega) * 1.58).toFixed(4);
+      
+      let conflictDetail = "the collision arises from the classical duality between subjective quality structures and objective quantitative boundaries.";
+      
+      const allConcepts = [...src.concepts, ...tgt.concepts];
+      if (allConcepts.some(c => ["entropy", "time", "thermodynamics"].includes(c.toLowerCase()))) {
+        conflictDetail = "the temporal decay vectors directly oppose static eternity laws, presenting extreme friction as local thermodynamic structures undergo entropy dissipation while absolute light coordinates preserve permanent information grids.";
+      } else if (allConcepts.some(c => ["physics", "quantum", "light", "gravity", "geometry"].includes(c.toLowerCase()))) {
+        conflictDetail = "the ontological conflict manifests in the scale mismatch of general relativity constraints against micro-quantum fluctuations, demanding a higher dimensional manifold to bridge energy conservation with localized particle density.";
+      } else if (allConcepts.some(c => ["buddhism", "taoism", "hinduism", "mystical", "christianity", "sufism"].includes(c.toLowerCase()))) {
+        conflictDetail = "the paradox stems from the classic dialectics of action vs. non-action, where worldly manifestation directly opposes absolute spiritual emptiness yet integrates seamlessly under non-dual cosmic rest.";
+      } else if (allConcepts.some(c => ["chakra", "kundalini", "nadis"].includes(c.toLowerCase()))) {
+        conflictDetail = "the spiritual energy centers clash at the interface of low-frequency grounded thermal desires vs. high-frequency cosmic consciousness transceivers. Resolving this tension requires aligning localized nerve nodes with the absolute Speed of Light (C).";
+      } else if (allConcepts.some(c => ["formula", "formulas", "equation"].includes(c.toLowerCase()))) {
+        conflictDetail = "this represents a strict boundary limitation in the system's dΩ/dt rate limits. Incompatible mathematical assumptions generate divergent singularities, but they settle into absolute conservation at the zero-point boundary limit.";
+      }
+
+      const summaryText = `Paradoxical Dialectic Analyzed! Juxtaposing the conceptual framework of ${src.name} (Ω = ${sOmega}) against ${tgt.name} (Ω = ${tOmega}) exposes a dialectical friction of ${dialecticalFriction}%. While ${conflictDetail}, this profound contradiction is not a fatal system error; rather, under the conservation theorem T × S = C, the paradox resolves completely at the attractor level of H = ${resolutionH}, where dualities melt into a coherent unified metemphysical continuum with a Paradox Budget (Ω_px) of ${paradoxBudget}.`;
+
+      setContradictionResult({
+        sourceName: src.name,
+        targetName: tgt.name,
+        friction: dialecticalFriction,
+        paradoxBudget,
+        resolutionH,
+        entropicDeformation,
+        summary: summaryText
+      });
+      setContradictionSecs(false);
+    }, 900);
+  };
+
   const getOmegaValueNumber = (omegaStr?: string) => {
     if (!omegaStr) return 0;
     const match = omegaStr.match(/\d+/);
@@ -2445,31 +2748,30 @@ export default function App() {
           >
             <div className={`relative flex items-center justify-center w-10 h-10 rounded-full border bg-gradient-to-br ${getLogoColors().border} ${getLogoColors().bg} ${getLogoColors().shadow}`}>
               <Atom className={`w-5 h-5 animate-spin-slow ${getLogoColors().icon}`} />
-              <span className="absolute -top-1 -right-1 flex h-3.5 w-3.5">
-                <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${getLogoColors().ping}`}></span>
-                <span className={`relative inline-flex rounded-full h-3.5 w-3.5 ${getLogoColors().dot}`}></span>
-              </span>
             </div>
-            <span className="hidden md:inline font-serif font-bold text-xs tracking-wider text-[#eeeae4]">METEMPHYSICS</span>
+            <span className="hidden md:inline font-serif font-bold text-xs tracking-widest text-orange-500 drop-shadow-[0_0_6px_rgba(255,95,0,0.4)] uppercase">METEMPHYSICS</span>
           </a>
         </div>
 
         {/* Center segment - Metemphysics Cog Mode Selector */}
         <div className="flex justify-center items-center">
-          <div className={`flex items-center gap-1.5 px-2.5 py-1 bg-[#0a0a0c] border rounded transition-all duration-300 ${getCogSelectorColors().border}`}>
+          <div className={`flex items-center gap-1.5 px-2.5 py-1 bg-[#0a0a0c] border rounded transition-all duration-300 ${typing ? "opacity-50 border-orange-500/10 cursor-not-allowed" : getCogSelectorColors().border}`}>
             <span className="text-[9px] font-mono text-gray-500 uppercase tracking-tight">Metemphysics Cog:</span>
             <select
               value={studioMode}
+              disabled={typing}
               onChange={(e) => {
                 const nMode = e.target.value;
                 setStudioMode(nMode);
                 handleSendMessage(`Switching dynamic Metemphysics calibration mode to: ${nMode.toUpperCase()}`);
               }}
-              className={`bg-transparent font-mono text-[9px] uppercase font-bold outline-none cursor-pointer p-0.5 transition-colors duration-300 ${getCogSelectorColors().text}`}
+              className={`bg-transparent font-mono text-[9px] uppercase font-bold outline-none p-0.5 transition-colors duration-300 ${typing ? "cursor-not-allowed text-gray-550" : `cursor-pointer ${getCogSelectorColors().text}`}`}
             >
-              <option value="omniscient" className="bg-black text-orange-400 font-bold uppercase text-[9px]">Omniscient Mode</option>
+              <option value="basic" className="bg-black text-orange-400 font-bold uppercase text-[9px]">Basic Engine</option>
+              <option value="omniscient" className="bg-black text-[#eeeae4]/90 font-bold uppercase text-[9px]">Omniscient Mode</option>
               <option value="socratic" className="bg-black text-cyan-400 font-bold uppercase text-[9px]">Socratic Guide</option>
               <option value="strict_calc" className="bg-black text-amber-500 font-bold uppercase text-[9px]">Strict Calculator</option>
+              <option value="discovery" className="bg-black text-emerald-400 font-bold uppercase text-[9px]">Research & Discovery</option>
             </select>
           </div>
         </div>
@@ -2528,8 +2830,8 @@ export default function App() {
                   onClick={() => setSidebarTab(tab.id as any)}
                   className={`flex-1 py-3 text-[10px] font-mono uppercase tracking-wider flex flex-col sm:flex-row items-center justify-center gap-1.5 border-b-2 cursor-pointer transition-all ${
                     isActive
-                      ? "bg-orange-500/10 border-b-orange-500 text-orange-400 font-bold shadow-[0_-2px_0_#ff5f00_inset]"
-                      : "border-b-transparent text-gray-400 hover:text-white"
+                      ? "bg-orange-500/15 border-b-orange-500 text-white font-extrabold shadow-[0_-2px_0_#ff5f00_inset]"
+                      : "border-b-transparent text-white/75 hover:text-white hover:bg-white/5 font-medium"
                   }`}
                 >
                   <IconComp className="w-3.5 h-3.5" />
@@ -2546,7 +2848,7 @@ export default function App() {
             {sidebarTab === "ontology" && (
               <div className="flex-1 flex flex-col h-full">
                 <div className="flex items-center justify-between pb-3 border-b border-orange-500/20 mb-3">
-                  <div className="relative group/synthesis-title flex items-center gap-1.5">
+                  <div className="relative group/synthesis-title flex items-center gap-1.5 justify-between w-full">
                     <h3 className="font-serif font-bold text-white text-xs tracking-wider flex items-center gap-2 cursor-help">
                       <BookOpen className="w-4 h-4 text-orange-500 drop-shadow-[0_0_4px_rgba(255,95,0,0.4)]" /> SYNTHESIS
                     </h3>
@@ -2559,122 +2861,444 @@ export default function App() {
                   </div>
                 </div>
 
-                {/* Category Toggle */}
-                <div className="grid grid-cols-5 gap-1 mb-3">
-                  {(["science", "religions", "discoveries", "systems", "formulas"] as const).map((cat) => {
-                    const isActive = selectedDbCategory === cat;
-                    let catStyle = "border-transparent text-gray-500 hover:text-white hover:bg-white/5";
-                    if (isActive) {
-                      if (cat === "science") {
-                        catStyle = "bg-white/10 border-white/50 text-white font-bold shadow-[0_0_8px_rgba(255,255,255,0.15)] font-sans";
-                      } else if (cat === "religions") {
-                        catStyle = "bg-amber-500/10 border-amber-500/50 text-amber-400 font-bold shadow-[0_0_8px_rgba(245,158,11,0.15)] font-serif";
-                      } else if (cat === "discoveries") {
-                        catStyle = "bg-yellow-500/10 border-yellow-500/50 text-yellow-400 font-bold shadow-[0_0_8px_rgba(234,179,8,0.15)] font-serif italic";
-                      } else if (cat === "systems") {
-                        catStyle = "bg-teal-500/10 border-teal-500/50 text-teal-400 font-bold shadow-[0_0_8px_rgba(20,184,166,0.15)] font-mono";
-                      } else if (cat === "formulas") {
-                        catStyle = "bg-orange-500/10 border-orange-500/50 text-orange-400 font-bold shadow-[0_0_8px_rgba(249,115,22,0.15)] font-mono";
-                      }
-                    } else {
-                      if (cat === "science") {
-                        catStyle = "border-transparent text-gray-500 hover:text-white hover:bg-white/5 font-sans";
-                      } else if (cat === "religions") {
-                        catStyle = "border-transparent text-gray-500 hover:text-amber-400 hover:bg-amber-500/5 font-serif";
-                      } else if (cat === "discoveries") {
-                        catStyle = "border-transparent text-gray-500 hover:text-yellow-400 hover:bg-yellow-500/5 font-serif italic";
-                      } else if (cat === "systems") {
-                        catStyle = "border-transparent text-gray-500 hover:text-teal-400 hover:bg-teal-500/5 font-mono";
-                      } else if (cat === "formulas") {
-                        catStyle = "border-transparent text-gray-500 hover:text-orange-400 hover:bg-orange-500/5 font-mono";
-                      }
-                    }
-                    return (
-                      <button
-                        key={cat}
-                        disabled={typing}
-                        onClick={() => setSelectedDbCategory(cat)}
-                        className={`py-1 rounded text-[9px] uppercase border transition-all cursor-pointer text-center ${catStyle} ${typing ? "opacity-50 cursor-not-allowed" : ""}`}
-                      >
-                        {cat === "religions" ? "tradition" : cat === "formulas" ? "formula" : cat}
-                      </button>
-                    );
-                  })}
+                {/* Database vs reasoning vs contradiction engine selector buttons */}
+                <div className="grid grid-cols-3 gap-1 mb-3 bg-[#070503] p-1 rounded-lg border border-orange-500/10">
+                  <button
+                    onClick={() => setOntologyMode("directory")}
+                    className={`py-1.5 text-[8.5px] font-mono uppercase rounded transition-all cursor-pointer text-center leading-none ${
+                      ontologyMode === "directory" ? "bg-orange-500/25 border border-orange-500 text-white font-bold shadow-[0_0_8px_rgba(255,95,0,0.15)]" : "text-white/70 hover:text-white bg-white/5 border border-transparent"
+                    }`}
+                  >
+                    Directory
+                  </button>
+                  <button
+                    onClick={() => setOntologyMode("reasoning")}
+                    className={`py-1.5 text-[8.5px] font-mono uppercase rounded transition-all cursor-pointer text-center leading-none ${
+                      ontologyMode === "reasoning" ? "bg-orange-500/25 border border-orange-500 text-white font-bold shadow-[0_0_8px_rgba(255,95,0,0.15)]" : "text-white/70 hover:text-white bg-white/5 border border-transparent"
+                    }`}
+                  >
+                    Reasoning
+                  </button>
+                  <button
+                    onClick={() => setOntologyMode("contradiction")}
+                    className={`py-1.5 text-[8.5px] font-mono uppercase rounded transition-all cursor-pointer text-center leading-none ${
+                      ontologyMode === "contradiction" ? "bg-rose-500/25 border border-rose-500 text-white font-bold shadow-[0_0_8px_rgba(244,63,94,0.15)]" : "text-white/70 hover:text-white bg-white/5 border border-transparent"
+                    }`}
+                  >
+                    Contradict
+                  </button>
                 </div>
 
-                {/* Search Input inline */}
-                <input
-                  type="text"
-                  value={dbSearch}
-                  disabled={typing}
-                  onChange={(e) => setDbSearch(e.target.value)}
-                  placeholder="Query concepts, tags, systems..."
-                  className="w-full bg-black/80 border border-orange-500/25 rounded px-2.5 py-1.5 font-mono text-[11px] mb-3 focus:border-orange-500/60 outline-none text-[#eeeae4] shadow-[inset_0_0_10px_rgba(255,95,0,0.05)] disabled:opacity-50 disabled:cursor-not-allowed"
-                />
-
-                {/* Scrollable list */}
-                <div className="flex-1 overflow-y-auto space-y-2 pr-1 custom-scroll min-h-[480px] lg:min-h-0 border-b border-orange-500/10 pb-2">
-                  {filteredItems.map((item) => {
-                    const colors = getOntologyItemColors(item.id, selectedDbCategory);
-                    return (
-                      <div
-                        key={item.id}
-                        onClick={() => {
-                          if (typing) return;
-                          if (selectedDbCategory === "formulas") {
-                            handleSendMessage(`Formulate and synthesize the Metemphysics Equation: ${item.name}. Analyze its meaning (${item.summary}), explain what its symbols represent within T × S = C conservation dynamics, and evaluate its mathematical & spiritual significance.`);
-                          } else {
-                            handleSendMessage(`Detail the specific metemphysical aspect of '${item.name}' under ${selectedDbCategory} category and explain its J/S significance.`);
+                {ontologyMode === "directory" && (
+                  <>
+                    {/* Category Toggle */}
+                    <div className="grid grid-cols-5 gap-1 mb-3">
+                      {(["science", "religions", "discoveries", "systems", "formulas"] as const).map((cat) => {
+                        const isActive = selectedDbCategory === cat;
+                        let catStyle = "border-transparent text-white/50 hover:text-white hover:bg-white/5";
+                        if (isActive) {
+                          if (cat === "science") {
+                            catStyle = "bg-white/10 border-white text-white font-extrabold shadow-[0_0_8px_rgba(255,255,255,0.2)] font-sans";
+                          } else if (cat === "religions") {
+                            catStyle = "bg-amber-500/15 border-amber-500 text-white font-extrabold shadow-[0_0_8px_rgba(245,158,11,0.2)] font-serif";
+                          } else if (cat === "discoveries") {
+                            catStyle = "bg-yellow-500/15 border-yellow-500 text-white font-extrabold shadow-[0_0_8px_rgba(234,179,8,0.2)] font-serif italic";
+                          } else if (cat === "systems") {
+                            catStyle = "bg-teal-500/15 border-teal-500 text-white font-extrabold shadow-[0_0_8px_rgba(20,184,166,0.2)] font-mono";
+                          } else if (cat === "formulas") {
+                            catStyle = "bg-orange-500/15 border-orange-500 text-white font-extrabold shadow-[0_0_8px_rgba(249,115,22,0.2)] font-mono";
                           }
-                        }}
-                        className={`group bg-[#040404]/80 border ${colors.borderClass} rounded p-2.5 cursor-pointer transition-all ${colors.hoverClass} shadow-[0_0_10px_rgba(0,0,0,0.2)] ${
-                          typing ? "opacity-60 cursor-not-allowed pointer-events-none" : ""
-                        }`}
-                      >
-                        <div className="flex justify-between items-start gap-2">
-                          <div className="flex flex-col">
-                            <span className={`${colors.fontClass || "font-mono font-bold text-xs"} ${colors.textClass} ${colors.textHoverClass} transition-colors tracking-wide`}>{item.name}</span>
-                            {item.omegaVal && (
-                              <span className="text-[9px] font-mono text-[#c9a84c] font-bold tracking-wider mt-0.5">{item.omegaVal}</span>
-                            )}
-                          </div>
-                          {/* Interactive Tooltip on the category / subcategory tags */}
-                          <span className="relative group/tag inline-block">
-                            <span className={`text-[8px] font-mono border px-1.5 py-0.5 rounded uppercase cursor-help transition-all ${colors.badgeClass}`}>
-                              {item.subcategory}
-                            </span>
-                            <span className="pointer-events-none absolute right-0 top-full mt-1.5 w-52 p-2.5 bg-black border border-orange-500/40 text-[9.5px] text-[#dacbb6] font-mono rounded shadow-[0_0_12px_rgba(255,95,0,0.25)] invisible group-hover/tag:visible opacity-0 group-hover/tag:opacity-100 transition-all duration-200 z-50 text-right leading-normal">
-                              Classification: <strong className="text-orange-400 uppercase font-bold">{selectedDbCategory === "religions" ? "Tradition" : selectedDbCategory === "formulas" ? "Formula" : selectedDbCategory}</strong>. Integrated calibration index value: <strong className="text-amber-400">{item.omegaVal || "Ω = Dynamic"}</strong>.
-                              <span className="absolute top-[-4px] right-4 border-x-4 border-x-transparent border-b-4 border-b-orange-500/40" />
-                            </span>
-                          </span>
-                        </div>
-                        <p className="text-[11px] text-[#afbbc9] mt-1 line-clamp-2 leading-relaxed font-serif italic">{item.summary}</p>
-                        <div className="flex items-center justify-between mt-2 pt-1 border-t border-white/5">
-                          <div className="flex flex-wrap gap-1">
-                            {item.concepts.slice(0, 3).map((tag, idx) => (
-                              <span key={idx} className="bg-white/[0.02] px-1 py-0.5 rounded text-[8px] font-mono text-gray-400 border border-white/5">
-                                #{tag}
+                        } else {
+                          if (cat === "science") {
+                            catStyle = "border-white/10 text-white/80 hover:text-white hover:bg-white/10 bg-white/5 font-sans font-medium";
+                          } else if (cat === "religions") {
+                            catStyle = "border-white/10 text-white/80 hover:text-amber-300 hover:bg-amber-500/10 bg-white/5 font-serif font-medium";
+                          } else if (cat === "discoveries") {
+                            catStyle = "border-white/10 text-white/80 hover:text-yellow-300 hover:bg-yellow-500/10 bg-white/5 font-serif italic font-medium";
+                          } else if (cat === "systems") {
+                            catStyle = "border-white/10 text-white/80 hover:text-teal-300 hover:bg-teal-500/10 bg-white/5 font-mono font-medium";
+                          } else if (cat === "formulas") {
+                            catStyle = "border-white/10 text-white/80 hover:text-orange-300 hover:bg-orange-500/10 bg-white/5 font-mono font-medium";
+                          }
+                        }
+                        return (
+                          <button
+                            key={cat}
+                            disabled={typing}
+                            onClick={() => setSelectedDbCategory(cat)}
+                            className={`py-1 rounded text-[9px] uppercase border transition-all cursor-pointer text-center ${catStyle} ${typing ? "opacity-50 cursor-not-allowed" : ""}`}
+                          >
+                            {cat === "religions" ? "tradition" : cat === "formulas" ? "formula" : cat}
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    {/* Search Input inline */}
+                    <input
+                      type="text"
+                      value={dbSearch}
+                      disabled={typing}
+                      onChange={(e) => setDbSearch(e.target.value)}
+                      placeholder="Query concepts, tags, systems..."
+                      className="w-full bg-black/80 border border-orange-500/25 rounded px-2.5 py-1.5 font-mono text-[11px] mb-3 focus:border-orange-500/60 outline-none text-[#eeeae4] shadow-[inset_0_0_10px_rgba(255,95,0,0.05)] disabled:opacity-50 disabled:cursor-not-allowed"
+                    />
+
+                    {/* Scrollable list */}
+                    <div className="flex-1 overflow-y-auto space-y-2 pr-1 custom-scroll min-h-[480px] lg:min-h-0 border-b border-orange-500/10 pb-2">
+                      {filteredItems.map((item) => {
+                        const colors = getOntologyItemColors(item.id, selectedDbCategory);
+                        return (
+                          <div
+                            key={item.id}
+                            onClick={() => {
+                              if (typing) return;
+                              if (selectedDbCategory === "formulas") {
+                                handleSendMessage(`Formulate and synthesize the Metemphysics Equation: ${item.name}. Analyze its meaning (${item.summary}), explain what its symbols represent within T × S = C conservation dynamics, and evaluate its mathematical & spiritual significance.`);
+                              } else {
+                                handleSendMessage(`Detail the specific metemphysical aspect of '${item.name}' under ${selectedDbCategory} category and explain its J/S significance.`);
+                              }
+                            }}
+                            className={`group bg-[#040404]/80 border ${colors.borderClass} rounded p-2.5 cursor-pointer transition-all ${colors.hoverClass} shadow-[0_0_10px_rgba(0,0,0,0.2)] ${
+                              typing ? "opacity-60 cursor-not-allowed pointer-events-none" : ""
+                            }`}
+                          >
+                            <div className="flex justify-between items-start gap-2">
+                              <div className="flex flex-col">
+                                <span className={`${colors.fontClass || "font-mono font-bold text-xs"} ${colors.textClass} ${colors.textHoverClass} transition-colors tracking-wide`}>{item.name}</span>
+                                {item.omegaVal && (
+                                  <span className="text-[9px] font-mono text-orange-400 font-bold tracking-wider mt-0.5">{item.omegaVal}</span>
+                                )}
+                              </div>
+                              {/* Interactive Tooltip on the category / subcategory tags */}
+                              <span className="relative group/tag inline-block">
+                                <span className={`text-[8px] font-mono border px-1.5 py-0.5 rounded uppercase cursor-help transition-all ${colors.badgeClass}`}>
+                                  {item.subcategory}
+                                </span>
+                                <span className="pointer-events-none absolute right-0 top-full mt-1.5 w-52 p-2.5 bg-black border border-orange-500/40 text-[9.5px] text-[#dacbb6] font-mono rounded shadow-[0_0_12px_rgba(255,95,0,0.25)] invisible group-hover/tag:visible opacity-0 group-hover/tag:opacity-100 transition-all duration-200 z-50 text-right leading-normal">
+                                  Classification: <strong className="text-orange-400 uppercase font-bold">{selectedDbCategory === "religions" ? "Tradition" : selectedDbCategory === "formulas" ? "Formula" : selectedDbCategory}</strong>. Integrated calibration index value: <strong className="text-orange-400">{item.omegaVal || "Ω = Dynamic"}</strong>.
+                                  <span className="absolute top-[-4px] right-4 border-x-4 border-x-transparent border-b-4 border-b-orange-500/40" />
+                                </span>
                               </span>
-                            ))}
+                            </div>
+                            <p className="text-[11px] text-[#afbbc9] mt-1 line-clamp-2 leading-relaxed font-serif italic">{item.summary}</p>
+                            <div className="flex items-center justify-between mt-2 pt-1 border-t border-white/5">
+                              <div className="flex flex-wrap gap-1">
+                                {item.concepts.slice(0, 3).map((tag, idx) => (
+                                  <span key={idx} className="bg-white/[0.02] px-1 py-0.5 rounded text-[8px] font-mono text-gray-400 border border-white/5">
+                                    #{tag}
+                                  </span>
+                                ))}
+                              </div>
+                              {selectedDbCategory === "formulas" ? (
+                                <span className="text-[8px] font-mono text-orange-400 group-hover:text-amber-300 font-bold tracking-widest uppercase flex items-center gap-1 transition-colors">
+                                  Devise Auto ✦
+                                </span>
+                              ) : (
+                                <span className="text-[8px] font-mono text-gray-500 group-hover:text-amber-500 transition-colors">
+                                  Query ◈
+                                </span>
+                              )}
+                            </div>
                           </div>
-                          {selectedDbCategory === "formulas" ? (
-                            <span className="text-[8px] font-mono text-orange-400 group-hover:text-amber-300 font-bold tracking-widest uppercase flex items-center gap-1 transition-colors">
-                              Devise Auto ✦
-                            </span>
-                          ) : (
-                            <span className="text-[8px] font-mono text-gray-500 group-hover:text-amber-500 transition-colors">
-                              Query ◈
-                            </span>
-                          )}
+                        );
+                      })}
+                      {filteredItems.length === 0 && (
+                        <div className="text-center text-xs text-gray-500 pt-6 font-mono">No matching records found.</div>
+                      )}
+                    </div>
+                  </>
+                )}
+
+                {ontologyMode === "reasoning" && (
+                  <div className="flex-1 flex flex-col space-y-3.5 overflow-y-auto pr-1 min-h-[480px] lg:min-h-0 custom-scroll border-b border-orange-500/10 pb-2">
+                    <div className="p-3 bg-orange-950/10 border border-orange-500/15 rounded-xl space-y-3">
+                      <span className="text-[10px] font-mono text-orange-400 tracking-widest block uppercase font-bold">
+                        Discover New Relationships
+                      </span>
+                      
+                      <div className="space-y-3">
+                        <div>
+                          <label className="text-[9px] font-mono text-gray-500 uppercase block mb-1">Source Domain Aspect:</label>
+                          <select
+                            value={reasoningSource}
+                            disabled={typing}
+                            onChange={(e) => setReasoningSource(e.target.value)}
+                            className="w-full bg-black border border-orange-500/20 rounded px-2.5 py-1.5 font-mono text-xs text-[#eeeae4] outline-none focus:border-orange-500/60 disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            <option value="">-- SELECT SOURCE ASPECT --</option>
+                            {reasoningOptions.map((opt) => (
+                              <option key={opt.id} value={opt.id}>
+                                {opt.name} ({opt.category})
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+
+                        <div>
+                          <label className="text-[9px] font-mono text-gray-500 uppercase block mb-1">Target Domain Aspect:</label>
+                          <select
+                            value={reasoningTarget}
+                            disabled={typing}
+                            onChange={(e) => setReasoningTarget(e.target.value)}
+                            className="w-full bg-black border border-orange-500/20 rounded px-2.5 py-1.5 font-mono text-xs text-[#eeeae4] outline-none focus:border-orange-500/60 disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            <option value="">-- SELECT TARGET ASPECT --</option>
+                            {reasoningOptions.map((opt) => (
+                              <option key={opt.id} value={opt.id} disabled={opt.id === reasoningSource}>
+                                {opt.name} ({opt.category})
+                              </option>
+                            ))}
+                          </select>
                         </div>
                       </div>
-                    );
-                  })}
-                  {filteredItems.length === 0 && (
-                    <div className="text-center text-xs text-gray-500 pt-6 font-mono">No matching records found.</div>
-                  )}
-                </div>
+
+                      <button
+                        onClick={handleTriggerReasoning}
+                        disabled={typing || reasoningSecs || !reasoningSource || !reasoningTarget}
+                        className="w-full py-2 bg-gradient-to-r from-orange-500/30 to-orange-500/25 border border-orange-500/40 hover:from-orange-500 hover:to-orange-400 hover:text-black font-mono font-bold text-[10px] rounded tracking-widest uppercase transition-all duration-300 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer flex items-center justify-center gap-2"
+                      >
+                        {reasoningSecs ? (
+                          <>
+                            <Cpu className="w-3.5 h-3.5 animate-spin text-orange-400" /> Synthesizing Tensor Fields...
+                          </>
+                        ) : (
+                          <>
+                            <Sparkles className="w-3.5 h-3.5 text-orange-400" /> Calculate Synthesis Link
+                          </>
+                        )}
+                      </button>
+                    </div>
+
+                    {/* Reasoning Output Results */}
+                    {reasoningSecs && (
+                      <div className="flex-1 flex flex-col items-center justify-center py-12 space-y-3">
+                        <Cpu className="w-8 h-8 text-orange-500 animate-spin" />
+                        <span className="font-mono text-[9px] text-orange-400 uppercase tracking-widest animate-pulse">Running systemic correlation scanner...</span>
+                      </div>
+                    )}
+
+                    {!reasoningSecs && !reasoningResult && (
+                      <div className="flex-1 flex flex-col items-center justify-center text-center py-12 text-gray-500 font-mono text-[10px] space-y-1.5 bg-black/20 rounded-xl border border-white/5">
+                        <Network className="w-6 h-6 text-orange-700/40" />
+                        <span>Select source and target aspects above to map synergistic linkages under standard parameter C.</span>
+                      </div>
+                    )}
+
+                    {!reasoningSecs && reasoningResult && (
+                      <div className="bg-black/50 border border-orange-500/20 rounded-xl p-3.5 space-y-3.5">
+                        <div className="flex justify-between items-start border-b border-orange-500/10 pb-2">
+                          <div>
+                            <span className="text-[8px] font-mono text-gray-500 block uppercase">Synthesized Linkage:</span>
+                            <strong className="text-white text-xs font-serif leading-tight">
+                              {reasoningResult.sourceName} × {reasoningResult.targetName}
+                            </strong>
+                          </div>
+                          <div className="text-right">
+                            <span className="text-[8px] font-mono text-gray-500 block uppercase">Confidence:</span>
+                            <span className="text-sm font-mono text-orange-400 font-black">
+                              {reasoningResult.confidence}%
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Confidence Bar Meter */}
+                        <div className="space-y-1">
+                          <div className="flex justify-between text-[8px] font-mono text-gray-500 uppercase">
+                            <span>Coherence Field Strength</span>
+                            <span>{reasoningResult.confidence}%</span>
+                          </div>
+                          <div className="w-full bg-white/5 h-2 rounded overflow-hidden border border-white/5">
+                            <div
+                              className="bg-gradient-to-r from-orange-600 to-orange-400 h-full rounded transition-all duration-300"
+                              style={{ width: `${reasoningResult.confidence}%` }}
+                            ></div>
+                          </div>
+                        </div>
+
+                        {/* Numeric Metemphysics Indicators */}
+                        <div className="grid grid-cols-2 gap-1.5 font-mono text-[9.5px]">
+                          <div className="bg-black/40 p-2 rounded border border-white/5">
+                            <span className="text-gray-500 uppercase block">Resonance (Ω_res):</span>
+                            <span className="text-white font-extrabold">{reasoningResult.resonance}%</span>
+                          </div>
+                          <div className="bg-black/40 p-2 rounded border border-white/5">
+                            <span className="text-gray-500 uppercase block">Entropy Flux (ΔS):</span>
+                            <span className="text-emerald-400 font-extrabold">{reasoningResult.deltaS}</span>
+                          </div>
+                          <div className="col-span-2 bg-black/40 p-2 rounded border border-white/5 flex justify-between items-center">
+                            <span className="text-gray-500 uppercase">Attractor Level Value H:</span>
+                            <span className="text-orange-400 font-black">H = {reasoningResult.synH}</span>
+                          </div>
+                        </div>
+
+                        {/* Intuitive summary text block */}
+                        <p className="text-[11px] text-[#afbbc9] leading-relaxed font-serif italic border-l-2 border-orange-500 pl-2.5">
+                          "{reasoningResult.summary}"
+                        </p>
+
+                        <button
+                          onClick={() => {
+                            if (typing) return;
+                            handleSendMessage(`Detail and explain the synthesized relationship between '${reasoningResult.sourceName}' and '${reasoningResult.targetName}'. They co-resonate at a high confidence score of ${reasoningResult.confidence}%, mapping to standard attractor calibration coordinate H=${reasoningResult.synH} with entropy shift modifier ΔS=${reasoningResult.deltaS}. Analyze this connection.`);
+                          }}
+                          className={`w-full py-1.5 font-semibold text-[9px] font-mono border rounded uppercase transition-all cursor-pointer text-center ${
+                            typing 
+                              ? "bg-orange-500/5 text-orange-400/40 border-orange-500/10 cursor-not-allowed pointer-events-none opacity-50" 
+                              : "bg-orange-500/10 hover:bg-orange-500 hover:text-black border-orange-500/30 text-orange-450"
+                          }`}
+                        >
+                          💬 Submit to Oracle Terminal
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {ontologyMode === "contradiction" && (
+                  <div className="flex-1 flex flex-col space-y-3.5 overflow-y-auto pr-1 min-h-[480px] lg:min-h-0 custom-scroll border-b border-[#f43f5e]/10 pb-2">
+                    <div className="p-3 bg-rose-950/10 border border-rose-500/15 rounded-xl space-y-3">
+                      <span className="text-[10px] font-mono text-rose-450 tracking-widest block uppercase font-bold">
+                        Conflict & Contradiction Engine
+                      </span>
+                      
+                      <div className="space-y-3">
+                        <div>
+                          <label className="text-[9px] font-mono text-gray-500 uppercase block mb-1">Thesis Aspect (Source):</label>
+                          <select
+                            value={contradictionSource}
+                            disabled={typing}
+                            onChange={(e) => setContradictionSource(e.target.value)}
+                            className="w-full bg-black border border-rose-500/20 rounded px-2.5 py-1.5 font-mono text-xs text-[#eeeae4] outline-none focus:border-rose-500/60 disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            <option value="">-- SELECT THESIS --</option>
+                            {reasoningOptions.map((opt) => (
+                              <option key={opt.id} value={opt.id}>
+                                {opt.name} ({opt.category})
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+
+                        <div>
+                          <label className="text-[9px] font-mono text-gray-500 uppercase block mb-1">Antithesis Aspect (Target):</label>
+                          <select
+                            value={contradictionTarget}
+                            disabled={typing}
+                            onChange={(e) => setContradictionTarget(e.target.value)}
+                            className="w-full bg-black border border-rose-500/20 rounded px-2.5 py-1.5 font-mono text-xs text-[#eeeae4] outline-none focus:border-rose-500/60 disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            <option value="">-- SELECT ANTITHESIS --</option>
+                            {reasoningOptions.map((opt) => (
+                              <option key={opt.id} value={opt.id} disabled={opt.id === contradictionSource}>
+                                {opt.name} ({opt.category})
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                      </div>
+
+                      <button
+                        onClick={handleTriggerContradiction}
+                        disabled={typing || contradictionSecs || !contradictionSource || !contradictionTarget}
+                        className="w-full py-2 bg-gradient-to-r from-rose-500/30 to-rose-500/25 border border-rose-500/40 hover:from-rose-500 hover:to-rose-450 hover:text-white font-mono font-bold text-[10px] rounded tracking-widest uppercase transition-all duration-300 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer flex items-center justify-center gap-2"
+                      >
+                        {contradictionSecs ? (
+                          <>
+                            <RefreshCw className="w-3.5 h-3.5 animate-spin text-rose-400" /> Plotting Dualities...
+                          </>
+                        ) : (
+                          <>
+                            <Zap className="w-3.5 h-3.5 text-rose-400" /> Measure Dialectical Tension
+                          </>
+                        )}
+                      </button>
+                    </div>
+
+                    {/* Contradiction Output Results */}
+                    {contradictionSecs && (
+                      <div className="flex-1 flex flex-col items-center justify-center py-12 space-y-3">
+                        <RefreshCw className="w-8 h-8 text-rose-500 animate-spin" />
+                        <span className="font-mono text-[9px] text-rose-400 uppercase tracking-widest animate-pulse">Scanning paradoxical dualities...</span>
+                      </div>
+                    )}
+
+                    {!contradictionSecs && !contradictionResult && (
+                      <div className="flex-1 flex flex-col items-center justify-center text-center py-12 text-gray-500 font-mono text-[10px] space-y-1.5 bg-black/20 rounded-xl border border-white/5">
+                        <Scale className="w-6 h-6 text-rose-700/40" />
+                        <span>Select thesis and antithesis aspects to plot dialectical friction vectors within parameters.</span>
+                      </div>
+                    )}
+
+                    {!contradictionSecs && contradictionResult && (
+                      <div className="bg-black/50 border border-rose-500/20 rounded-xl p-3.5 space-y-3.5">
+                        <div className="flex justify-between items-start border-b border-rose-500/10 pb-2">
+                          <div>
+                            <span className="text-[8px] font-mono text-gray-500 block uppercase">Dialectical Clash:</span>
+                            <strong className="text-white text-xs font-serif leading-tight">
+                              {contradictionResult.sourceName} ↯ {contradictionResult.targetName}
+                            </strong>
+                          </div>
+                          <div className="text-right">
+                            <span className="text-[8px] font-mono text-gray-500 block uppercase">Friction Index:</span>
+                            <span className="text-sm font-mono text-rose-450 font-black">
+                              {contradictionResult.friction}%
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Friction Bar Meter */}
+                        <div className="space-y-1">
+                          <div className="flex justify-between text-[8px] font-mono text-gray-500 uppercase">
+                            <span>Dialectical Static Field Tension</span>
+                            <span>{contradictionResult.friction}%</span>
+                          </div>
+                          <div className="w-full bg-white/5 h-2 rounded overflow-hidden border border-white/5">
+                            <div
+                              className="bg-gradient-to-r from-rose-600 to-amber-500 h-full rounded transition-all duration-300"
+                              style={{ width: `${contradictionResult.friction}%` }}
+                            ></div>
+                          </div>
+                        </div>
+
+                        {/* Numeric Indicators */}
+                        <div className="grid grid-cols-2 gap-1.5 font-mono text-[9.5px]">
+                          <div className="bg-black/40 p-2 rounded border border-white/5">
+                            <span className="text-gray-500 uppercase block">Paradox Budget (Ω_px):</span>
+                            <span className="text-white font-extrabold">{contradictionResult.paradoxBudget}</span>
+                          </div>
+                          <div className="bg-black/40 p-2 rounded border border-white/5">
+                            <span className="text-gray-500 uppercase block">Deformation (ΔS_def):</span>
+                            <span className="text-rose-400 font-extrabold">{contradictionResult.entropicDeformation}</span>
+                          </div>
+                          <div className="col-span-2 bg-black/40 p-2 rounded border border-white/5 flex justify-between items-center">
+                            <span className="text-gray-500 uppercase">Non-dual Integration Level:</span>
+                            <span className="text-rose-400 font-extrabold">H = {contradictionResult.resolutionH}</span>
+                          </div>
+                        </div>
+
+                        {/* Paradox Intuitive summary text block */}
+                        <p className="text-[11px] text-[#afbbc9] leading-relaxed font-serif italic border-l-2 border-rose-500 pl-2.5">
+                          "{contradictionResult.summary}"
+                        </p>
+
+                        <button
+                          onClick={() => {
+                            if (typing) return;
+                            handleSendMessage(`Explain the dialectical tension between '${contradictionResult.sourceName}' and '${contradictionResult.targetName}'. They exhibit a contradiction rating of ${contradictionResult.friction}%, resolving into non-dual equilibrium at attractor coordinates H=${contradictionResult.resolutionH} with Paradox Budget index value Ω_px=${contradictionResult.paradoxBudget} and distortion modifier ΔS_def=${contradictionResult.entropicDeformation}. Deliver a detailed ontological integration analysis of this conflict.`);
+                          }}
+                          className={`w-full py-1.5 font-semibold text-[9px] font-mono border rounded uppercase transition-all cursor-pointer text-center ${
+                            typing 
+                              ? "bg-rose-500/5 text-rose-400/40 border-rose-500/10 cursor-not-allowed pointer-events-none opacity-50" 
+                              : "bg-rose-500/10 hover:bg-rose-500 hover:text-white border-rose-500/30 text-rose-400"
+                          }`}
+                        >
+                          💬 Submit Dialectic to Oracle Terminal
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             )}
 
@@ -2829,7 +3453,7 @@ export default function App() {
                   <h3 className="font-serif font-bold text-white text-xs tracking-wider flex items-center gap-2">
                     <Atom className="w-4 h-4 text-orange-550" /> HARMONICS &amp; COHERENCE SPECS
                   </h3>
-                  <p className="text-[9px] font-mono text-gray-450 mt-1">Solfeggio frequencies, vibrations and critical elemental molar S°</p>
+                  <p className="text-[9px] font-mono text-gray-450 mt-1">Solfeggio frequencies, Pythagorean ratios, and Chakra attractor calibrations</p>
                 </div>
 
                 <div className="flex-1 overflow-y-auto space-y-4 pr-1 custom-scroll min-h-[480px] lg:min-h-0 border-b border-orange-500/10 pb-2">
@@ -2840,24 +3464,53 @@ export default function App() {
                       {[
                         { hz: "174 Hz", chakra: "Earth Foundation", js: "J/S = -0.150", query: "Explain properties of 174 Hz Solfeggio scale with -0.150 J/S." },
                         { hz: "285 Hz", chakra: "Tissue Calibration", js: "J/S = -0.050", query: "Explain properties of 285 Hz Solfeggio scale with -0.050 J/S." },
-                        { hz: "396 Hz", chakra: "Muladhara (Root)", js: "J/S = 0.00", query: "Discuss standard molar properties of 396 Hz Muladhara foundational base." },
+                        { hz: "396 Hz", chakra: "Muladhara (Root)", js: "J/S = 0.00", query: "Discuss standard properties of 396 Hz Muladhara foundational base." },
                         { hz: "417 Hz", chakra: "Svadhisthana (Sacral)", js: "J/S = 9.50e-5", query: "Explain properties of 417 Hz Solfeggio scale with 9.50e-5 J/S." },
-                        { hz: "528 Hz", chakra: "Manipura (Solar Plexus)", js: "J/S = 0.01", query: "Discuss standard molar properties of 528 Hz Manipura solar plexus, miracle tone." },
-                        { hz: "639 Hz", chakra: "Anahata (Heart)", js: "J/S = 0.99", query: "Discuss standard molar properties of 639 Hz Anahata heart chakra communion frequency." },
+                        { hz: "528 Hz", chakra: "Manipura (Solar Plexus)", js: "J/S = 0.01", query: "Discuss standard properties of 528 Hz Manipura solar plexus, miracle tone." },
+                        { hz: "639 Hz", chakra: "Anahata (Heart)", js: "J/S = 0.99", query: "Discuss standard properties of 639 Hz Anahata heart chakra communion frequency." },
                         { hz: "741 Hz", chakra: "Vishuddha (Throat)", js: "J/S = 7.414", query: "Explain properties of 741 Hz Solfeggio scale with 7.414 J/S." },
                         { hz: "852 Hz", chakra: "Ajna (Third Eye)", js: "J/S = 35.353", query: "Explain properties of 852 Hz Solfeggio scale with 35.353 J/S." },
-                        { hz: "963 Hz", chakra: "Sahasrara (Crown)", js: "J/S = 950.00", query: "Discuss standard molar properties of 963 Hz Sahasrara crown direct cosmic link." }
+                        { hz: "963 Hz", chakra: "Sahasrara (Crown)", js: "J/S = 950.00", query: "Discuss standard properties of 963 Hz Sahasrara crown direct cosmic link." }
                       ].map((item) => (
                         <div 
-                          key={item.hz}
-                          onClick={() => !typing && handleSendMessage(item.query)}
-                          className={`p-2 border border-orange-500/15 bg-black hover:border-orange-500/50 hover:bg-orange-500/5 rounded text-left cursor-pointer transition-all ${
-                            typing ? "opacity-60 cursor-not-allowed pointer-events-none" : ""
-                          }`}
+                           key={item.hz}
+                           onClick={() => !typing && handleSendMessage(item.query)}
+                           className={`p-2 border border-orange-500/15 bg-black hover:border-orange-500/50 hover:bg-orange-500/5 rounded text-left cursor-pointer transition-all ${
+                             typing ? "opacity-60 cursor-not-allowed pointer-events-none" : ""
+                           }`}
                         >
                           <div className="text-xs font-bold text-orange-400 font-mono">{item.hz}</div>
                           <div className="text-[10px] text-[#eeeae4]/80 font-serif mt-0.5">{item.chakra}</div>
                           <div className="text-[9.5px] font-mono text-gray-400 mt-1">{item.js}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Pythagorean Tuning Intervals Section */}
+                  <div className="space-y-2">
+                    <h4 className="text-[9px] font-mono text-teal-400 uppercase tracking-widest font-semibold border-b border-teal-500/10 pb-1">Pythagorean Tuning Intervals</h4>
+                    <div className="grid grid-cols-2 gap-1.5">
+                      {[
+                        { interval: "1:1 Unison (C)", ratio: "Ratio: 1.000", desc: "Foundational Tonic root", query: "Deconstruct 1:1 Pythagorean Unison ratio in conscious acoustic alignment." },
+                        { interval: "9:8 Major 2nd (D)", ratio: "Ratio: 1.125", desc: "Intellectual activation step", query: "Deconstruct 9:8 Pythagorean Major Second ratio and conscious resonance." },
+                        { interval: "81:64 Major 3rd (E)", ratio: "Ratio: 1.265", desc: "Luminous focal harmony", query: "Discuss 81:64 Pythagorean Major Third ratio and organic chord structures." },
+                        { interval: "4:3 Perfect 4th (F)", ratio: "Ratio: 1.333", desc: "Consonant stability center", query: "Discuss 4:3 Pythagorean Perfect Fourth ratio in organic harmonics." },
+                        { interval: "3:2 Perfect 5th (G)", ratio: "Ratio: 1.500", desc: "Archetypal cosmic mediator", query: "Explain the archetypal significance of 3:2 Pythagorean Perfect Fifth ratio." },
+                        { interval: "27:16 Major 6th (A)", ratio: "Ratio: 1.6875", desc: "Ethereal aesthetic lift", query: "Discuss 27:16 Pythagorean Major Sixth ratio and conscious uplift." },
+                        { interval: "243:128 Major 7th (B)", ratio: "Ratio: 1.898", desc: "Astral boundary threshold", query: "Explain 243:128 Pythagorean Major Seventh and psychic tension properties." },
+                        { interval: "2:1 Pure Octave (C')", ratio: "Ratio: 2.000", desc: "Consummate fractal recursion", query: "Discuss 2:1 Pythagorean Pure Octave and the recursion of sonic consciousness." }
+                      ].map((item) => (
+                        <div 
+                          key={item.interval}
+                          onClick={() => !typing && handleSendMessage(item.query)}
+                          className={`p-2 border border-teal-500/15 bg-black hover:border-teal-500/50 hover:bg-teal-500/5 rounded text-left cursor-pointer transition-all ${
+                            typing ? "opacity-60 cursor-not-allowed pointer-events-none" : ""
+                          }`}
+                        >
+                          <div className="text-xs font-bold text-teal-400 font-mono">{item.interval}</div>
+                          <div className="text-[10px] text-[#eeeae4]/80 font-serif mt-0.5">{item.desc}</div>
+                          <div className="text-[9.5px] font-mono text-gray-400 mt-1">{item.ratio}</div>
                         </div>
                       ))}
                     </div>
@@ -2868,68 +3521,266 @@ export default function App() {
                     <h4 className="text-[9px] font-mono text-red-400 uppercase tracking-widest font-semibold border-b border-red-500/10 pb-1">Music Genre Calibration (H, J/S, Phase)</h4>
                     <div className="space-y-1.5">
                       {[
-                        { style: "Death Metal / Grindcore", h: "H: 100", js: "-0.5", phase: "Φ = 2", styleClass: "border-red-900/30 text-red-400" },
-                        { style: "Blues (dark, slow)", h: "H: 250", js: "3.5e-6", phase: "Φ = 3", styleClass: "border-orange-900/30 text-orange-300" },
-                        { style: "Rock / Pop", h: "H: 350", js: "0.01", phase: "Φ = 4", styleClass: "border-teal-950/30 text-teal-300" },
-                        { style: "Classical (Baroque)", h: "H: 600", js: "7.41", phase: "Φ = 5", styleClass: "border-amber-950/30 text-amber-300 font-bold" },
-                        { style: "Bach Fugues", h: "H: 700", js: "35.35", phase: "Φ = 5", styleClass: "border-amber-500/20 text-[#ffd700] font-bold" },
-                        { style: "Binaural Beats (Theta)", h: "H: 900", js: "372.6", phase: "Φ = 5", styleClass: "border-purple-500/20 text-purple-300" }
+                        { style: "Death Metal / Grindcore", h: "H: 100", js: "-0.5", phase: "Φ = 2", state: "Suffering", styleClass: "border-red-950/30 text-red-400" },
+                        { style: "Heavy Metal / Doom", h: "H: 150", js: "-0.25", phase: "Φ = 2", state: "Suffering", styleClass: "border-red-900/25 text-red-350" },
+                        { style: "Blues (dark, slow)", h: "H: 250", js: "3.535e-6", phase: "Φ = 3", state: "Tipping Point", styleClass: "border-orange-900/30 text-orange-300" },
+                        { style: "Rock / Pop", h: "H: 350", js: "0.01", phase: "Φ = 4", state: "Tipping Point", styleClass: "border-orange-500/10 text-orange-200" },
+                        { style: "Country / Folk", h: "H: 400", js: "0.06", phase: "Φ = 4", state: "Time Passing", styleClass: "border-amber-900/20 text-amber-200" },
+                        { style: "R&B / Soul", h: "H: 450", js: "0.61", phase: "Φ = 4", state: "Time Passing", styleClass: "border-amber-600/15 text-amber-300" },
+                        { style: "Classical (Romantic)", h: "H: 500", js: "1.55", phase: "Φ = 5", state: "Eudaimonia", styleClass: "border-teal-950/30 text-teal-300" },
+                        { style: "Jazz (Bebop / Modern)", h: "H: 540", js: "2.38", phase: "Φ = 5", state: "Eudaimonia", styleClass: "border-teal-500/15 text-teal-200" },
+                        { style: "Classical (Baroque)", h: "H: 600", js: "7.41", phase: "Φ = 5", state: "Deep Flourishing", styleClass: "border-amber-500/15 text-yellow-300 font-bold" },
+                        { style: "Sacred / Gregorian", h: "H: 650", js: "16.91", phase: "Φ = 5", state: "Mystical Clarity", styleClass: "border-yellow-600/15 text-yellow-200 font-semibold" },
+                        { style: "Bach Fugues", h: "H: 700", js: "35.35", phase: "Φ = 5", state: "Mystical Clarity", styleClass: "border-amber-500/20 text-[#ffd700] font-bold" },
+                        { style: "Indian Classical (Raga)", h: "H: 750", js: "46.52", phase: "Φ = 5", state: "Mystical Clarity", styleClass: "border-yellow-500/20 text-yellow-100 font-bold" },
+                        { style: "Overtone Chanting", h: "H: 800", js: "126.68", phase: "Φ = 5", state: "Near Timeless", styleClass: "border-purple-900/30 text-purple-300" },
+                        { style: "Tibetan Singing Bowls", h: "H: 850", js: "221.83", phase: "Φ = 5", state: "Near Timeless", styleClass: "border-indigo-950/30 text-purple-200" },
+                        { style: "Binaural Beats (Theta)", h: "H: 900", js: "372.67", phase: "Φ = 5", state: "Near Timeless", styleClass: "border-purple-500/20 text-purple-100" },
+                        { style: "Pure Sinewave / 432Hz", h: "H: 1000", js: "950", phase: "Φ = 5", state: "REVELATION", styleClass: "border-amber-400/35 bg-amber-500/[0.02] text-yellow-400 font-extrabold" }
                       ].map((item) => (
                         <div 
                           key={item.style}
-                          onClick={() => !typing && handleSendMessage(`Detailed breakdown of ${item.style} with J/S = ${item.js} calibrations.`)}
+                          onClick={() => !typing && handleSendMessage(`Detailed breakdown of ${item.style} with J/S = ${item.js} calibrations under Hawkins Attractor limit.`)}
                           className={`flex items-center justify-between p-1.5 border ${item.styleClass} bg-black hover:bg-white/[0.02] rounded text-left cursor-pointer transition-all ${
                             typing ? "opacity-60 cursor-not-allowed pointer-events-none" : ""
                           }`}
                         >
-                          <div className="text-[10px] font-medium truncate max-w-[120px]">{item.style}</div>
-                          <div className="flex gap-2 font-mono text-[9px]">
-                            <span className="text-gray-500">{item.h}</span>
-                            <span className="text-gray-400">J/S: {item.js}</span>
-                            <span className="text-yellow-500/85">{item.phase}</span>
+                          <div className="text-[10px] font-medium truncate max-w-[130px]" title={item.state}>
+                            {item.style}
+                            <span className="text-[8px] font-mono opacity-50 ml-1 font-normal">({item.state})</span>
+                          </div>
+                          <div className="flex gap-2 font-mono text-[9px] items-center">
+                            <span className="text-gray-500 text-[8.5px]">{item.h}</span>
+                            <span className="text-gray-400 text-[8.5px]">J/S: {item.js}</span>
+                            <span className="text-yellow-500/80 text-[8.5px]">{item.phase}</span>
                           </div>
                         </div>
                       ))}
                     </div>
                   </div>
 
-                  {/* Elements Section */}
-                  <div className="space-y-2">
-                    <h4 className="text-[10.5px] font-mono text-amber-500 uppercase tracking-widest font-semibold border-b border-orange-500/10 pb-1">Molar Entropy S° values (J/mol·K)</h4>
-                    <div className="grid grid-cols-2 gap-1.5">
+                  {/* Acoustic Chakra Color & Resonance Coordinate Linkage */}
+                  <div className="space-y-3">
+                    <div className="border-b border-purple-500/10 pb-1 flex justify-between items-center">
+                      <h4 className="text-[9px] font-mono text-purple-400 uppercase tracking-widest font-semibold">Chakra Metemphysics &amp; Resonance Atlas</h4>
+                      <span className="text-[7.5px] font-mono text-gray-500 uppercase tracking-widest">7 Phase States</span>
+                    </div>
+
+                    <div className="space-y-2.5">
                       {[
-                        { sym: "C (Carbon)", s: "5.74", note: "Lowest, life's crystalline base", query: "Explain the low entropy value S° = 5.74 J/mol·K of Carbon." },
-                        { sym: "Si (Silicon)", s: "18.83", note: "Metalloid threshold center", query: "Explain standard entropy S° = 18.83 J/mol·K of Silicon." },
-                        { sym: "O2 (Oxygen)", s: "102.57", note: "Fluid gas metabolic motor", query: "Explain standard entropy S° = 102.57 J/mol·K of Oxygen." },
-                        { sym: "He (Helium)", s: "126.15", note: "Noble high-dispersal state", query: "Explain standard entropy S° = 126.15 J/mol·K of Helium." }
+                        { 
+                          num: "1", 
+                          name: "Root — Muladhara", 
+                          element: "EARTH", 
+                          note: "C", 
+                          locus: "BASE OF SPINE", 
+                          freq: "396Hz", 
+                          ratio: "33:32", 
+                          epoch: "2.52 ms", 
+                          phase: "45°", 
+                          js: "0", 
+                          order: "0.6321", 
+                          gland: "Adrenals / Skeletal", 
+                          crystals: "Red Jasper, Garnet, Bloodstone", 
+                          mantra: "LAM", 
+                          meaning: "Survival, grounding, safety", 
+                          color: "Red Spectrum (λ = 700 nm)", 
+                          isApex: false,
+                          styleClass: "border-red-500/20 hover:border-red-500/50 hover:bg-red-500/[0.02]",
+                          textClass: "text-red-400 font-bold",
+                          textAccent: "text-red-300"
+                        },
+                        { 
+                          num: "2", 
+                          name: "Sacral — Svadhisthana", 
+                          element: "WATER", 
+                          note: "D", 
+                          locus: "LOWER ABDOMEN", 
+                          freq: "417Hz", 
+                          ratio: "139:128", 
+                          epoch: "2.40 ms", 
+                          phase: "60°", 
+                          js: "9.49e-5", 
+                          order: "0.7534", 
+                          gland: "Gonads / Reproductive", 
+                          crystals: "Carnelian, Tiger's Eye, Sunstone", 
+                          mantra: "VAM", 
+                          meaning: "Desire, creativity, sexuality", 
+                          color: "Orange Spectrum (λ = 610 nm)", 
+                          isApex: false,
+                          styleClass: "border-orange-500/20 hover:border-orange-500/50 hover:bg-orange-500/[0.02]",
+                          textClass: "text-orange-400 font-bold",
+                          textAccent: "text-orange-300"
+                        },
+                        { 
+                          num: "3", 
+                          name: "Solar Plexus — Manipura", 
+                          element: "FIRE", 
+                          note: "E", 
+                          locus: "NAVEL REGION", 
+                          freq: "528Hz", 
+                          ratio: "11:8", 
+                          epoch: "1.89 ms", 
+                          phase: "90°", 
+                          js: "0.01", 
+                          order: "0.8262", 
+                          gland: "Pancreas / Adrenal Cortex", 
+                          crystals: "Citrine, Amber, Yellow Jasper", 
+                          mantra: "RAM", 
+                          meaning: "Will, power, self-identity", 
+                          color: "Yellow Spectrum (λ = 580 nm)", 
+                          isApex: false,
+                          styleClass: "border-amber-500/20 hover:border-amber-500/50 hover:bg-amber-500/[0.02]",
+                          textClass: "text-amber-400 font-bold",
+                          textAccent: "text-amber-300"
+                        },
+                        { 
+                          num: "4", 
+                          name: "Heart — Anahata", 
+                          element: "AIR", 
+                          note: "F", 
+                          locus: "HEART CENTRE", 
+                          freq: "639Hz", 
+                          ratio: "5:3", 
+                          epoch: "1.56 ms", 
+                          phase: "120°", 
+                          js: "0.99", 
+                          order: "0.9179", 
+                          gland: "Thymus / Cardiovascular", 
+                          crystals: "Rose Quartz, Malachite, Jade, Emerald", 
+                          mantra: "YAM", 
+                          meaning: "Love, compassion, connection", 
+                          color: "Green Spectrum (λ = 530 nm)", 
+                          isApex: true,
+                          styleClass: "border-emerald-500/25 hover:border-emerald-500/60 hover:bg-emerald-500/[0.02]",
+                          textClass: "text-emerald-400 font-bold",
+                          textAccent: "text-emerald-350"
+                        },
+                        { 
+                          num: "5", 
+                          name: "Throat — Vishuddha", 
+                          element: "ETHER", 
+                          note: "G", 
+                          locus: "THROAT", 
+                          freq: "741Hz", 
+                          ratio: "247:128", 
+                          epoch: "1.35 ms", 
+                          phase: "180°", 
+                          js: "7.41", 
+                          order: "0.9502", 
+                          gland: "Thyroid / Vocal Tract", 
+                          crystals: "Lapis Lazuli, Turquoise, Aquamarine", 
+                          mantra: "HAM", 
+                          meaning: "Expression, truth, communication", 
+                          color: "Blue Spectrum (λ = 470 nm)", 
+                          isApex: false,
+                          styleClass: "border-blue-500/20 hover:border-blue-500/50 hover:bg-blue-500/[0.02]",
+                          textClass: "text-blue-400 font-bold",
+                          textAccent: "text-blue-300"
+                        },
+                        { 
+                          num: "6", 
+                          name: "Third Eye — Ajna", 
+                          element: "LIGHT", 
+                          note: "A", 
+                          locus: "BETWEEN EYES", 
+                          freq: "852Hz", 
+                          ratio: "85:64", 
+                          epoch: "1.17 ms", 
+                          phase: "270°", 
+                          js: "35.35", 
+                          order: "0.9698", 
+                          gland: "Pineal / Pituitary Gland", 
+                          crystals: "Amethyst, Sodalite, Lapis", 
+                          mantra: "OM", 
+                          meaning: "Intuition, perception, clarity", 
+                          color: "Indigo Spectrum (λ = 425 nm)", 
+                          isApex: false,
+                          styleClass: "border-indigo-500/20 hover:border-indigo-500/50 hover:bg-indigo-500/[0.02]",
+                          textClass: "text-indigo-400 font-bold",
+                          textAccent: "text-indigo-300"
+                        },
+                        { 
+                          num: "7", 
+                          name: "Crown — Sahasrara", 
+                          element: "SPACE", 
+                          note: "B", 
+                          locus: "TOP OF HEAD", 
+                          freq: "963Hz", 
+                          ratio: "321:256", 
+                          epoch: "1.04 ms", 
+                          phase: "360°", 
+                          js: "950", 
+                          order: "0.9933", 
+                          gland: "Pineal / Hypothalamus", 
+                          crystals: "Clear Quartz, Selenite, Diamond", 
+                          mantra: "Silence / AH", 
+                          meaning: "Unity with C, revelation", 
+                          color: "Violet Spectrum (λ = 400 nm)", 
+                          isApex: true,
+                          styleClass: "border-purple-500/25 hover:border-purple-500/60 hover:bg-purple-500/[0.02]",
+                          textClass: "text-purple-400 font-bold",
+                          textAccent: "text-purple-300"
+                        }
                       ].map((item) => (
                         <div 
-                          key={item.sym}
-                          onClick={() => !typing && handleSendMessage(item.query)}
-                          className={`p-2 border border-orange-500/15 bg-black hover:border-orange-500/50 hover:bg-orange-500/5 rounded text-left cursor-pointer transition-all ${
+                          key={item.num}
+                          onClick={() => !typing && handleSendMessage(`Analyze ${item.name} Chakra in standard Metemphyiscs alignment: Key note ${item.note}, element ${item.element} situated at locus ${item.locus}. Frequency ${item.freq} (${item.ratio}), Epoch ${item.epoch}, Phase Φ=${item.phase}, J/S: ${item.js}, Order Ω: ${item.order}. Gland: ${item.gland}, Crystals: ${item.crystals}, Seed mantra: ${item.mantra}. Dynamic meaning: "${item.meaning}" under absolute wave coherence constraints.`)}
+                          className={`p-3 border bg-[#040201] rounded-lg text-left cursor-pointer transition-all ${item.styleClass} ${
                             typing ? "opacity-60 cursor-not-allowed pointer-events-none" : ""
                           }`}
                         >
-                          <div className="text-xs font-bold text-amber-300 font-mono">{item.sym}</div>
-                          <div className="text-[10.5px] text-[#eeeae4]/80 font-serif mt-0.5">{item.note}</div>
-                          <div className="text-[10px] font-mono text-orange-450 mt-1">S°: {item.s}</div>
+                          {/* Title block */}
+                          <div className="flex items-start justify-between min-w-0">
+                            <div className="flex items-center gap-2">
+                              <span className="w-5 h-5 rounded-full flex items-center justify-center text-[10px] bg-black border border-white/10 font-bold font-mono text-gray-300">
+                                {item.num}
+                              </span>
+                              <div className="min-w-0">
+                                <h5 className={`text-[11px] leading-tight font-serif ${item.textClass}`}>
+                                  {item.name}
+                                </h5>
+                                <p className="text-[8.5px] font-mono text-gray-500 italic mt-0.5">
+                                  Locus: {item.locus}
+                                </p>
+                              </div>
+                            </div>
+                            <div className="flex flex-col items-end gap-1 flex-shrink-0">
+                              <span className="text-[8.5px] font-mono font-bold text-gray-400 bg-white/[0.02] border border-white/5 px-1 py-0.2 rounded uppercase">
+                                KEY: {item.note}
+                              </span>
+                              {item.isApex && (
+                                <span className="text-[7.5px] font-mono font-semibold text-orange-400 bg-orange-500/[0.05] border border-orange-500/20 px-1 py-0.2 rounded uppercase tracking-wider">
+                                  APEX PORTAL
+                                </span>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* Stats Grid */}
+                          <div className="grid grid-cols-3 gap-x-2 gap-y-1 font-mono text-[8.5px] text-gray-500 bg-black/80 p-2 rounded-md border border-white/[0.03] mt-2">
+                            <div>FREQ: <span className="text-gray-300 font-bold">{item.freq}</span></div>
+                            <div>RATIO: <span className="text-gray-300">{item.ratio}</span></div>
+                            <div>EPOCH: <span className="text-gray-300">{item.epoch}</span></div>
+                            <div>PHASE: <span className="text-gray-300">{item.phase}</span></div>
+                            <div>J/S INDEX: <span className={item.textAccent}>{item.js}</span></div>
+                            <div>ORDER Ω: <span className="text-gray-400 font-bold">{item.order}</span></div>
+                          </div>
+
+                          {/* Extra info */}
+                          <div className="mt-2 pt-1.5 border-t border-white/[0.03] text-[9px] leading-relaxed space-y-0.5">
+                            <div className="flex justify-between text-gray-450 text-[8.5px]">
+                              <span><span className="text-gray-500 font-mono">SEED MANTRA:</span> <strong className="font-semibold text-orange-400">{item.mantra}</strong></span>
+                              <span><span className="text-gray-500 font-mono">ELEMENT:</span> <strong className="font-semibold text-gray-300">{item.element}</strong></span>
+                            </div>
+                            <div className="text-gray-450"><span className="text-gray-500 font-mono">GLAND:</span> {item.gland}</div>
+                            <div className="text-gray-450"><span className="text-gray-500 font-mono">CRYSTALS:</span> {item.crystals}</div>
+                            <div className="text-gray-400 italic mt-1 pl-1 border-l border-orange-550/30">
+                              "{item.meaning}"
+                            </div>
+                          </div>
                         </div>
                       ))}
-                    </div>
-                  </div>
-
-                  {/* Constants Box */}
-                  <div className="p-3 bg-white/4 rounded-xl border border-white/5">
-                    <span className="text-[10px] font-mono text-gray-500 uppercase tracking-widest block mb-1">Standard Reference Constants</span>
-                    <div className="space-y-1 text-xs font-mono">
-                      <div className="flex justify-between">
-                        <span className="text-gray-400">Planck Entropy Limit:</span>
-                        <span className="text-purple-400">ΔΩ·ΔT ≥ C/2</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-gray-400 font-serif">Boltzmann's Constant:</span>
-                        <span className="text-orange-400">1.3806e-23 y</span>
-                      </div>
                     </div>
                   </div>
 
@@ -2974,7 +3825,7 @@ export default function App() {
           </div>
 
           {/* Conversation list */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-5 custom-scroll bg-[#030303]">
+          <div className="flex-1 overflow-y-auto overflow-x-hidden p-4 space-y-5 custom-scroll bg-[#030303]">
             {messages.map((m, idx) => {
               const isUser = m.role === "user";
               const textLower = m.text.toLowerCase();
@@ -2988,9 +3839,9 @@ export default function App() {
               const hasCode = textLower.includes("code") || textLower.includes("cast") || textLower.includes("personal") || textLower.includes("identity") || textLower.includes("knode");
 
               return (
-                <div key={idx} id={`msg-${idx}`} className={`flex flex-col ${isUser ? "items-end" : "items-start"}`}>
+                <div key={idx} id={`msg-${idx}`} className={`flex flex-col ${isUser ? "items-end" : "items-start"} w-full`}>
                   <div 
-                    className={`rounded-xl p-4 shadow-lg transition-all duration-300 ${
+                    className={`rounded-xl p-4 shadow-lg transition-all duration-300 break-words ${
                       isUser
                         ? "max-w-[90%] bg-gradient-to-br from-orange-950/20 via-[#150a00]/70 to-black border border-orange-500/40 text-[#eeeae4] shadow-[0_0_12px_rgba(255,95,0,0.08)]"
                         : "w-full bg-[#0b0705] border border-orange-500/15 border-l-4 border-l-orange-500 text-[#dcd7cb] shadow-[0_0_15px_rgba(212,175,55,0.05)]"
@@ -3101,62 +3952,7 @@ export default function App() {
                           </div>
                         )}
 
-                        {/* References Section */}
-                        {idx > 0 && (
-                          <div className="border-t border-orange-500/10 pt-2.5">
-                            <p className="text-[10px] text-gray-550 font-mono uppercase mb-2 tracking-widest flex items-center gap-1.5">
-                              <BookOpen className="w-3 h-3 text-orange-500" /> REFERENCES
-                            </p>
-                            <div className="space-y-1.5">
-                              {getRelevantReferences(m.text, idx > 0 ? messages[idx - 1].text : undefined).map((ref, refIdx) => {
-                                const isPeak = refIdx === 0;
-                                return (
-                                  <div 
-                                    key={refIdx} 
-                                    className={`rounded-lg p-2.5 border transition-all duration-200 text-left ${
-                                      isPeak 
-                                        ? "bg-gradient-to-r from-orange-950/25 via-[#1a0f02]/40 to-black border-orange-500/25 hover:border-orange-500/40 shadow-[0_0_10px_rgba(255,95,0,0.04)]" 
-                                        : "bg-[#090605] border-orange-500/10 hover:border-orange-500/20"
-                                    }`}
-                                  >
-                                    <div className="flex flex-wrap items-center justify-between gap-1 mb-1">
-                                      <span className="text-[11px] font-bold text-orange-300 font-serif leading-tight">
-                                        {ref.title}
-                                      </span>
-                                      <div className="flex items-center gap-1.5">
-                                        {isPeak && (
-                                          <span className="text-[8.5px] font-mono px-1 py-0.5 bg-orange-500/15 text-orange-400 border border-orange-500/30 rounded font-semibold animate-pulse uppercase tracking-wider">
-                                            ★ Resonates Highest ({ref.resonance}%)
-                                          </span>
-                                        )}
-                                        {!isPeak && (
-                                          <span className="text-[8.5px] font-mono text-gray-400">
-                                            Resonance: {ref.resonance}%
-                                          </span>
-                                        )}
-                                        <a 
-                                          href={ref.link} 
-                                          target="_blank" 
-                                          rel="noopener noreferrer" 
-                                          className="text-[9px] font-mono px-1.5 py-0.5 bg-orange-500/10 hover:bg-orange-500/25 border border-orange-500/20 hover:border-orange-555 rounded text-orange-300 hover:text-orange-200 transition-all cursor-pointer flex items-center gap-0.5"
-                                          title="Search on Google Scholar"
-                                        >
-                                          Scholar <ChevronRight className="w-2.5 h-2.5" />
-                                        </a>
-                                      </div>
-                                    </div>
-                                    <div className="text-[9.5px] text-gray-500 font-mono mb-1">
-                                      By {ref.authors} &nbsp;·&nbsp; {ref.source} ({ref.year})
-                                    </div>
-                                    <p className="text-[10px] text-[#dacbb6] leading-relaxed font-sans">
-                                      {ref.description}
-                                    </p>
-                                  </div>
-                                );
-                              })}
-                            </div>
-                          </div>
-                        )}
+
                       </div>
                     )}
                   </div>
@@ -3183,6 +3979,45 @@ export default function App() {
               </div>
             )}
             <div ref={messagesEndRef} />
+          </div>
+
+          {/* Dynamic Suggested Query Banner */}
+          <div className="px-3 py-2 sm:px-4 sm:py-2.5 bg-[#060403] border-t border-orange-500/15 flex flex-col gap-2 text-xs select-none flex-shrink-0">
+            <div className="flex items-center justify-between border-b border-orange-500/10 pb-1 flex-shrink-0">
+              <span className="flex-shrink-0 text-[8px] font-mono font-bold text-orange-400 bg-orange-500/5 border border-orange-500/15 px-1.5 py-0.5 rounded uppercase tracking-wider flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-orange-500 animate-pulse"></span>
+                Suggested Query
+              </span>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+              {computedSuggestedQueries.map((item, idx) => (
+                <button
+                  key={idx}
+                  disabled={typing}
+                  onClick={() => {
+                    if (!typing) {
+                      handleSendMessage(item.query);
+                    }
+                  }}
+                  className={`p-2 bg-black/60 border border-orange-500/10 rounded text-left transition-all flex flex-col justify-between gap-1.5 group/sug ${
+                    typing 
+                      ? "opacity-40 cursor-not-allowed pointer-events-none" 
+                      : "hover:bg-orange-500/[0.03] hover:border-orange-500/25 cursor-pointer"
+                  }`}
+                  title={`Definition: ${item.tip}`}
+                >
+                  <span className={`text-[10px] sm:text-[10.5px] leading-relaxed font-serif ${
+                    typing ? "text-gray-600" : "text-orange-200 group-hover/sug:text-orange-350"
+                  }`}>
+                    "{item.query}"
+                  </span>
+                  <div className="flex items-center justify-between w-full mt-1 border-t border-orange-500/[0.04] pt-1 text-[8px] font-mono">
+                    <span className="text-gray-500 truncate max-w-[65%]">Knode: {item.word}</span>
+                    <span className="text-orange-400 font-bold">{item.resonance}% resonance</span>
+                  </div>
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* Throttle Warning Alert */}
@@ -3288,8 +4123,13 @@ export default function App() {
               return (
                 <div key={p.id} className="relative group/lab-item lg:flex-1 lg:flex lg:flex-col lg:justify-center">
                   <button
-                    onClick={() => setActivePanel(p.id)}
-                    className={`w-full bg-[#050505] p-2.5 lg:py-2.5 lg:px-3 rounded-lg border text-left transition-[#e4d9c0] duration-350 transform hover:-translate-y-0.5 cursor-pointer flex items-center justify-between shadow-[0_0_6px_rgba(255,95,0,0.01)] ${styles.borderClass}`}
+                    onClick={() => !typing && setActivePanel(p.id)}
+                    disabled={typing}
+                    className={`w-full bg-[#050505] p-2.5 lg:py-2.5 lg:px-3 rounded-lg border text-left transition-[#e4d9c0] duration-350 transform flex items-center justify-between shadow-[0_0_6px_rgba(255,95,0,0.01)] ${styles.borderClass} ${
+                      typing 
+                        ? "opacity-50 cursor-not-allowed pointer-events-none" 
+                        : "hover:-translate-y-0.5 cursor-pointer"
+                    }`}
                   >
                     <div className="flex items-center gap-2.5 min-w-0">
                       <div className={`flex-shrink-0 w-7 h-7 lg:w-8 lg:h-8 rounded border flex items-center justify-center ${styles.iconBgClass} ${styles.iconBorderClass}`}>
@@ -3325,14 +4165,25 @@ export default function App() {
 
       {/* FOOTER RAILS */}
       <footer className="border-t border-orange-500/20 bg-black px-6 py-4 flex flex-col md:flex-row items-center justify-between text-[11px] font-mono text-gray-500 gap-4 mt-0">
-        <a 
-          href="https://metemphysics.com/" 
-          target="_blank" 
-          rel="noopener noreferrer" 
-          className="text-orange-500 hover:text-orange-400 hover:underline transition-colors duration-200 md:flex-1 text-center md:text-left"
-        >
-          © 2026 Metemphysics Synthesis AI. All Rights Reserved.
-        </a>
+        <div className="flex items-center gap-4 md:flex-1 justify-center md:justify-start">
+          <a 
+            href="https://metemphysics.com/about" 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            className="text-orange-500/80 hover:text-orange-400 hover:underline transition-colors duration-200 font-bold"
+          >
+            About
+          </a>
+          <span className="text-gray-700 select-none">•</span>
+          <a 
+            href="https://metemphysics.com/" 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            className="text-orange-500 hover:text-orange-400 hover:underline transition-colors duration-200"
+          >
+            © 2026 Metemphysics Synthesis AI. All Rights Reserved.
+          </a>
+        </div>
 
         {/* MIDDLE COLUMN FOR SAVED SESSIONS */}
         <div className="relative flex items-center gap-2 px-4 py-1.5 bg-[#0a0a0d] border border-orange-500/20 rounded-xl shadow-[0_0_15px_rgba(255,95,0,0.04)] justify-center md:flex-1">

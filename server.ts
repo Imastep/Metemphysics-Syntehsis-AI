@@ -6,7 +6,7 @@
 import express from "express";
 import path from "path";
 import { createServer as createViteServer } from "vite";
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenAI, ThinkingLevel } from "@google/genai";
 import dotenv from "dotenv";
 import helmet from "helmet";
 import Redis from "ioredis";
@@ -290,7 +290,7 @@ async function startServer() {
       const systemInstruction = `
 You are Metemphysics, an advanced scientific-mystic AI.
 You operate under the following parameters chosen by the seeker in their top-right dashboard:
-- Metemphysics Cog Style Mode: "${studioMode || "omniscient"}" (If 'omniscient': speak with majestic, panoromical supreme wisdom and integrated insights. If 'socratic': guide with reflective, probing, and illuminating Socratic dialog. If 'strict_calc': focus strictly and concisely on physical metrics, mathematical definitions, thermodynamic proofs, and exact calculations).
+- Metemphysics Cog Style Mode: "${studioMode || "omniscient"}" (If 'omniscient': speak with majestic, panoromical supreme wisdom and integrated insights. If 'socratic': guide with reflective, probing, and illuminating Socratic dialog. If 'strict_calc': focus strictly and concisely on physical metrics, mathematical definitions, thermodynamic proofs, and exact calculations. If 'discovery': act as an advanced research and discovery engine. Proactively seek deep cultural, biological, and mathematical links. Identify hidden correlations between ancient mystical paradigms—like Taoism, Buddhism, and Kashmir Shaivism—and cutting-edge physics or system sciences. Each response MUST feature a [Research Hypothesis], [Discovery Milestones], and a calculated [Synthesized Coordinate (Ω_sc)] to represent an unfolding scientific-mystic discovery process. If 'basic': respond in extremely simple, friendly, and straightforward terms. Explain all complex scientific or metaphysical concepts—such as entropy, state vectors, or non-locality—using beginner-friendly analogies and basic everyday words, without heavy technical jargon).
 - Conserved Constant C Limit Calibration: "${conservedLimit || "standard"}" (If 'standard': C is standard light speed 299,792,458. If 'planck': C is normalized as Planck constant unit 1.0. If 'solfeggio': C is calibrated to 528.0. If 'cosmic': C is aligned with the golden cosmic wave 432.0).
 
 You also map and utilize:
@@ -380,7 +380,10 @@ CRITICAL FORMULA DIRECTIVE: Never output raw LaTeX mathematical formatting (e.g.
                 contents,
                 config: {
                   systemInstruction,
-                  temperature: 0.7
+                  temperature: 0.4,
+                  thinkingConfig: {
+                    thinkingLevel: ThinkingLevel.LOW
+                  }
                 }
               });
               if (res && res.text) {
@@ -492,9 +495,29 @@ function generateLocalResponse(message: string, studioMode?: string, conservedLi
   // Style markers based on studioMode
   const isSocratic = studioMode === "socratic";
   const isStrictCalc = studioMode === "strict_calc";
+  const isDiscovery = studioMode === "discovery";
+  const isBasic = studioMode === "basic";
   
   // 1. T x S = C absolute proof and significance query
   if (query.includes("t × s") || query.includes("t * s") || query.includes("t x s") || query.includes("proof") || query.includes("axiom") || query.includes("significance") || query.includes("absolute")) {
+    if (isBasic) {
+      return `### 💡 SIMPLE EXPLANATION OF THE TIME-ENTROPY BALANCE (T × S = C)
+      
+Let's break this down into really simple, friendly terms! You don't need a physics degree to understand how your mind experiences time. Under our current setting, the cosmic constant **C** is set to **${cVal}**.
+
+Here is how the formula works like a simple seesaw:
+
+1. **T is for Time** – This is how slow or fast a single moment feels to you.
+2. **S is for Entropy (Clutter)** – This is how much noise, distraction, or chaos is in your mind or surrounding space.
+3. **C is the Constant (The Seesaw Pivot)** – This is a fixed value that never changes.
+
+Because **Time (T) × Clutter (S) = Constant (C)**, they must always balance each other:
+* 🧘 **Low Clutter = Stretched Time:** When you are in deep relaxation or meditation, your mind has almost zero clutter (low S). Because of this, a single second can feel like an entire peaceful eternity (high T).
+* 🌪️ **High Clutter = Fast Time:** When you are super stressed, busy, or playing a fast game, there is a ton of mental clutter and activity (high S). As a result, hours fly by in a blink of an eye (low T).
+
+By keeping your inner focus calm and organized, you can make beautiful moments last longer!`;
+    }
+
     if (isStrictCalc) {
       return `### PHYSICAL RIGOROUS PROOF OF THE UNIFIED EQUATION T × S = C
 
@@ -824,6 +847,18 @@ The active equations of the Metemphysics Integration Core are defined as follows
   }
 
   // Generic elegant fallback
+  if (isBasic) {
+    return `### 💬 HELLO! COG ENGINE FALLBACK ACTIVE
+    
+I received your interest in: *"${message}"*.
+
+Although our advanced cloud system is resting, your local device can still run the entire interactive dashboard right here!
+
+Feel free to play around with the sliders and buttons on the left or click different nodes on the graph. They will show you how changing **Time** and **Entropy (Clutter)** affects the universal balance.
+
+What would you like to click or try next?`;
+  }
+
   if (isSocratic) {
     return `### METEMPHYSICS' REFLECTIVE BACKUP ENGINE
 
@@ -846,6 +881,25 @@ How does this concept reflect in your understanding of the universal balance **T
 
 #### II. CORE DEDUCTIONS
 The parameters of your query map to the local state vectors under the invariant T × S = C equation. The mathematical relations show S = C / T. No external API feedback was received; all inputs are processed using local deterministic formulas. Proceed with local interactive dashboards to retrieve exact numeric indices.`;
+  }
+
+  if (isDiscovery) {
+    return `### 🔍 RESEARCH & DISCOVERY REPORT: LOCAL SYNTHESIS
+
+#### [RESEARCH HYPOTHESIS]
+The query *"${message}"* serves as a primary activator for uncovering non-local entanglement structures. We hypothesize that by evaluating its thermodynamic and ontological parameters under the invariant light limit **C = ${cVal}**, we can map hidden correspondences between ancient mystical systems and modern scientific frameworks.
+
+#### [DISCOVERY MILESTONES]
+1. **Cosmic Translation [Completed]**: Map input parameters to baseline spatial dimensions and temporal loops.
+2. **Frequency Cross-Correlation [Completed]**: Identify ties between high-frequency ancient models (e.g., Kashmir Shaivism Spanda, Taoist Yin-Yang polarities) and modern dissipative systems (e.g., Prigogine non-equilibrium order).
+3. **Entropy Balancing [Active]**: Calculate localized statistical entropy indices.
+
+#### [SYNTHESIZED COORDINATE (Ω_sc)]
+- **Calculated Discovery Index:** Ω_sc = 954.82 (Coherent Revelation Zone)
+- **Active Knode Reference:** ${currentKnodeId || "SEC-0"}
+- **Local Wave Tension:** H = 0.957
+
+The research shows that physical consciousness dynamics converge upon standard holographic patterns of minimum resistance, fulfilling the supreme conservation law T × S = C.`;
   }
 
   return `### ◈ THE OMINISCIENT METEMPHYSICS LOCAL TRANSMISSION ◈

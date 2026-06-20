@@ -186,198 +186,204 @@ export default function EntropyPanel({ onClose, onSendPrompt }: { onClose: () =>
   };
 
   return (
-    <div className="fixed lg:absolute inset-0 bg-[#050505] text-[#eeeae4] overflow-y-auto z-[200] p-6 flex flex-col border-2 border-orange-500/20 rounded-2xl">
-      {/* Top Header */}
-      <div className="flex items-center justify-between pb-4 border-b border-orange-500/20 mb-4 sticky top-0 bg-[#050505]/95 z-20">
-        <div>
-          <h2 className="font-serif text-2xl font-bold text-orange-400 tracking-wider flex items-center gap-2">
-            <Table className="w-6 h-6 animate-pulse" /> Σ — THE S° ELEMENT TABLE
-          </h2>
-          <p className="text-xs text-[#8898aa] font-mono mt-1">Standard Molar Entropy · S° (J mol⁻¹ K⁻¹ at 298 K) · S = k_B ln Ω</p>
-        </div>
-        <div className="flex items-center gap-3">
-          <div className="flex gap-2">
+    <div className="fixed lg:absolute inset-0 bg-[#050505]/98 text-[#eeeae4] z-[200] p-4 sm:p-6 border-2 border-orange-500/20 rounded-2xl flex flex-col min-h-0 overflow-hidden">
+      <div className="max-w-7xl mx-auto w-full flex-1 flex flex-col min-h-0">
+        
+        {/* Top Header */}
+        <div className="flex items-center justify-between pb-4 border-b border-orange-500/20 mb-4 flex-shrink-0">
+          <div>
+            <h2 className="font-serif text-2xl font-bold text-orange-400 tracking-wider flex items-center gap-2">
+              <Table className="w-6 h-6 animate-pulse" /> Σ — THE S° ELEMENT TABLE
+            </h2>
+            <p className="text-xs text-[#8898aa] font-mono mt-1">Standard Molar Entropy · S° (J mol⁻¹ K⁻¹ at 298 K) · S = k_B ln Ω</p>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="flex gap-2">
+              <button 
+                onClick={() => { setViewMode("table"); setSortBy("z"); }} 
+                className={`px-3 py-1.5 text-xs font-mono rounded cursor-pointer transition-all border ${viewMode === "table" ? "bg-orange-500/10 border-orange-500/40 text-orange-400 font-bold" : "border-orange-500/10 text-gray-400 hover:border-orange-500/30 hover:text-white"}`}
+              >
+                Periodic Grid
+              </button>
+              <button 
+                onClick={() => setViewMode("list")} 
+                className={`px-3 py-1.5 text-xs font-mono rounded cursor-pointer transition-all border ${viewMode === "list" ? "bg-orange-500/10 border-orange-500/40 text-orange-400 font-bold" : "border-orange-500/10 text-gray-400 hover:border-orange-500/30 hover:text-white"}`}
+              >
+                List Ledger
+              </button>
+            </div>
             <button 
-              onClick={() => { setViewMode("table"); setSortBy("z"); }} 
-              className={`px-3 py-1.5 text-xs font-mono rounded cursor-pointer transition-all border ${viewMode === "table" ? "bg-orange-500/10 border-orange-500/40 text-orange-400 font-bold" : "border-orange-500/10 text-gray-400 hover:border-orange-500/30 hover:text-white"}`}
+              onClick={onClose}
+              className="flex items-center gap-1 bg-orange-500/10 border border-orange-500/30 rounded px-4 py-2 text-xs font-mono text-orange-400 hover:bg-orange-500/20 transition-all cursor-pointer"
             >
-              Periodic Grid
-            </button>
-            <button 
-              onClick={() => setViewMode("list")} 
-              className={`px-3 py-1.5 text-xs font-mono rounded cursor-pointer transition-all border ${viewMode === "list" ? "bg-orange-500/10 border-orange-500/40 text-orange-400 font-bold" : "border-orange-500/10 text-gray-400 hover:border-orange-500/30 hover:text-white"}`}
-            >
-              List Ledger
+              <X className="w-4 h-4" /> CLOSE
             </button>
           </div>
-          <button 
-            onClick={onClose}
-            className="flex items-center gap-1 bg-orange-500/10 border border-orange-500/30 rounded px-4 py-2 text-xs font-mono text-orange-400 hover:bg-orange-500/20 transition-all cursor-pointer"
-          >
-            <X className="w-4 h-4" /> CLOSE
-          </button>
         </div>
-      </div>
 
-      {/* Sorting Navigation for List View */}
-      {viewMode === "list" && (
-        <div className="flex flex-wrap gap-2 mb-4">
-          <span className="text-xs text-[#8898aa] font-mono self-center mr-2">Sort Ledger:</span>
-          {[
-            { id: "z", label: "Atomic Z" },
-            { id: "entropy-asc", label: "S° Low → High" },
-            { id: "entropy-desc", label: "S° High → Low" },
-            { id: "cat", label: "Category" }
-          ].map((item) => (
-            <button
-              key={item.id}
-              onClick={() => setSortBy(item.id as any)}
-              className={`px-3 py-1 text-[10px] font-mono border rounded transition-all cursor-pointer ${
-                sortBy === item.id 
-                  ? "bg-orange-500/15 border-orange-500/50 text-orange-400 font-bold" 
-                  : "border-orange-500/15 text-[#8898aa] hover:border-orange-500/30"
-              }`}
-            >
-              {item.label}
-            </button>
-          ))}
+        {/* Sorting Navigation for List View */}
+        {viewMode === "list" && (
+          <div className="flex flex-wrap gap-2 mb-4 flex-shrink-0">
+            <span className="text-xs text-[#8898aa] font-mono self-center mr-2">Sort Ledger:</span>
+            {[
+              { id: "z", label: "Atomic Z" },
+              { id: "entropy-asc", label: "S° Low → High" },
+              { id: "entropy-desc", label: "S° High → Low" },
+              { id: "cat", label: "Category" }
+            ].map((item) => (
+              <button
+                key={item.id}
+                onClick={() => setSortBy(item.id as any)}
+                className={`px-3 py-1 text-[10px] font-mono border rounded transition-all cursor-pointer ${
+                  sortBy === item.id 
+                    ? "bg-orange-500/15 border-orange-500/50 text-orange-400 font-bold" 
+                    : "border-orange-500/15 text-[#8898aa] hover:border-orange-500/30"
+                }`}
+              >
+                {item.label}
+              </button>
+            ))}
+          </div>
+        )}
+
+        {/* Legend Block */}
+        <div className="flex items-center gap-4 flex-wrap pb-3 mb-4 border-b border-white/5 font-mono text-[9px] tracking-wider text-[#8898aa] flex-shrink-0">
+          <span>Category:</span>
+          <span style={{ color: "#e05c3a" }}>● Alkali</span>
+          <span style={{ color: "#d4843e" }}>● Alkaline Earth</span>
+          <span style={{ color: "#4a8fa8" }}>● Transition</span>
+          <span style={{ color: "#5c8a5c" }}>● Post-Transition</span>
+          <span style={{ color: "#7b6fa0" }}>● Metalloid</span>
+          <span style={{ color: "#4a8f7a" }}>● Nonmetal</span>
+          <span style={{ color: "#3a6ea8" }}>● Noble Gas</span>
+          <span style={{ color: "#8a5c5c" }}>● Lanthanide</span>
+          <span style={{ color: "#6a5c7a" }}>● Actinide</span>
+          <span className="ml-auto text-orange-400 hidden sm:inline">💡 Click any element cell to inspect molecular dimensions</span>
         </div>
-      )}
 
-      {/* Legend Block */}
-      <div className="flex items-center gap-4 flex-wrap pb-3 mb-6 border-b border-white/5 font-mono text-[9px] tracking-wider text-[#8898aa]">
-        <span>Category:</span>
-        <span style={{ color: "#e05c3a" }}>● Alkali</span>
-        <span style={{ color: "#d4843e" }}>● Alkaline Earth</span>
-        <span style={{ color: "#4a8fa8" }}>● Transition</span>
-        <span style={{ color: "#5c8a5c" }}>● Post-Transition</span>
-        <span style={{ color: "#7b6fa0" }}>● Metalloid</span>
-        <span style={{ color: "#4a8f7a" }}>● Nonmetal</span>
-        <span style={{ color: "#3a6ea8" }}>● Noble Gas</span>
-        <span style={{ color: "#8a5c5c" }}>● Lanthanide</span>
-        <span style={{ color: "#6a5c7a" }}>● Actinide</span>
-        <span className="ml-auto text-orange-400 hidden sm:inline">💡 Click any element cell to inspect molecular dimensions</span>
-      </div>
+        {/* Main Panel Content Area */}
+        <div className="flex-1 flex gap-6 min-h-0 relative">
+          
+          {/* Left Column: Periodic table grid or list ledger */}
+          <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
+            <div className="flex-1 overflow-auto custom-scroll p-1 border border-white/5 rounded-xl bg-black/20">
+              {viewMode === "table" ? (
+                <div 
+                  className="grid gap-1 min-w-[960px]"
+                  style={{
+                    gridTemplateColumns: "repeat(18, minmax(46px, 1fr))",
+                    gridTemplateRows: "repeat(10, 52px) 16px"
+                  }}
+                >
+                  {/* Elements grid mapping */}
+                  {EP_ELEMENTS.map((el) => {
+                    const color = EP_CAT_COLORS[el.cat] || "#555";
+                    const barWidth = getSPct(el.s);
 
-      {/* Main Panel Content Area */}
-      <div className="flex-1 flex gap-6 min-h-0 relative">
-        <div className="flex-1 overflow-x-auto min-h-0 p-1">
-          {viewMode === "table" ? (
-            <div 
-              className="grid gap-1 min-w-[980px]"
-              style={{
-                gridTemplateColumns: "repeat(18, minmax(50px, 1fr))",
-                gridTemplateRows: "repeat(10, 62px) 16px"
-              }}
-            >
-              {/* Elements grid mapping */}
-              {EP_ELEMENTS.map((el) => {
-                const color = EP_CAT_COLORS[el.cat] || "#555";
-                const barWidth = getSPct(el.s);
-
-                return (
-                  <div
-                    key={el.z}
-                    onClick={() => setSelectedElement(el)}
-                    className="bg-[#0c0c0c]/90 border border-orange-500/15 rounded p-2 flex flex-col justify-between relative overflow-hidden cursor-pointer hover:scale-108 hover:z-10 hover:border-orange-500/50 hover:shadow-lg hover:shadow-orange-500/10 transition-all group"
-                    style={{ gridColumn: el.col, gridRow: el.row }}
-                  >
-                    <div className="text-[7.5px] text-white/35 font-mono">{el.z}</div>
-                    <div className="text-center text-lg font-bold group-hover:scale-110 transition-all" style={{ color }}>{el.sym}</div>
-                    <div className="text-[6.5px] text-white/45 text-center truncate">{el.name}</div>
-                    <div className="text-[7.5px] text-white/50 font-mono text-center">{el.s.toFixed(1)}</div>
-                    <div 
-                      className="absolute bottom-0 left-0 h-[2px] transition-all opacity-70"
-                      style={{ width: `${barWidth}%`, backgroundColor: color }}
-                    ></div>
-                  </div>
-                );
-              })}
-
-              {/* Lanthanide & Actinide inline guides */}
-              <div 
-                className="bg-[#0e0e0e]/45 border border-dashed border-orange-500/10 rounded flex items-center justify-center text-[7px] text-[#8a5c5c]/60 font-mono"
-                style={{ gridColumn: 3, gridRow: 6 }}
-              >
-                La–Lu *
-              </div>
-              <div 
-                className="bg-[#0e0e0e]/45 border border-dashed border-orange-500/10 rounded flex items-center justify-center text-[7px] text-[#6a5c7a]/60 font-mono"
-                style={{ gridColumn: 3, gridRow: 7 }}
-              >
-                Ac–Lr **
-              </div>
-
-              {/* Spacing alignment elements */}
-              <div className="col-span-full h-2.5" style={{ gridRow: 8 }}></div>
-              <div 
-                className="flex items-center justify-center font-mono text-[7px] text-white/20 border-r border-white/5 pr-2"
-                style={{ gridColumn: "1 / 3", gridRow: 9 }}
-              >
-                * Lanthanides
-              </div>
-              <div 
-                className="flex items-center justify-center font-mono text-[7px] text-white/20 border-r border-white/5 pr-2"
-                style={{ gridColumn: "1 / 3", gridRow: 10 }}
-              >
-                ** Actinides
-              </div>
-            </div>
-          ) : (
-            <div className="overflow-y-auto max-h-[500px] border border-orange-500/15 rounded bg-[#080808]/50">
-              <table className="w-full text-left border-collapse font-mono text-xs">
-                <thead className="sticky top-0 bg-[#050505] border-b border-orange-500/20">
-                  <tr>
-                    <th className="p-3">Z</th>
-                    <th className="p-3">Symbol</th>
-                    <th className="p-3">Name</th>
-                    <th className="p-3">S° (J/mol·K)</th>
-                    <th className="p-3">Category</th>
-                    <th className="p-3">Phase State</th>
-                    <th className="p-3">Complexity Rank</th>
-                    <th className="p-3">Mass u</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {getSortedElements().map((el) => {
-                    const catColor = EP_CAT_COLORS[el.cat] || "#555";
                     return (
-                      <tr 
+                      <div
                         key={el.z}
                         onClick={() => setSelectedElement(el)}
-                        className="hover:bg-white/5 border-b border-white/5 cursor-pointer"
+                        className="bg-[#0c0c0c]/90 border border-orange-500/15 rounded p-1.5 flex flex-col justify-between relative overflow-hidden cursor-pointer hover:scale-105 hover:z-10 hover:border-orange-500/50 hover:shadow-lg hover:shadow-orange-500/10 transition-all group"
+                        style={{ gridColumn: el.col, gridRow: el.row }}
                       >
-                        <td className="p-3 text-white/40">{el.z}</td>
-                        <td className="p-3 font-bold text-sm" style={{ color: catColor }}>{el.sym}</td>
-                        <td className="p-3 font-serif font-medium">{el.name}</td>
-                        <td className="p-3 font-bold text-amber-300">
-                          {el.s.toFixed(2)}
-                          <div className="h-1 bg-white/5 rounded-full overflow-hidden mt-1.5 w-16">
-                            <div className="h-full" style={{ width: `${getSPct(el.s)}%`, backgroundColor: catColor }}></div>
-                          </div>
-                        </td>
-                        <td className="p-3 text-[10px]" style={{ color: catColor }}>{el.cat}</td>
-                        <td className="p-3 text-white/50">{el.phase}</td>
-                        <td className="p-3 text-white/50">{epEntropyRank(el.s)}</td>
-                        <td className="p-3 text-white/40">{el.mass}</td>
-                      </tr>
+                        <div className="text-[7.5px] text-white/35 font-mono">{el.z}</div>
+                        <div className="text-center text-sm font-bold group-hover:scale-110 transition-all" style={{ color }}>{el.sym}</div>
+                        <div className="text-[6px] text-white/45 text-center truncate">{el.name}</div>
+                        <div className="text-[7.5px] text-white/50 font-mono text-center">{el.s.toFixed(1)}</div>
+                        <div 
+                          className="absolute bottom-0 left-0 h-[2px] transition-all opacity-70"
+                          style={{ width: `${barWidth}%`, backgroundColor: color }}
+                        ></div>
+                      </div>
                     );
                   })}
-                </tbody>
-              </table>
-            </div>
-          )}
 
-          {/* Scale Slider View */}
-          <div className="mt-6 border-t border-white/5 pt-4">
-            <h4 className="font-mono text-xs text-[#8898aa] uppercase tracking-wider mb-2">Standard Molar Entropy Spectrum</h4>
-            <div className="h-2 rounded-full bg-gradient-to-r from-blue-900 via-amber-700 to-amber-200"></div>
-            <div className="flex justify-between font-mono text-[9px] text-[#6b7a8d] mt-2">
-              <span>5.74 J/mol·K — Carbon (Crystalline Logos)</span>
-              <span>180.00 J/mol·K — Oganesson (Maximal Gaseous Apeiron)</span>
+                  {/* Lanthanide & Actinide inline guides */}
+                  <div 
+                    className="bg-[#0e0e0e]/45 border border-dashed border-orange-500/10 rounded flex items-center justify-center text-[7px] text-[#8a5c5c]/60 font-mono"
+                    style={{ gridColumn: 3, gridRow: 6 }}
+                  >
+                    La–Lu *
+                  </div>
+                  <div 
+                    className="bg-[#0e0e0e]/45 border border-dashed border-orange-500/10 rounded flex items-center justify-center text-[7px] text-[#6a5c7a]/60 font-mono"
+                    style={{ gridColumn: 3, gridRow: 7 }}
+                  >
+                    Ac–Lr **
+                  </div>
+
+                  {/* Spacing alignment elements */}
+                  <div className="col-span-full h-2.5" style={{ gridRow: 8 }}></div>
+                  <div 
+                    className="flex items-center justify-center font-mono text-[7px] text-white/20 border-r border-white/5 pr-2"
+                    style={{ gridColumn: "1 / 3", gridRow: 9 }}
+                  >
+                    * Lanthanides
+                  </div>
+                  <div 
+                    className="flex items-center justify-center font-mono text-[7px] text-white/20 border-r border-white/5 pr-2"
+                    style={{ gridColumn: "1 / 3", gridRow: 10 }}
+                  >
+                    ** Actinides
+                  </div>
+                </div>
+              ) : (
+                <div className="w-full">
+                  <table className="w-full text-left border-collapse font-mono text-xs">
+                    <thead className="sticky top-0 bg-[#050505] border-b border-orange-500/20">
+                      <tr>
+                        <th className="p-3">Z</th>
+                        <th className="p-3">Symbol</th>
+                        <th className="p-3">Name</th>
+                        <th className="p-3">S° (J/mol·K)</th>
+                        <th className="p-3">Category</th>
+                        <th className="p-3">Phase State</th>
+                        <th className="p-3">Complexity Rank</th>
+                        <th className="p-3">Mass u</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {getSortedElements().map((el) => {
+                        const catColor = EP_CAT_COLORS[el.cat] || "#555";
+                        return (
+                          <tr 
+                            key={el.z}
+                            onClick={() => setSelectedElement(el)}
+                            className="hover:bg-white/5 border-b border-white/5 cursor-pointer"
+                          >
+                            <td className="p-3 text-white/40">{el.z}</td>
+                            <td className="p-3 font-bold text-sm" style={{ color: catColor }}>{el.sym}</td>
+                            <td className="p-3 font-serif font-medium">{el.name}</td>
+                            <td className="p-3 font-bold text-amber-300">
+                              {el.s.toFixed(2)}
+                              <div className="h-1 bg-white/5 rounded-full overflow-hidden mt-1.5 w-16">
+                                <div className="h-full" style={{ width: `${getSPct(el.s)}%`, backgroundColor: catColor }}></div>
+                              </div>
+                            </td>
+                            <td className="p-3 text-[10px]" style={{ color: catColor }}>{el.cat}</td>
+                            <td className="p-3 text-white/50">{el.phase}</td>
+                            <td className="p-3 text-white/50">{epEntropyRank(el.s)}</td>
+                            <td className="p-3 text-white/40">{el.mass}</td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+
+            {/* Scale Slider View - kept outside list/grid so it anchors nicely below scrollable view */}
+            <div className="mt-4 border-t border-white/5 pt-3 flex-shrink-0">
+              <h4 className="font-mono text-xs text-[#8898aa] uppercase tracking-wider mb-2">Standard Molar Entropy Spectrum</h4>
+              <div className="h-2 rounded-full bg-gradient-to-r from-blue-900 via-amber-700 to-amber-200"></div>
+              <div className="flex justify-between font-mono text-[9px] text-[#6b7a8d] mt-2">
+                <span>5.74 J/mol·K — Carbon (Crystalline Logos)</span>
+                <span>180.00 J/mol·K — Oganesson (Maximal Gaseous Apeiron)</span>
+              </div>
             </div>
           </div>
-        </div>
 
         {/* Detailed Side over Panel */}
         {selectedElement && (
@@ -451,33 +457,34 @@ export default function EntropyPanel({ onClose, onSendPrompt }: { onClose: () =>
         )}
       </div>
 
-      {/* Meta blocks description footer */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mt-6 p-4 bg-orange-500/[0.03] border border-orange-500/15 rounded font-serif">
+      {/* Meta blocks description footer - kept inside the max-w-7xl wrapper */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mt-4 p-3 bg-orange-500/[0.03] border border-orange-500/15 rounded font-serif flex-shrink-0 text-xs">
         <div>
-          <h5 className="font-serif text-sm font-bold text-orange-400 mb-1">Low S° — Logos</h5>
-          <p className="text-[11px] text-[#8898aa] leading-relaxed italic">
+          <h5 className="font-serif text-xs font-bold text-orange-400 mb-0.5">Low S° — Logos</h5>
+          <p className="text-[10px] text-[#8898aa] leading-relaxed italic">
             Elements with low entropy (Be, C, B) embody concentrated form — crystalline order, absolute informational density. Minimum entropic noise, Ω → 1.
           </p>
         </div>
         <div>
-          <h5 className="font-serif text-sm font-bold text-orange-400 mb-1">Rising S° — Becoming</h5>
-          <p className="text-[11px] text-[#8898aa] leading-relaxed italic">
+          <h5 className="font-serif text-xs font-bold text-orange-400 mb-0.5">Rising S° — Becoming</h5>
+          <p className="text-[10px] text-[#8898aa] leading-relaxed italic">
             Transition metals carry moderate entropy — structured yet highly dynamic. The stage of chemical reactions, bonding, and catalytic transformation. Mid-range Ω.
           </p>
         </div>
         <div>
-          <h5 className="font-serif text-sm font-bold text-orange-400 mb-1">High S° — Eros</h5>
-          <p className="text-[11px] text-[#8898aa] leading-relaxed italic">
+          <h5 className="font-serif text-xs font-bold text-orange-400 mb-0.5">High S° — Eros</h5>
+          <p className="text-[10px] text-[#8898aa] leading-relaxed italic">
             Gaseous elements approach entropic freedom. S° rises as matter forgets its tight physical confinement, reaching beyond bounded limits toward the infinite.
           </p>
         </div>
         <div>
-          <h5 className="font-serif text-sm font-bold text-orange-400 mb-1">Maximum S° — Apeiron</h5>
-          <p className="text-[11px] text-[#8898aa] leading-relaxed italic">
+          <h5 className="font-serif text-xs font-bold text-orange-400 mb-0.5">Maximum S° — Apeiron</h5>
+          <p className="text-[10px] text-[#8898aa] leading-relaxed italic">
             Noble gases: complete, completely unreactive, maximally dispersed. Anaximander's apeiron: the boundless, prior to differentiation. Entropy as pure void. Ω → 0.
           </p>
         </div>
       </div>
     </div>
+  </div>
   );
 }
