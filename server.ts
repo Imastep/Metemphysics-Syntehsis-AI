@@ -369,11 +369,14 @@ CRITICAL FORMULA DIRECTIVE: Never output raw LaTeX mathematical formatting (e.g.
 
       const REQUEST_TIMEOUT_MS = 13.2 * 1000; // 13.2s robust threshold for comprehensive synthesis and model warm-ups
       let timeoutId: NodeJS.Timeout | undefined;
+      let cancelled = false;
 
       const generateResponseWithTimeout = async (): Promise<any> => {
         for (const currentModel of modelsToTry) {
+          if (cancelled) break; // ← exit model loop
           const maxRetries = 2; // Reduced to 2 retries under timeout pressure to fail-over faster
           for (let attempt = 1; attempt <= maxRetries; attempt++) {
+            if (cancelled) break; // ← exit retry loop
             try {
               const res = await ai.models.generateContent({
                 model: currentModel,
@@ -395,7 +398,7 @@ CRITICAL FORMULA DIRECTIVE: Never output raw LaTeX mathematical formatting (e.g.
               const briefErrMsg = sanitizeErrorMsg(err);
               console.log(`[Gemini API Status] Attempt ${attempt}/${maxRetries} on ${currentModel}: ${briefErrMsg}`);
               
-              if (attempt < maxRetries) {
+              if (attempt < maxRetries && !cancelled) { // ← skip sleep if cancelled
                 const sleepMs = 400 * Math.pow(2, attempt - 1);
                 await delay(sleepMs);
               }
@@ -409,6 +412,7 @@ CRITICAL FORMULA DIRECTIVE: Never output raw LaTeX mathematical formatting (e.g.
         const responsePromise = generateResponseWithTimeout();
         const timeoutPromise = new Promise<never>((_, reject) => {
           timeoutId = setTimeout(() => {
+            cancelled = true; // ← set the flag
             reject(new Error("Uplink response timeout. Transitioning to local deterministic core."));
           }, REQUEST_TIMEOUT_MS);
         });
@@ -418,6 +422,7 @@ CRITICAL FORMULA DIRECTIVE: Never output raw LaTeX mathematical formatting (e.g.
         if (timeoutId) {
           clearTimeout(timeoutId);
         }
+        cancelled = false; // ← reset for next request
       }
 
       if (!response || !response.text) {
