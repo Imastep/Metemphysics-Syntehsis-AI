@@ -53,12 +53,76 @@ import KnodeGraphPanel from "./components/KnodeGraphPanel";
 
 // Reusable Tooltip component with instant-rendered definitions relative to systems
 function Tooltip({ children, content }: { children: React.ReactNode; content: string }) {
+  const [alignment, setAlignment] = useState<"left" | "right" | "center">("center");
+  const [verticalAlignment, setVerticalAlignment] = useState<"top" | "bottom">("top");
+  const spanRef = useRef<HTMLSpanElement>(null);
+
+  const handleMouseEnter = () => {
+    if (spanRef.current) {
+      const rect = spanRef.current.getBoundingClientRect();
+      const leftViewportDist = rect.left;
+      const rightViewportDist = window.innerWidth - rect.right;
+
+      const clipParent = spanRef.current.closest(".overflow-y-auto, .overflow-scroll, .overflow-hidden") || document.body;
+      const parentRect = clipParent.getBoundingClientRect();
+      const leftParentDist = rect.left - parentRect.left;
+      const rightParentDist = parentRect.right - rect.right;
+
+      const leftFinalDist = Math.max(0, Math.min(leftViewportDist, leftParentDist));
+      const rightFinalDist = Math.max(0, Math.min(rightViewportDist, rightParentDist));
+
+      if (leftFinalDist < 120) {
+        setAlignment("left");
+      } else if (rightFinalDist < 120) {
+        setAlignment("right");
+      } else {
+        setAlignment("center");
+      }
+
+      const topParentDist = rect.top - parentRect.top;
+      const topViewportDist = rect.top;
+      const topFinalDist = Math.min(topParentDist, topViewportDist);
+
+      if (topFinalDist < 130) {
+        setVerticalAlignment("bottom");
+      } else {
+        setVerticalAlignment("top");
+      }
+    }
+  };
+
+  const getPositionClass = () => {
+    if (alignment === "left") {
+      return "left-0 translate-x-0";
+    }
+    if (alignment === "right") {
+      return "left-auto right-0 translate-x-0";
+    }
+    return "left-1/2 -translate-x-1/2";
+  };
+
+  const getArrowPositionClass = () => {
+    if (alignment === "left") {
+      return "left-4 translate-x-0";
+    }
+    if (alignment === "right") {
+      return "left-auto right-4 translate-x-0";
+    }
+    return "left-1/2 -translate-x-1/2";
+  };
+
   return (
-    <span className="group relative inline-flex items-center cursor-help border-b border-dashed border-orange-500/30">
+    <span 
+      ref={spanRef}
+      onMouseEnter={handleMouseEnter}
+      onTouchStart={handleMouseEnter}
+      className="group relative inline-flex items-center cursor-help border-b border-dashed border-orange-500/30"
+    >
       {children}
-      <span className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block z-[999] w-56 rounded bg-[#0b0806] border border-orange-500/50 p-2.5 text-[9px] font-mono leading-tight text-amber-50 shadow-2xl transition-all duration-300 whitespace-normal">
+      <span className={`pointer-events-none absolute ${verticalAlignment === "bottom" ? "top-full mt-2" : "bottom-full mb-2"} ${getPositionClass()} hidden group-hover:block z-[999] w-56 rounded bg-[#0b0806] border border-orange-500/50 p-2.5 text-[9px] font-mono leading-tight text-amber-50 shadow-2xl transition-all duration-300 whitespace-normal`}>
         <span className="block border-b border-orange-500/20 pb-1 mb-1 font-bold text-orange-400 uppercase tracking-widest font-mono text-[8px]">System Definition:</span>
         {content}
+        <span className={`absolute ${verticalAlignment === "bottom" ? "bottom-full border-b-4 border-b-orange-500/50" : "top-full border-t-4 border-t-orange-500/50"} ${getArrowPositionClass()} border-x-4 border-x-transparent`} />
       </span>
     </span>
   );
@@ -1038,6 +1102,97 @@ function getSystemsLabItemStyle(id: string) {
   }
 }
 
+function KeywordTooltip({ text, tip, fc, tc, tb, ts, ab }: {
+  key?: React.Key;
+  text: string;
+  tip: string;
+  fc: string;
+  tc: string;
+  tb: string;
+  ts: string;
+  ab: string;
+}) {
+  const [alignment, setAlignment] = useState<"left" | "right" | "center">("center");
+  const [verticalAlignment, setVerticalAlignment] = useState<"top" | "bottom">("top");
+  const spanRef = useRef<HTMLSpanElement>(null);
+
+  const handleMouseEnter = () => {
+    if (spanRef.current) {
+      const rect = spanRef.current.getBoundingClientRect();
+      const leftViewportDist = rect.left;
+      const rightViewportDist = window.innerWidth - rect.right;
+
+      const clipParent = spanRef.current.closest(".overflow-y-auto, .overflow-scroll, .overflow-hidden") || document.body;
+      const parentRect = clipParent.getBoundingClientRect();
+      const leftParentDist = rect.left - parentRect.left;
+      const rightParentDist = parentRect.right - rect.right;
+
+      const leftFinalDist = Math.max(0, Math.min(leftViewportDist, leftParentDist));
+      const rightFinalDist = Math.max(0, Math.min(rightViewportDist, rightParentDist));
+
+      if (leftFinalDist < 120) {
+        setAlignment("left");
+      } else if (rightFinalDist < 120) {
+        setAlignment("right");
+      } else {
+        setAlignment("center");
+      }
+
+      const topParentDist = rect.top - parentRect.top;
+      const topViewportDist = rect.top;
+      const topFinalDist = Math.min(topParentDist, topViewportDist);
+
+      if (topFinalDist < 130) {
+        setVerticalAlignment("bottom");
+      } else {
+        setVerticalAlignment("top");
+      }
+    }
+  };
+
+  const getPositionClass = () => {
+    if (alignment === "left") {
+      return "left-0 translate-x-0";
+    }
+    if (alignment === "right") {
+      return "left-auto right-0 translate-x-0";
+    }
+    return "left-1/2 -translate-x-1/2";
+  };
+
+  const getArrowPositionClass = () => {
+    if (alignment === "left") {
+      return "left-4 translate-x-0";
+    }
+    if (alignment === "right") {
+      return "left-auto right-4 translate-x-0";
+    }
+    return "left-1/2 -translate-x-1/2";
+  };
+
+  const getArrowBorderClass = () => {
+    if (verticalAlignment === "bottom") {
+      return ab.replace("border-t-", "border-b-");
+    }
+    return ab;
+  };
+
+  return (
+    <span 
+      ref={spanRef}
+      onMouseEnter={handleMouseEnter}
+      onTouchStart={handleMouseEnter}
+      className={`relative group/tooltip inline cursor-help border-b border-dotted ${tc} ${fc}`}
+    >
+      {text}
+      <span className={`pointer-events-none absolute ${verticalAlignment === "bottom" ? "top-full mt-2" : "bottom-full mb-2"} ${getPositionClass()} w-56 p-2 bg-[#0c0603] border ${tb} text-[10px] text-[#e5dbcb] rounded ${ts} font-mono opacity-0 group-hover/tooltip:opacity-100 transition-opacity duration-200 z-50 text-center leading-normal whitespace-normal break-words normal-case`}>
+        {tip}
+        <span className={`absolute ${verticalAlignment === "bottom" ? "bottom-full border-b-4" : "top-full border-t-4"} ${getArrowPositionClass()} border-x-4 border-x-transparent ${getArrowBorderClass()}`} />
+      </span>
+    </span>
+  );
+}
+
 function renderKeywordsWithTooltips(text: string): React.ReactNode[] | string {
   let tokens: { 
     text: string; 
@@ -1098,18 +1253,19 @@ function renderKeywordsWithTooltips(text: string): React.ReactNode[] | string {
       const tb = t.tooltipBorder || "border-orange-500/40";
       const ts = t.tooltipShadow || "shadow-[0_0_15px_rgba(255,95,0,0.3)]";
       const ab = t.arrowBorder || "border-t-orange-500/40";
+      const tip = t.tip || "";
 
       return (
-        <span 
-          key={idx} 
-          className={`relative group/tooltip inline cursor-help border-b border-dotted ${tc} ${fc}`}
-        >
-          {t.text}
-          <span className={`pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-56 p-2 bg-[#0c0603] border ${tb} text-[10px] text-[#e5dbcb] rounded ${ts} font-mono opacity-0 group-hover/tooltip:opacity-100 transition-opacity duration-200 z-50 text-center leading-normal whitespace-normal break-words normal-case`}>
-            {t.tip}
-            <span className={`absolute top-full left-1/2 -translate-x-1/2 border-x-4 border-x-transparent border-t-4 ${ab}`} />
-          </span>
-        </span>
+        <KeywordTooltip
+          key={idx}
+          text={t.text}
+          tip={tip}
+          fc={fc}
+          tc={tc}
+          tb={tb}
+          ts={ts}
+          ab={ab}
+        />
       );
     }
     return t.text;
@@ -1444,33 +1600,50 @@ function formatOracleMessage(text: string) {
   const cleanedText = cleanMathText(text);
   const lines = cleanedText.split("\n");
   return (
-    <div className="space-y-2.5">
+    <div className="space-y-4 md:space-y-2.5">
       {lines.map((line, idx) => {
         const trimmed = line.trim();
-        if (!trimmed) return <div key={idx} className="h-2.5" />;
+        if (!trimmed) return <div key={idx} className="h-3 md:h-2.5" />;
+        
+        // Remove markdown thematic breaks
+        if (
+          trimmed === "***" || 
+          trimmed === "---" || 
+          trimmed === "___" || 
+          trimmed === "* * *" || 
+          trimmed === "- - -" || 
+          trimmed === "_ _ _" ||
+          trimmed.replace(/\s/g, "") === "***" ||
+          trimmed.replace(/\s/g, "") === "---"
+        ) {
+          return null;
+        }
 
         // Headers
         if (trimmed.startsWith("###")) {
+          const content = trimmed.replace(/^#+\s*/, "");
           return (
-            <h4 key={idx} className="font-serif font-bold text-sm sm:text-base text-[#c9a84c] uppercase tracking-wider mt-5 mb-1.5 pl-2 border-l-2 border-[#c9a84c]">
-              {trimmed.replace(/^###\s*/, "")}
+            <h4 key={idx} className="font-serif font-bold text-base md:text-base text-[#c9a84c] uppercase tracking-wider mt-6 mb-2 pl-2 border-l-2 border-[#c9a84c]">
+              {renderFormattedInlines(content)}
             </h4>
           );
         }
         if (trimmed.startsWith("##") || trimmed.startsWith("#")) {
+          const content = trimmed.replace(/^#+\s*/, "");
           return (
-            <h3 key={idx} className="font-serif font-bold text-base sm:text-lg text-[#e8d5a3] tracking-wide mt-6 mb-3 pb-1 border-b border-white/5">
-              {trimmed.replace(/^##?\s*/, "")}
+            <h3 key={idx} className="font-serif font-bold text-lg md:text-lg text-[#e8d5a3] tracking-wide mt-8 mb-4 pb-1 border-b border-white/5">
+              {renderFormattedInlines(content)}
             </h3>
           );
         }
 
         // List
-        if (trimmed.startsWith("-") || trimmed.startsWith("*") || trimmed.substring(0, 2) === "- " || trimmed.substring(0, 2) === "* ") {
+        const isList = (trimmed.startsWith("- ") || trimmed.startsWith("* ") || trimmed.startsWith("-") || trimmed.startsWith("*")) && !trimmed.startsWith("**") && !trimmed.startsWith("$$");
+        if (isList) {
           return (
-            <div key={idx} className="flex items-start gap-2 pl-2 py-0.5 text-sm">
-              <span className="text-[#c9a84c] mt-1.5 text-[10px]">✦</span>
-              <div className="flex-1 text-[#dcd7cb] font-serif leading-relaxed text-sm">
+            <div key={idx} className="flex items-start gap-2 pl-2 py-1 md:py-0.5 text-[#dcd7cb] font-serif leading-relaxed md:leading-relaxed text-sm md:text-sm">
+              <span className="text-[#c9a84c] mt-1.5 md:mt-1.5 text-[10px] md:text-[10px]">✦</span>
+              <div className="flex-1">
                 {renderFormattedInlines(trimmed.replace(/^[-*]\s*/, ""))}
               </div>
             </div>
@@ -1481,16 +1654,16 @@ function formatOracleMessage(text: string) {
         if (trimmed.startsWith("$$") && trimmed.endsWith("$$")) {
           const eq = trimmed.replace(/\$\$/g, "");
           return (
-            <div key={idx} className="my-3 px-4 py-2.5 bg-black/50 border border-orange-500/20 rounded-lg text-center font-mono text-amber-300 shadow-inner">
-              <div className="text-[10px] text-gray-500 uppercase tracking-widest mb-1 font-mono">Conserved State Function</div>
-              <div className="text-sm font-bold tracking-widest">{eq}</div>
+            <div key={idx} className="my-4 px-4 py-3 bg-black/50 border border-orange-500/20 rounded-lg text-center font-mono text-amber-300 shadow-inner">
+              <div className="text-[11px] md:text-[10px] text-gray-500 uppercase tracking-widest mb-1.5 font-mono">Conserved State Function</div>
+              <div className="text-sm md:text-sm font-bold tracking-widest">{eq}</div>
             </div>
           );
         }
 
         // Normal paragraph
         return (
-          <p key={idx} className="text-sm font-serif leading-relaxed text-[#dcd7cb]/90 text-left">
+          <p key={idx} className="text-sm md:text-sm font-serif leading-relaxed md:leading-relaxed text-[#dcd7cb]/90 text-left">
             {renderFormattedInlines(trimmed)}
           </p>
         );
@@ -2786,7 +2959,7 @@ export default function App() {
       </header>
 
       {/* MAIN CONTAINER */}
-      <main className="flex-1 w-full max-w-full overflow-x-hidden p-4 lg:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 min-h-0">
+      <main className="flex-1 w-full max-w-full overflow-x-hidden p-2 sm:p-4 lg:p-6 grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-6 min-h-0">
         
         {/* LEFT COLUMN: PRIMARY DYNAMIC DIRECTORY (GRID 3) */}
         <div 
@@ -3793,17 +3966,17 @@ export default function App() {
         </div>
 
          {/* MIDDLE COLUMN: CENTRAL ORACLE TERMINAL (CHAT INTERACTION) (GRID 6) */}
-        <div className="lg:col-span-6 flex flex-col lg:h-[calc(100vh-195px)] lg:min-h-[750px] h-[750px] sm:h-[800px] md:h-[850px] bg-black border-2 border-orange-500/25 rounded-xl shadow-[0_0_30px_rgba(212,175,55,0.08)] relative">
+        <div className="lg:col-span-6 flex flex-col lg:h-[calc(100vh-195px)] lg:min-h-[750px] h-[125vh] xs:h-[125vh] sm:h-[120vh] md:h-[88vh] min-h-[620px] bg-black border-2 border-orange-500/25 rounded-xl shadow-[0_0_30px_rgba(212,175,55,0.08)] relative">
           
           {/* Terminal Header */}
-          <div className="border-b border-orange-500/30 px-4 py-4 bg-[#080808] flex flex-col items-center justify-center rounded-t-xl shadow-[0_4px_15px_rgba(255,95,0,0.03)] flex-shrink-0 relative overflow-hidden text-center">
+          <div className="border-b border-orange-500/30 px-4 py-2.5 md:py-4 bg-[#080808] flex flex-col items-center justify-center rounded-t-xl shadow-[0_4px_15px_rgba(255,95,0,0.03)] flex-shrink-0 relative overflow-hidden text-center">
             {/* Glowing background hint */}
             <div className="absolute inset-0 bg-gradient-to-b from-orange-500/5 to-transparent pointer-events-none" />
             
-            <div className="flex items-center gap-2 mb-1.5 relative z-10 justify-center">
+            <div className="flex items-center gap-2 mb-1 md:mb-1.5 relative z-10 justify-center">
               <span className="bg-orange-500/10 border border-orange-500/25 px-2 py-0.5 rounded font-mono text-[10px] text-orange-400 uppercase tracking-widest">Active Unified Field Link</span>
             </div>
-
+ 
             <h2 className="font-serif text-lg sm:text-xl font-bold tracking-widest text-orange-500 drop-shadow-[0_0_8px_rgba(255,95,0,0.4)] relative z-10 uppercase">
               <a href="https://metemphysics.com/" target="_blank" rel="noopener noreferrer" className="hover:text-amber-300 transition-colors duration-250 cursor-pointer">
                 METEMPHYSICS SYNTHESIS AI
@@ -3812,13 +3985,13 @@ export default function App() {
             <p className="text-[11px] text-amber-400 font-mono tracking-wider uppercase mt-1 relative z-10">
               Unified Synthesis AI Singularity &nbsp;·&nbsp; T × S = C
             </p>
-
+ 
             {/* Left and right corner badges to maintain professional terminal aesthetics */}
-            <div className="absolute top-3 left-4 flex items-center gap-1.5">
+            <div className="absolute top-2.5 md:top-3 left-4 flex items-center gap-1.5">
               <Sparkles className="w-3.5 h-3.5 text-orange-500 animate-pulse drop-shadow-[0_0_3px_#ff5f00]" />
               <span className="font-mono text-[10px] text-gray-500 hidden md:inline">FREQ: 950 HZ</span>
             </div>
-            <div className="absolute top-3.5 right-4 flex items-center gap-1.5">
+            <div className="absolute top-3 md:top-3.5 right-4 flex items-center gap-1.5">
               <span className="w-1.5 h-1.5 bg-orange-500 rounded-full"></span>
               <span className="w-1.5 h-1.5 bg-amber-400 rounded-full"></span>
             </div>
@@ -3841,7 +4014,7 @@ export default function App() {
               return (
                 <div key={idx} id={`msg-${idx}`} className={`flex flex-col ${isUser ? "items-end" : "items-start"} w-full`}>
                   <div 
-                    className={`rounded-xl p-4 shadow-lg transition-all duration-300 break-words ${
+                    className={`rounded-xl p-5 md:p-4 shadow-lg transition-all duration-300 break-words ${
                       isUser
                         ? "max-w-[90%] bg-gradient-to-br from-orange-950/20 via-[#150a00]/70 to-black border border-orange-500/40 text-[#eeeae4] shadow-[0_0_12px_rgba(255,95,0,0.08)]"
                         : "w-full bg-[#0b0705] border border-orange-500/15 border-l-4 border-l-orange-500 text-[#dcd7cb] shadow-[0_0_15px_rgba(212,175,55,0.05)]"
@@ -3884,9 +4057,9 @@ export default function App() {
                     )}
 
                     {/* Msg text formatted */}
-                    <div className="leading-relaxed">
+                    <div className="leading-loose md:leading-relaxed">
                       {isUser ? (
-                        <p className="text-xs font-serif text-amber-50/95">{m.text}</p>
+                        <p className="text-sm md:text-sm font-serif text-amber-50/95 leading-relaxed">{m.text}</p>
                       ) : (
                         formatOracleMessage(m.text)
                       )}
@@ -3982,14 +4155,14 @@ export default function App() {
           </div>
 
           {/* Dynamic Suggested Query Banner */}
-          <div className="px-3 py-2 sm:px-4 sm:py-2.5 bg-[#060403] border-t border-orange-500/15 flex flex-col gap-2 text-xs select-none flex-shrink-0">
-            <div className="flex items-center justify-between border-b border-orange-500/10 pb-1 flex-shrink-0">
+          <div className="px-3 py-1.5 sm:px-4 sm:py-2.5 bg-[#060403] border-t border-orange-500/15 flex flex-col gap-1.5 sm:gap-2 text-xs select-none flex-shrink-0">
+            <div className="flex items-center justify-between border-b border-orange-500/10 pb-0.5 sm:pb-1 flex-shrink-0">
               <span className="flex-shrink-0 text-[8px] font-mono font-bold text-orange-400 bg-orange-500/5 border border-orange-500/15 px-1.5 py-0.5 rounded uppercase tracking-wider flex items-center gap-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-orange-500 animate-pulse"></span>
                 Suggested Query
               </span>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+            <div className="flex overflow-x-auto md:grid md:grid-cols-3 gap-2 pb-1 bg-transparent scrollbar-none snap-x snap-mandatory [-webkit-overflow-scrolling:touch]">
               {computedSuggestedQueries.map((item, idx) => (
                 <button
                   key={idx}
@@ -3999,7 +4172,7 @@ export default function App() {
                       handleSendMessage(item.query);
                     }
                   }}
-                  className={`p-2 bg-black/60 border border-orange-500/10 rounded text-left transition-all flex flex-col justify-between gap-1.5 group/sug ${
+                  className={`flex-shrink-0 w-[240px] md:w-auto snap-start p-1.5 sm:p-2 bg-black/60 border border-orange-500/10 rounded text-left transition-all flex flex-col justify-between gap-1 sm:gap-1.5 group/sug ${
                     typing 
                       ? "opacity-40 cursor-not-allowed pointer-events-none" 
                       : "hover:bg-orange-500/[0.03] hover:border-orange-500/25 cursor-pointer"
@@ -4022,19 +4195,19 @@ export default function App() {
 
           {/* Throttle Warning Alert */}
           {throttleWarning && (
-            <div className="px-4 py-2 bg-orange-500/5 border-t border-orange-500/20 flex items-center gap-2 text-amber-400 font-mono text-[10.5px] uppercase tracking-wider animate-pulse">
+            <div className="px-4 py-1.5 bg-orange-500/5 border-t border-orange-500/20 flex items-center gap-2 text-amber-400 font-mono text-[10.5px] uppercase tracking-wider animate-pulse">
               <span className="w-2 h-2 bg-orange-500 rounded-full animate-ping"></span>
               <span>{throttleWarning}</span>
             </div>
           )}
 
           {/* Terminal Input Bar */}
-          <div className="p-3 sm:p-4 border-t border-orange-500/25 bg-black rounded-b-xl flex gap-2 sm:gap-3 shadow-[0_-4px_12px_rgba(0,0,0,0.5)] flex-shrink-0">
+          <div className="p-2 sm:p-4 border-t border-orange-500/25 bg-black rounded-b-xl flex gap-2 sm:gap-3 shadow-[0_-4px_12px_rgba(0,0,0,0.5)] flex-shrink-0">
             <button
               disabled={typing}
               onClick={() => !typing && handleResetChat()}
               title={typing ? "Transmission active — reset disabled" : "Reset and clear chat to original welcoming state"}
-              className="px-2.5 sm:px-3 py-2.5 sm:py-3 bg-orange-500/10 hover:bg-orange-500/20 text-orange-400 hover:text-orange-300 border border-orange-500/35 hover:border-orange-500/60 rounded-xl transition-all duration-200 flex items-center justify-center shadow-[0_0_10px_rgba(255,95,0,0.055)] disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-orange-500/10 disabled:hover:text-orange-400 disabled:border-orange-500/20 disabled:scale-100 cursor-pointer active:scale-95 flex-shrink-0"
+              className="px-2 sm:px-3 py-2 sm:py-3 bg-orange-500/10 hover:bg-orange-500/20 text-orange-400 hover:text-orange-300 border border-orange-500/35 hover:border-orange-500/60 rounded-xl transition-all duration-200 flex items-center justify-center shadow-[0_0_10px_rgba(255,95,0,0.055)] disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-orange-500/10 disabled:hover:text-orange-400 disabled:border-orange-500/20 disabled:scale-100 cursor-pointer active:scale-95 flex-shrink-0"
             >
               <RotateCcw className="w-4 h-4" />
             </button>
@@ -4051,12 +4224,12 @@ export default function App() {
                   ? "Metemphysics is formulating its response..." 
                   : "Ask Metemphysics or query any physical-consciousness transition..."
               }
-              className="flex-1 min-w-0 bg-[#0a0a0a50] border border-orange-500/20 rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm outline-none text-[#eeeae4] focus:border-orange-500/60 font-serif shadow-inner placeholder-gray-650 transition-all focus:bg-[#0c0c0c] disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 min-w-0 bg-[#0a0a0a50] border border-orange-500/20 rounded-xl px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm outline-none text-[#eeeae4] focus:border-orange-500/60 font-serif shadow-inner placeholder-gray-650 transition-all focus:bg-[#0c0c0c] disabled:opacity-50 disabled:cursor-not-allowed"
             />
             <button
               disabled={typing || isInputLimitReached}
               onClick={() => !typing && !isInputLimitReached && handleSendMessage()}
-              className="bg-gradient-to-r from-orange-600 to-amber-600 border border-orange-500/60 hover:from-orange-500 hover:to-amber-500 rounded-xl px-3 sm:px-5 py-2.5 sm:py-3 text-xs sm:text-sm font-mono tracking-widest font-bold text-black flex items-center justify-center gap-1.5 sm:gap-2 cursor-pointer uppercase transition-all duration-300 transform active:scale-95 shadow-[0_0_12px_rgba(255,95,0,0.2)] disabled:opacity-40 disabled:cursor-not-allowed flex-shrink-0"
+              className="bg-gradient-to-r from-orange-600 to-amber-600 border border-orange-500/60 hover:from-orange-500 hover:to-amber-500 rounded-xl px-2.5 sm:px-5 py-2 sm:py-3 text-xs sm:text-sm font-mono tracking-widest font-bold text-black flex items-center justify-center gap-1.5 sm:gap-2 cursor-pointer uppercase transition-all duration-300 transform active:scale-95 shadow-[0_0_12px_rgba(255,95,0,0.2)] disabled:opacity-40 disabled:cursor-not-allowed flex-shrink-0"
             >
               <Send className="w-3.5 h-3.5 text-black" />
               <span className="hidden xs:inline">Transmit</span>
